@@ -1,0 +1,2209 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>契約変更・請求検証管理システム</title>
+  <style>
+:root {
+  --primary: #c92a2a;
+  --primary-hover: #a61e1e;
+  --accent-gold: #c9a23e;
+  --accent-gold-hover: #b8860b;
+  --bg-main: #1a0a0a;
+  --bg-card: #2a1515;
+  --bg-sidebar: #1f0d0d;
+  --bg-hover: #3a2020;
+  --border: #5a3030;
+  --border-light: #7a4040;
+  --text: #f5f5f5;
+  --text-muted: #b8b8b8;
+  --text-disabled: #6a6a6a;
+  --top-bar-bg: #0f0505;
+  --top-bar-border: #4a2020;
+  --success: #4caf50;
+  --warning: #ff9800;
+  --error: #f44336;
+  --info: #2196f3;
+  --shadow: rgba(0, 0, 0, 0.5);
+  --overlay: rgba(0, 0, 0, 0.7);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text);
+  line-height: 1.4;
+  font-size: 13px;
+}
+
+a {
+  color: var(--accent-gold);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--accent-gold-hover);
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+.app-shell {
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+}
+
+.top-bar {
+  background-color: var(--top-bar-bg);
+  border-bottom: 1px solid var(--top-bar-border);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  gap: 20px;
+}
+
+.top-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.system-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--accent-gold);
+  letter-spacing: 0.3px;
+}
+
+.top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-badge {
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 4px 8px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+}
+
+.logout-btn {
+  padding: 6px 12px;
+  background-color: var(--primary);
+  color: var(--text);
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.logout-btn:hover {
+  background-color: var(--primary-hover);
+}
+
+.main-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 240px;
+  background-color: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.sidebar-section {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-section:last-child {
+  border-bottom: none;
+}
+
+.sidebar-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 8px 16px 6px;
+}
+
+.nav-item {
+  display: block;
+  padding: 8px 16px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  border-left: 2px solid transparent;
+  font-size: 13px;
+}
+
+.nav-item:hover {
+  background-color: var(--bg-hover);
+  color: var(--text);
+}
+
+.nav-item.aivic-active {
+  background-color: var(--bg-hover);
+  border-left-color: var(--primary);
+  color: var(--accent-gold);
+  font-weight: 500;
+}
+
+.content-area {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+[data-aivic-panel] {
+  padding: 20px;
+  min-height: 100%;
+}
+
+.panel-header {
+  margin-bottom: 20px;
+}
+
+.panel-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.panel-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.toolbar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.search-box {
+  flex: 1;
+  min-width: 200px;
+  padding: 8px 12px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.search-box::placeholder {
+  color: var(--text-disabled);
+}
+
+.btn {
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background-color: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.btn:hover {
+  background-color: var(--bg-hover);
+  border-color: var(--border-light);
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: var(--text);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+.btn-accent {
+  background-color: var(--accent-gold);
+  border-color: var(--accent-gold);
+  color: var(--bg-main);
+}
+
+.btn-accent:hover {
+  background-color: var(--accent-gold-hover);
+  border-color: var(--accent-gold-hover);
+}
+
+.table-wrapper {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+thead {
+  background-color: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+tbody tr:hover {
+  background-color: var(--bg-hover);
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.badge-success {
+  background-color: rgba(76, 175, 80, 0.15);
+  color: var(--success);
+}
+
+.badge-warning {
+  background-color: rgba(255, 152, 0, 0.15);
+  color: var(--warning);
+}
+
+.badge-error {
+  background-color: rgba(244, 67, 54, 0.15);
+  color: var(--error);
+}
+
+.badge-info {
+  background-color: rgba(33, 150, 243, 0.15);
+  color: var(--info);
+}
+
+.card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.card-header {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.card-body {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.kpi-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 16px;
+  text-align: center;
+}
+
+.kpi-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 8px;
+}
+
+.kpi-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--accent-gold);
+  margin-bottom: 4px;
+}
+
+.kpi-change {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  padding: 8px 12px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  font-size: 12px;
+}
+
+.form-input::placeholder, .form-textarea::placeholder {
+  color: var(--text-disabled);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.stepper {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  align-items: center;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.step-number {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--bg-card);
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.step.active .step-number {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: var(--text);
+}
+
+.step.completed .step-number {
+  background-color: var(--success);
+  border-color: var(--success);
+  color: var(--text);
+}
+
+.step-connector {
+  flex: 1;
+  height: 2px;
+  background-color: var(--border);
+  margin: 0 4px;
+}
+
+.step.completed .step-connector {
+  background-color: var(--success);
+}
+
+.split-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  height: 100%;
+}
+
+.split-left {
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.split-right {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.list-item {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.list-item:hover {
+  background-color: var(--bg-hover);
+  border-color: var(--border-light);
+}
+
+.list-item.active {
+  background-color: var(--bg-hover);
+  border-color: var(--primary);
+}
+
+.list-item-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.list-item-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.timeline {
+  position: relative;
+  padding-left: 24px;
+}
+
+.timeline-item {
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: -24px;
+  top: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--primary);
+  border: 2px solid var(--bg-main);
+}
+
+.timeline-content {
+  font-size: 12px;
+  color: var(--text);
+}
+
+.timeline-date {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--overlay);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 20px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  justify-content: flex-end;
+}
+
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.tab {
+  padding: 10px 16px;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tab.active {
+  border-bottom-color: var(--primary);
+  color: var(--accent-gold);
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin-bottom: 16px;
+}
+
+.comparison-table th {
+  background-color: var(--bg-card);
+  padding: 10px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.comparison-table td {
+  padding: 10px;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.comparison-table tr:hover {
+  background-color: var(--bg-hover);
+}
+
+.diff-added {
+  background-color: rgba(76, 175, 80, 0.1);
+}
+
+.diff-removed {
+  background-color: rgba(244, 67, 54, 0.1);
+}
+
+.diff-changed {
+  background-color: rgba(255, 152, 0, 0.1);
+}
+
+.status-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.status-pending {
+  background-color: var(--warning);
+}
+
+.status-approved {
+  background-color: var(--success);
+}
+
+.status-rejected {
+  background-color: var(--error);
+}
+
+.status-processing {
+  background-color: var(--info);
+}
+
+.action-menu {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.action-btn {
+  padding: 4px 8px;
+  background-color: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 11px;
+  transition: all 0.15s;
+}
+
+.action-btn:hover {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: var(--text);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+}
+
+.empty-state-icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.empty-state-text {
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) var(--bg-main);
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: var(--bg-main);
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: var(--border-light);
+}
+  </style>
+  <script>
+window.AIVIC_API_URL = "https://mkwmoife37uqyv4zhy4yhweozq0oddxn.lambda-url.us-east-1.on.aws/";
+window.AIVIC_APP_ID = "session-1781935010162";
+window.AIVIC_SYSTEM_NAME = "契約変更・請求検証管理システム";
+window.AIVIC_TABLES = [{"tableName":"契約","purpose":"顧客企業との契約情報を一元管理し、契約の締結、更新、ステータス追跡、成果管理を支援するマスタテーブル","columns":[{"name":"契約ID","type":"uuid","required":true,"description":"契約の一意識別子"},{"name":"顧客企業ID","type":"uuid","required":true,"description":"顧客企業テーブルへの外部キー"},{"name":"契約書ID","type":"uuid","required":false,"description":"契約書テーブルへの外部キー"},{"name":"提案資料ID","type":"uuid","required":false,"description":"提案資料テーブルへの外部キー"},{"name":"契約名","type":"varchar(100)","required":true,"description":"契約の名称"},{"name":"契約ステータス","type":"varchar(100)","required":true,"description":"契約状態（提案中/承認待ち/契約済/完了/終了等）"},{"name":"契約開始日","type":"timestamp","required":true,"description":"契約の開始日"},{"name":"契約終了日","type":"timestamp","required":true,"description":"契約の終了日"},{"name":"契約金額","type":"integer","required":true,"description":"契約金額（円）"},{"name":"契約内容","type":"text","required":false,"description":"契約の詳細内容"},{"name":"成果目標","type":"text","required":false,"description":"契約に基づく成果目標"},{"name":"作成日時","type":"timestamp","required":true,"description":"契約レコード作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"契約レコード最終更新日時"},{"name":"作成者","type":"varchar(100)","required":true,"description":"契約レコード作成者"},{"name":"更新者","type":"varchar(100)","required":false,"description":"契約レコード最終更新者"}]},{"tableName":"ユーザー","purpose":"営業データ品質管理・請求自動化システムのユーザー管理。ユーザー認証、権限管理、監査ログ記録に必要なマスターテーブル","columns":[{"name":"ユーザーID","type":"uuid","required":true,"description":"ユーザーの一意識別子"},{"name":"ユーザー名","type":"varchar(100)","required":true,"description":"ログイン用のユーザー名"},{"name":"メールアドレス","type":"varchar(100)","required":true,"description":"ユーザーのメールアドレス"},{"name":"パスワードハッシュ","type":"varchar(255)","required":true,"description":"ハッシュ化されたパスワード"},{"name":"氏名","type":"varchar(100)","required":true,"description":"ユーザーの氏名"},{"name":"部門","type":"varchar(100)","required":false,"description":"ユーザーが属する部門"},{"name":"役割","type":"varchar(50)","required":true,"description":"ユーザーの役割（管理者/営業/品質管理者/請求担当者等）"},{"name":"ステータス","type":"varchar(20)","required":true,"description":"ユーザーステータス（有効/無効/休止）"},{"name":"最終ログイン日時","type":"timestamp","required":false,"description":"最後にログインした日時"},{"name":"作成日時","type":"timestamp","required":true,"description":"ユーザーレコード作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"ユーザーレコード最終更新日時"},{"name":"作成者","type":"varchar(100)","required":true,"description":"ユーザーレコード作成者"},{"name":"更新者","type":"varchar(100)","required":false,"description":"ユーザーレコード最終更新者"}]},{"tableName":"契約履歴","purpose":"契約の変更履歴を記録し、契約変更・請求検証管理システムにおいて変更内容の追跡と監査証跡を提供する","columns":[{"name":"契約履歴ID","type":"uuid","required":true,"description":"契約履歴レコードの一意識別子"},{"name":"契約ID","type":"uuid","required":true,"description":"親テーブル「契約」への外部キー"},{"name":"変更種別","type":"varchar(100)","required":true,"description":"変更の種類（例：新規作成、更新、キャンセル、更新日変更）"},{"name":"変更前値","type":"text","required":false,"description":"変更前の値（JSON形式で複数フィールドを保持する場合はテキスト化）"},{"name":"変更後値","type":"text","required":false,"description":"変更後の値（JSON形式で複数フィールドを保持する場合はテキスト化）"},{"name":"変更フィールド名","type":"varchar(100)","required":false,"description":"変更されたフィールド名（例：契約金額、開始日、ステータス）"},{"name":"請求検証ステータス","type":"varchar(100)","required":false,"description":"この変更に関連する請求検証の状態（例：未検証、検証済み、不一致）"},{"name":"作成日時","type":"timestamp","required":true,"description":"履歴レコード作成日時"},{"name":"作成者ID","type":"uuid","required":true,"description":"ユーザーテーブルへの外部キー、変更を実施したユーザー"},{"name":"備考","type":"text","required":false,"description":"変更に関する追加情報やコメント"}]},{"tableName":"請求","purpose":"契約に基づく請求情報を管理し、請求額の検証、支払い状況の追跡、請求履歴の記録を行う","columns":[{"name":"請求ID","type":"uuid","required":true,"description":"請求の一意識別子"},{"name":"契約ID","type":"uuid","required":true,"description":"関連する契約の識別子（契約テーブルへの外部キー）"},{"name":"請求年月","type":"varchar(7)","required":true,"description":"請求対象の年月（YYYY-MM形式）"},{"name":"請求金額","type":"integer","required":true,"description":"請求額（円単位）"},{"name":"請求日","type":"timestamp","required":true,"description":"請求を発行した日時"},{"name":"支払期限日","type":"timestamp","required":true,"description":"支払い期限"},{"name":"請求ステータス","type":"varchar(20)","required":true,"description":"請求状態（未請求/請求済/支払済/延滞/キャンセル）"},{"name":"支払済金額","type":"integer","required":false,"description":"実際に支払われた金額（円単位）"},{"name":"支払日","type":"timestamp","required":false,"description":"実際の支払い日時"},{"name":"摘要","type":"text","required":false,"description":"請求内容の詳細説明や備考"},{"name":"作成日時","type":"timestamp","required":true,"description":"請求レコード作成日時"},{"name":"作成者ID","type":"uuid","required":true,"description":"請求を作成したユーザーの識別子（ユーザーテーブルへの外部キー）"},{"name":"更新日時","type":"timestamp","required":true,"description":"請求レコード最終更新日時"},{"name":"更新者ID","type":"uuid","required":true,"description":"請求を最後に更新したユーザーの識別子（ユーザーテーブルへの外部キー）"}]},{"tableName":"請求明細","purpose":"請求書に紐付く個別の明細行を管理し、契約内容と実績の対応関係を記録する","columns":[{"name":"請求明細ID","type":"uuid","required":true,"description":"請求明細の一意識別子"},{"name":"請求ID","type":"uuid","required":true,"description":"親テーブル(請求)への外部キー"},{"name":"契約ID","type":"uuid","required":true,"description":"対象契約への外部キー"},{"name":"契約行ID","type":"uuid","required":false,"description":"契約内の特定の行アイテムへの参照（契約に複数行がある場合）"},{"name":"明細種別","type":"varchar(100)","required":true,"description":"基本料金/従量料金/追加サービス/調整等の分類"},{"name":"説明","type":"text","required":false,"description":"明細の詳細説明"},{"name":"数量","type":"integer","required":true,"description":"請求対象の数量"},{"name":"単価","type":"integer","required":true,"description":"単位あたりの金額（整数、最小単位は1円）"},{"name":"金額","type":"integer","required":true,"description":"数量×単価の合計金額"},{"name":"税率","type":"integer","required":false,"description":"適用税率（パーセンテージ、例：10）"},{"name":"税額","type":"integer","required":false,"description":"計算された税額"},{"name":"対象期間開始日","type":"timestamp","required":false,"description":"この明細が適用される期間の開始日"},{"name":"対象期間終了日","type":"timestamp","required":false,"description":"この明細が適用される期間の終了日"},{"name":"検証ステータス","type":"varchar(100)","required":true,"description":"未検証/検証済み/差異検出/承認待ち等の状態"},{"name":"差異理由","type":"text","required":false,"description":"契約との差異が検出された場合の理由"},{"name":"作成日時","type":"timestamp","required":true,"description":"明細の作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"明細の最終更新日時"},{"name":"作成者","type":"uuid","required":true,"description":"作成したユーザーへの外部キー"},{"name":"更新者","type":"uuid","required":false,"description":"最後に更新したユーザーへの外部キー"}]},{"tableName":"顧客","purpose":"顧客マスタ。契約・請求の対象となる顧客情報を一元管理し、契約変更・請求検証時の顧客属性参照を支援する。","columns":[{"name":"顧客ID","type":"uuid","required":true,"description":"顧客の一意識別子。主キー。"},{"name":"顧客名","type":"varchar(100)","required":true,"description":"顧客の正式名称。請求書・契約書に記載される名前。"},{"name":"顧客名カナ","type":"varchar(100)","required":false,"description":"顧客名のカナ表記。検索・ソート用。"},{"name":"顧客区分","type":"varchar(100)","required":true,"description":"顧客分類。例：法人/個人/代理店。契約・請求ルール判定に使用。"},{"name":"請求先住所","type":"text","required":false,"description":"請求書送付先住所。"},{"name":"請求先電話番号","type":"varchar(100)","required":false,"description":"請求先の連絡先電話番号。"},{"name":"請求先メールアドレス","type":"varchar(100)","required":false,"description":"請求先のメールアドレス。電子請求対応時に使用。"},{"name":"担当者名","type":"varchar(100)","required":false,"description":"顧客側の主要担当者名。"},{"name":"支払条件","type":"varchar(100)","required":false,"description":"支払期限。例：月末締め翌月末払い。請求検証時に参照。"},{"name":"ステータス","type":"varchar(100)","required":true,"description":"顧客ステータス。例：有効/休止/解約。契約・請求対象判定に使用。"},{"name":"作成日時","type":"timestamp","required":true,"description":"顧客レコード作成日時。"},{"name":"更新日時","type":"timestamp","required":true,"description":"顧客レコード最終更新日時。"},{"name":"作成者","type":"uuid","required":true,"description":"顧客レコード作成者のユーザーID。ユーザーテーブルへの外部キー。"},{"name":"更新者","type":"uuid","required":true,"description":"顧客レコード最終更新者のユーザーID。ユーザーテーブルへの外部キー。"}]},{"tableName":"操作ログ","purpose":"契約変更・請求検証管理システムにおけるユーザーの全操作を記録し、監査証跡とシステム動作の追跡を実現する","columns":[{"name":"操作ログID","type":"uuid","required":true,"description":"操作ログの一意識別子"},{"name":"ユーザーID","type":"uuid","required":true,"description":"操作を実行したユーザーの識別子（ユーザーテーブルへの外部キー）"},{"name":"操作種別","type":"varchar(100)","required":true,"description":"操作の種類（作成/更新/削除/参照/承認/却下等）"},{"name":"対象テーブル","type":"varchar(100)","required":true,"description":"操作対象のテーブル名（契約/請求/請求明細等）"},{"name":"対象レコードID","type":"uuid","required":true,"description":"操作対象のレコード識別子"},{"name":"変更前値","type":"text","required":false,"description":"更新操作時の変更前の値（JSON形式で複数フィールド対応）"},{"name":"変更後値","type":"text","required":false,"description":"更新操作時の変更後の値（JSON形式で複数フィールド対応）"},{"name":"操作理由","type":"text","required":false,"description":"操作の理由やコメント"},{"name":"IPアドレス","type":"varchar(100)","required":false,"description":"操作を実行したクライアントのIPアドレス"},{"name":"操作日時","type":"timestamp","required":true,"description":"操作が実行された日時"},{"name":"作成日時","type":"timestamp","required":true,"description":"ログレコードが作成された日時"}]}];
+window.AIVIC_PRESET_SEED = {"契約":[{"契約ID":"rec-001","顧客企業ID":"rec-cust-0042","契約書ID":"rec-doc-0156","提案資料ID":"rec-prop-0089","契約名":"2024年度 精密部品年間供給契約","契約ステータス":"契約済","契約開始日":"2024-04-01T00:00:00Z","契約終了日":"2025-03-31T23:59:59Z","契約金額":48500000,"契約内容":"自動車用精密部品（ギアボックス部品、センサーマウント、制御弁ユニット）の年間供給契約。月間供給量は平均2,500ユニット。品質基準はJIS Q 9001に準拠し、納期は発注後15営業日以内。","成果目標":"年間納入実績50,000ユニット以上、不良率0.5%以下、納期遵守率99%以上、顧客満足度スコア85点以上","作成日時":"2024-02-15T10:30:45Z","更新日時":"2024-03-28T14:22:10Z","作成者":"佐藤健一","更新者":"鈴木美咲"},{"契約ID":"rec-20250115-001","顧客企業ID":"cust-rec-2024-0847","契約書ID":"doc-rec-2025-0312","提案資料ID":"prop-rec-2024-1156","契約名":"クラウド基幹システムSaaS 3年間ライセンス提供契約","契約ステータス":"承認待ち","契約開始日":"2025-04-01T00:00:00Z","契約終了日":"2028-03-31T23:59:59Z","契約金額":54000000,"契約内容":"月額1,500万円のクラウド基幹システムSaaSサービスを3年間提供。ユーザー数500名まで利用可能。24時間サポート、月次レポーティング、システムアップデートを含む。","成果目標":"顧客の業務効率化により年間30%のコスト削減を実現。システム稼働率99.9%以上の維持。ユーザー満足度スコア80点以上の達成。","作成日時":"2025-01-15T09:30:00Z","更新日時":"2025-01-15T09:30:00Z","作成者":"山田花子","更新者":"山田花子"},{"契約ID":"rec-001","顧客企業ID":"rec-cust-042","契約書ID":"rec-doc-015","提案資料ID":"rec-prop-028","契約名":"デジタル変革推進プロジェクト - 業務プロセス最適化コンサルティング","契約ステータス":"提案中","契約開始日":"2025-04-01T00:00:00Z","契約終了日":"2025-09-30T23:59:59Z","契約金額":4500000,"契約内容":"当社は貴社の営業・事務部門における業務プロセスの現状分析を実施し、効率化提案書を作成いたします。現地ヒアリング（全3回）、業務フロー図作成、改善案の提示までを範囲とします。","成果目標":"業務プロセスの可視化と改善提案を完了し、年間業務時間削減率15%以上の施策案を提示する。","作成日時":"2024-12-15T09:30:00Z","更新日時":"2024-12-15T09:30:00Z","作成者":"山田花子","更新者":"山田花子"},{"契約ID":"rec-001","顧客企業ID":"rec-cust-042","契約書ID":"rec-doc-156","提案資料ID":"rec-prop-089","契約名":"マーケティング支援サービス契約（2025年度更新版）","契約ステータス":"契約済","契約開始日":"2025-04-01T00:00:00Z","契約終了日":"2026-03-31T23:59:59Z","契約金額":4800000,"契約内容":"既存顧客向けマーケティング支援サービスの継続提供。デジタル広告運用、SNS管理、月次レポート作成を含む。前年度比20%の機能拡張により、インフルエンサー施策とコンテンツ制作支援を追加。","成果目標":"月間Webサイト訪問数を前年比35%増加させ、リード獲得数を月平均150件以上達成。SNS フォロワー数を12,000人以上に拡大。","作成日時":"2024-12-15T10:30:00Z","更新日時":"2025-01-22T14:45:00Z","作成者":"佐藤花子","更新者":"鈴木健一"},{"契約ID":"rec-001","顧客企業ID":"cust-042","契約書ID":"doc-015","提案資料ID":"prop-008","契約名":"クラウド基盤サービス試験導入契約","契約ステータス":"契約済","契約開始日":"2024-11-01T00:00:00Z","契約終了日":"2025-04-30T23:59:59Z","契約金額":980000,"契約内容":"当社クラウド基盤サービスの6ヶ月間の試験導入。対象システムは顧客企業の基幹業務システムとし、本番環境への段階的な移行を実施。サポートは平日9:00-18:00の範囲で提供。","成果目標":"システム稼働率99.5%以上の達成、既存システムからの移行完了率90%以上、ユーザー満足度スコア3.5/5.0以上","作成日時":"2024-10-15T14:32:00Z","更新日時":"2024-11-01T09:15:00Z","作成者":"営業部 山田花子","更新者":"契約管理部 佐藤次郎"},{"契約ID":"rec-001","顧客企業ID":"rec-cust-042","契約書ID":"rec-doc-156","提案資料ID":"rec-prop-089","契約名":"基幹システム保守サービス契約（2022年度～2024年度）","契約ステータス":"完了","契約開始日":"2022-04-01T00:00:00Z","契約終了日":"2025-03-31T23:59:59Z","契約金額":7200000,"契約内容":"顧客企業の基幹システムに対する定期保守、障害対応、セキュリティパッチ適用、月次レポート提供を含む包括的な保守サービス。対応時間は営業日9時～18時、緊急対応は24時間対応。","成果目標":"システム稼働率99.5%以上の維持、月平均対応時間4時間以内、年間セキュリティインシデント件数ゼロ、顧客満足度調査スコア4.5以上（5段階評価）","作成日時":"2022-02-15T10:30:00Z","更新日時":"2025-03-28T14:20:00Z","作成者":"鈴木花子","更新者":"佐藤次郎"},{"契約ID":"rec-001","顧客企業ID":"rec-cust-0847","契約書ID":"rec-doc-2341","提案資料ID":"rec-prop-5629","契約名":"令和6年度 厚生労働省統計調査システム保守運用業務","契約ステータス":"承認待ち","契約開始日":"2025-04-01T00:00:00Z","契約終了日":"2026-03-31T23:59:59Z","契約金額":47500000,"契約内容":"厚生労働省が運用する統計調査システムの保守運用業務。システムの24時間監視、障害対応、セキュリティパッチ適用、月次レポート作成を含む。納期は厳格であり、障害発生時は4時間以内の初期対応が必須。","成果目標":"システム稼働率99.9%以上の維持、障害対応時間平均2時間以内、月次セキュリティ監査完了率100%","作成日時":"2024-12-15T09:30:00Z","更新日時":"2025-01-20T14:15:00Z","作成者":"鈴木美咲","更新者":"佐藤健一"},{"契約ID":"rec-001","顧客企業ID":"rec-101","契約書ID":"rec-201","提案資料ID":"rec-301","契約名":"2024年度システム保守・運用サービス契約","契約ステータス":"契約済","契約開始日":"2024-04-01T00:00:00Z","契約終了日":"2025-03-31T23:59:59Z","契約金額":12000000,"契約内容":"グループ会社内における既存システムの日次保守運用、定期メンテナンス、トラブル対応、月次レポート作成を含む。営業時間内での電話サポート対応、緊急時の24時間対応体制を整備する。","成果目標":"システム稼働率99.5%以上の維持、月次トラブル対応時間平均2時間以内、四半期ごとのパフォーマンス改善提案3件以上","作成日時":"2024-02-15T09:30:00Z","更新日時":"2024-03-28T14:45:00Z","作成者":"山田花子","更新者":"佐藤次郎"},{"契約ID":"rec-001","顧客企業ID":"rec-c-042","契約書ID":"rec-doc-015","提案資料ID":"rec-prop-008","契約名":"システム保守運用サービス契約（2023年度）","契約ステータス":"終了","契約開始日":"2023-04-01T00:00:00Z","契約終了日":"2024-03-31T23:59:59Z","契約金額":2400000,"契約内容":"既存基幹システムの日次保守運用、月次レポート作成、障害対応（24時間以内）、セキュリティパッチ適用を含む。","成果目標":"システム稼働率99.5%以上の維持、月次障害件数3件以下、年間セキュリティインシデント0件","作成日時":"2023-03-15T09:30:00Z","更新日時":"2024-04-10T14:22:00Z","作成者":"山田花子","更新者":"鈴木一郎"},{"契約ID":"rec-001","顧客企業ID":"cust-0847","契約書ID":"doc-0156","提案資料ID":"prop-0203","契約名":"デジタルマーケティング支援サービス パイロットプログラム","契約ステータス":"提案中","契約開始日":"2025-02-01T00:00:00Z","契約終了日":"2025-04-30T23:59:59Z","契約金額":500000,"契約内容":"新規開拓企業向けのデジタルマーケティング支援サービス。SNS運用コンサルティング、月次レポート作成、施策提案を含む。3ヶ月間のパイロット期間として実施し、本格導入の可否を判断する。","成果目標":"SNS フォロワー数 30% 増加、月間ウェブサイトアクセス数 50% 増加、リード獲得数 月平均 15 件以上","作成日時":"2024-12-15T09:30:00Z","更新日時":"2024-12-15T09:30:00Z","作成者":"山田花子","更新者":"山田花子"}],"ユーザー":[{"ユーザーID":"rec-001","ユーザー名":"admin_tanaka","メールアドレス":"tanaka.admin@company.jp","パスワードハッシュ":"$2b$12$8qJ9kL2mN3pQ4rS5tU6vW7xY8zA9bB0cD1eF2gH3iJ4kL5mN6oP7q","氏名":"田中太郎","部門":"情報システム部","役割":"管理者","ステータス":"有効","最終ログイン日時":"2025-01-15T09:30:45Z","作成日時":"2024-04-01T08:00:00Z","更新日時":"2025-01-15T09:30:45Z","作成者":"初期設定","更新者":"田中太郎"},{"ユーザーID":"rec-001","ユーザー名":"tanaka.taro","メールアドレス":"tanaka.taro@company.co.jp","パスワードハッシュ":"$2b$12$abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqr","氏名":"田中太郎","部門":"営業部","役割":"契約担当者","ステータス":"有効","最終ログイン日時":"2025-01-15T09:30:00+09:00","作成日時":"2024-04-01T10:00:00+09:00","更新日時":"2025-01-10T14:20:00+09:00","作成者":"admin","更新者":"佐藤花子"},{"ユーザーID":"rec-001","ユーザー名":"suzuki.qc.manager","メールアドレス":"suzuki.yuki@company.jp","パスワードハッシュ":"$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQR","氏名":"鈴木由紀","部門":"品質管理部","役割":"品質管理者","ステータス":"有効","最終ログイン日時":"2025-01-15T09:30:00+09:00","作成日時":"2024-04-10T14:22:00+09:00","更新日時":"2025-01-10T16:45:00+09:00","作成者":"admin.master","更新者":"佐藤太郎"},{"ユーザーID":"rec-001","ユーザー名":"tanaka.invoice","メールアドレス":"tanaka.invoice@company.jp","パスワードハッシュ":"$2b$12$8qJ9mK2pL5nR3vX7wQ4eZ.oY6hG1fD8tC2bN9sM0aP5kL3jI7xU9m","氏名":"田中美咲","部門":"経理部門","役割":"請求担当者","ステータス":"有効","最終ログイン日時":"2025-01-15T09:30:45Z","作成日時":"2024-04-10T14:20:00Z","更新日時":"2025-01-10T16:45:30Z","作成者":"佐藤太郎","更新者":"山田花子"},{"ユーザーID":"rec-001","ユーザー名":"tanaka.taro","メールアドレス":"tanaka.taro@company.jp","パスワードハッシュ":"$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQR","氏名":"田中太郎","部門":"営業部","役割":"営業マネージャー","ステータス":"有効","最終ログイン日時":"2025-01-15 09:30:45","作成日時":"2024-04-10 14:20:00","更新日時":"2025-01-15 09:30:45","作成者":"鈴木花子","更新者":"田中太郎"},{"ユーザーID":"rec-001","ユーザー名":"tanaka.taro","メールアドレス":"tanaka.taro@company.jp","パスワードハッシュ":"$2b$12$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86E36P4/LLa","氏名":"田中太郎","部門":"システム管理部","役割":"管理者","ステータス":"有効","最終ログイン日時":"2025-01-15 09:30:45","作成日時":"2024-04-01 10:00:00","更新日時":"2025-01-10 14:22:30","作成者":"佐藤次郎","更新者":"鈴木花子"},{"ユーザーID":"rec-001","ユーザー名":"tanaka.taro","メールアドレス":"tanaka.taro@company.jp","パスワードハッシュ":"$2b$12$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ","氏名":"田中太郎","部門":"営業部","役割":"営業","ステータス":"休止","最終ログイン日時":"2024-12-15 17:30:00","作成日時":"2023-04-10 09:15:00","更新日時":"2024-12-20 14:45:00","作成者":"佐藤花子","更新者":"山田次郎"},{"ユーザーID":"rec-001","ユーザー名":"tanaka.taro","メールアドレス":"tanaka.taro@company.jp","パスワードハッシュ":"$2b$12$8qK9mL2pR5vN3xJ7wQ1eXuY4aB6cD9eF0gH1iJ2kL3mN4oP5qR6sT7","氏名":"田中太郎","部門":"営業部","役割":"営業","ステータス":"無効","最終ログイン日時":"2025-01-15T09:30:00+09:00","作成日時":"2023-04-01T10:00:00+09:00","更新日時":"2025-01-31T14:45:00+09:00","作成者":"admin.user","更新者":"hr.manager"},{"ユーザーID":"rec-001","ユーザー名":"tanaka.taro","メールアドレス":"tanaka.taro@company.jp","パスワードハッシュ":"$2b$12$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ","氏名":"田中太郎","部門":"営業部","役割":"営業","ステータス":"有効","最終ログイン日時":null,"作成日時":"2025-04-01 09:30:00","更新日時":"2025-04-01 09:30:00","作成者":"suzuki.hanako","更新者":"suzuki.hanako"},{"ユーザーID":"rec-001","ユーザー名":"yamada.billing","メールアドレス":"yamada.taro@partner-logistics.co.jp","パスワードハッシュ":"$2b$12$K8vN9pL2mQ5xR3tY7uI8vO6wZ1aB3cD4eF5gH6jK7lM8nO9pQ0rS","氏名":"山田太郎","部門":"経営管理部","役割":"請求担当者","ステータス":"有効","最終ログイン日時":"2025-01-15T09:32:18+09:00","作成日時":"2024-04-10T14:22:45+09:00","更新日時":"2025-01-10T16:48:22+09:00","作成者":"admin.system","更新者":"佐藤花子"}],"契約履歴":[{"契約履歴ID":"rec-001","契約ID":"rec-c-2024-001","変更種別":"新規作成","変更前値":"null","変更後値":"{\"契約名\": \"株式会社ABC物流サービス契約\", \"契約金額\": 2500000, \"開始日\": \"2024-04-01\", \"終了日\": \"2025-03-31\", \"ステータス\": \"有効\"}","変更フィールド名":"ステータス","請求検証ステータス":"未検証","作成日時":"2024-04-01T09:30:00+09:00","作成者ID":"rec-u-2024-015","備考":"新規契約作成時に初期ステータスを有効に設定。営業部門より依頼。契約担当者：山田花子"},{"契約履歴ID":"rec-a7f2-4c89-b1e3-9d5e2c8f1a4b","契約ID":"rec-5e3b-4f12-a8c2-7b9d1e6c3f5a","変更種別":"更新","変更前値":"{\"契約金額\": 2500000}","変更後値":"{\"契約金額\": 3200000}","変更フィールド名":"契約金額","請求検証ステータス":"未検証","作成日時":"2024-11-15 14:30:45","作成者ID":"rec-user-8b4e-2f7a-9c1d-5e3a6b2f","備考":"顧客A株式会社より追加注文（型番：OPT-2024-X500、数量：50個）を受け、契約金額を2,500,000円から3,200,000円に増額変更。営業担当：鈴木花子、顧客担当者：山田次郎（電話確認済み）"},{"契約履歴ID":"rec-20250115-001","契約ID":"rec-contract-2024-0847","変更種別":"更新","変更前値":"{\"契約開始日\": \"2025-02-01\"}","変更後値":"{\"契約開始日\": \"2025-03-01\"}","変更フィールド名":"契約開始日","請求検証ステータス":"未検証","作成日時":"2025-01-15 14:32:45","作成者ID":"rec-user-2024-0312","備考":"顧客（株式会社サンプル工業）からの要望により契約開始日を2025年2月1日から2025年3月1日に変更。顧客側の準備期間延長のため。変更承認者：営業部 佐藤花子"},{"契約履歴ID":"rec-20250215-0847","契約ID":"rec-contract-2024-1523","変更種別":"ステータス更新","変更前値":"{\"ステータス\": \"有効\", \"更新日時\": \"2024-12-10T14:30:00Z\"}","変更後値":"{\"ステータス\": \"一時停止\", \"更新日時\": \"2025-02-15T09:15:00Z\", \"一時停止理由\": \"支払遅延\"}","変更フィールド名":"ステータス","請求検証ステータス":"不一致","作成日時":"2025-02-15T09:45:23Z","作成者ID":"rec-user-yamada-1987","備考":"契約ステータスが有効から一時停止に変更されました。請求検証との照合時に、前月の請求額¥450,000が契約システムに未反映であることが判明。営業部と経理部で確認中。顧客（株式会社ABC商事）に対して2月17日までに対応予定。"},{"契約履歴ID":"rec-20250215-0847","契約ID":"rec-contract-2024-1523","変更種別":"更新","変更前値":"{\"契約金額\": 1500000, \"開始日\": \"2024-04-01\", \"終了日\": \"2025-03-31\", \"ステータス\": \"有効\"}","変更後値":"{\"契約金額\": 1650000, \"開始日\": \"2024-04-01\", \"終了日\": \"2025-03-31\", \"ステータス\": \"有効\"}","変更フィールド名":"契約金額、開始日","請求検証ステータス":"未検証","作成日時":"2025-02-15T14:23:45+09:00","作成者ID":"rec-user-yamada-0156","備考":"顧客からの追加サービス要望に伴い契約金額を1,500,000円から1,650,000円に修正。サービス内容の拡大に対応。請求検証部門での再確認が必要なため検証ステータスをリセット。"},{"契約履歴ID":"rec-20250215-001","契約ID":"rec-contract-2024-0847","変更種別":"キャンセル","変更前値":"{\"ステータス\": \"有効\", \"契約金額\": 2500000, \"開始日\": \"2024-04-01\", \"終了日\": \"2025-03-31\"}","変更後値":"{\"ステータス\": \"キャンセル\", \"契約金額\": 2500000, \"開始日\": \"2024-04-01\", \"終了日\": \"2025-03-31\", \"キャンセル日\": \"2025-02-15\"}","変更フィールド名":"ステータス","請求検証ステータス":"不一致","作成日時":"2025-02-15 14:32:18","作成者ID":"rec-user-2024-0312","備考":"顧客からの申し出により契約をキャンセル。既に1月分の請求が検証済みであったが、キャンセルに伴い請求額の調整が必要となったため検証ステータスを不一致に変更。2月分以降の請求は発行しない予定。"},{"契約履歴ID":"rec-20250115-0847","契約ID":"rec-contract-2024-0523","変更種別":"更新日変更","変更前値":"{\"更新日\": \"2025-01-15\"}","変更後値":"{\"更新日\": \"2025-04-15\"}","変更フィールド名":"更新日","請求検証ステータス":"未検証","作成日時":"2025-01-15T09:30:00+09:00","作成者ID":"rec-system-auto-001","備考":"自動更新ルール「3ヶ月ごとの契約更新」により、契約履行状況確認後に更新日が自動延長されました。前回実績：売上高1,250,000円、納期遵守率99.5%"},{"契約履歴ID":"rec-20250215-001","契約ID":"rec-contract-2024-0847","変更種別":"更新","変更前値":"{\"契約金額\": 1500000, \"金額種別\": \"税抜き\", \"計算根拠\": \"月額125,000円×12ヶ月\"}","変更後値":"{\"契約金額\": 1650000, \"金額種別\": \"税抜き\", \"計算根拠\": \"月額137,500円×12ヶ月（消費税計算誤りを修正）\"}","変更フィールド名":"契約金額","請求検証ステータス":"不一致","作成日時":"2025-02-15 10:30:45","作成者ID":"rec-user-2024-0312","備考":"請求部門による監査指摘により、消費税計算時に基本金額の誤適用が判明。2024年4月契約開始分から遡及適用。監査対象案件のため経理部長・山田花子による承認済み。差額150,000円は2025年3月請求分に反映予定。"},{"契約履歴ID":"rec-20250215-001","契約ID":"rec-contract-00847","変更種別":"更新","変更前値":"{\"親契約ID\": \"rec-contract-00512\", \"統合前契約数\": 1}","変更後値":"{\"親契約ID\": \"rec-contract-00901\", \"統合前契約数\": 3}","変更フィールド名":"親契約ID","請求検証ステータス":"未検証","作成日時":"2025-02-15 14:32:47","作成者ID":"rec-user-00156","備考":"複数契約の統合に伴い、契約ID rec-contract-00847 の親契約を rec-contract-00512 から rec-contract-00901 に変更。同時に rec-contract-00723、rec-contract-00815 も統合対象に含まれた。請求部門への通知済み。"},{"契約履歴ID":"rec-20250115-0847","契約ID":"rec-contract-2024-1523","変更種別":"更新","変更前値":"{\"契約終了日\": \"2025-03-31\", \"次月請求予定日\": \"2025-04-10\"}","変更後値":"{\"契約終了日\": \"2025-06-30\", \"次月請求予定日\": \"2025-07-10\"}","変更フィールド名":"契約終了日","請求検証ステータス":"検証済み","作成日時":"2025-01-15T09:30:00+09:00","作成者ID":"rec-user-yamada-0521","備考":"顧客からの延長申請により契約終了日を3ヶ月延長。営業担当者・山田花子により処理。翌月以降の請求スケジュールは自動調整システムにより自動更新済み。月額請求金額は変更なし（¥145,000/月）。"}],"請求":[{"請求ID":"rec-001","契約ID":"rec-012","請求年月":"2025-01","請求金額":150000,"請求日":"2025-01-05T09:30:00+09:00","支払期限日":"2025-01-31T23:59:59+09:00","請求ステータス":"請求済","支払済金額":0,"支払日":null,"摘要":"2025年1月分のシステム保守サービス利用料。基本料金150,000円。請求書発行済み。","作成日時":"2025-01-05T09:30:00+09:00","作成者ID":"rec-201","更新日時":"2025-01-05T09:30:00+09:00","更新者ID":"rec-201"},{"請求ID":"rec-20250215-001","契約ID":"rec-contract-00847","請求年月":"2025-02","請求金額":385000,"請求日":"2025-02-15T09:30:00Z","支払期限日":"2025-03-15T23:59:59Z","請求ステータス":"請求済","支払済金額":0,"支払日":null,"摘要":"2025年2月分サービス利用料金280,000円に加え、前月（2025年1月分）未払い分105,000円を含めた追加請求です。早期のお支払いをお願いいたします。","作成日時":"2025-02-15T09:30:00Z","作成者ID":"rec-user-00512","更新日時":"2025-02-15T09:30:00Z","更新者ID":"rec-user-00512"},{"請求ID":"rec-001","契約ID":"rec-102","請求年月":"2024-11","請求金額":150000,"請求日":"2024-11-01T09:30:00","支払期限日":"2024-12-15T23:59:59","請求ステータス":"延滞","支払済金額":0,"支払日":null,"摘要":"2024年11月分サービス利用料金。支払期限を60日超過しており、督促対象案件です。","作成日時":"2024-11-01T09:30:00","作成者ID":"rec-501","更新日時":"2025-02-10T14:15:00","更新者ID":"rec-502"},{"請求ID":"rec-20250142","契約ID":"rec-20240856","請求年月":"2025-02","請求金額":450000,"請求日":"2025-02-10T09:30:00+09:00","支払期限日":"2025-03-10T23:59:59+09:00","請求ステータス":"請求済","支払済金額":450000,"支払日":"2025-02-28T14:22:00+09:00","摘要":"2025年2月分システム保守費用。前月(2025年1月分)の部分支払い(60万円/100万円)に対する残金請求。契約番号:CTR-2024-0856、顧客:株式会社ソフトウェア開発センター","作成日時":"2025-02-10T09:30:00+09:00","作成者ID":"rec-00547","更新日時":"2025-02-28T14:25:00+09:00","更新者ID":"rec-00547"},{"請求ID":"rec-20250127-001","契約ID":"rec-contract-20240415-089","請求年月":"2025-01","請求金額":145000,"請求日":"2025-01-27T09:30:00+09:00","支払期限日":"2025-02-28T23:59:59+09:00","請求ステータス":"請求済","支払済金額":0,"支払日":null,"摘要":"2025年1月1日付での契約プラン変更に伴う差分調整。従来の基本料金月額98,000円から新プラン月額115,000円への変更により、2024年12月分の日割り差分47,000円を加算。変更手続きは2024年12月25日に完了。","作成日時":"2025-01-27T09:30:00+09:00","作成者ID":"rec-user-yamada-2024","更新日時":"2025-01-27T09:30:00+09:00","更新者ID":"rec-user-yamada-2024"},{"請求ID":"rec-001","契約ID":"rec-002","請求年月":"2024-12","請求金額":45000,"請求日":"2024-12-01T09:30:00+09:00","支払期限日":"2024-12-31T23:59:59+09:00","請求ステータス":"支払済","支払済金額":45000,"支払日":"2024-12-15T14:22:00+09:00","摘要":"12月度利用料金。年末キャンペーン割引20%を適用。通常料金56,250円から11,250円の割引を適用した金額です。","作成日時":"2024-12-01T08:00:00+09:00","作成者ID":"rec-003","更新日時":"2024-12-15T14:25:00+09:00","更新者ID":"rec-004"},{"請求ID":"rec-20250115-001","契約ID":"rec-contract-2022-0847","請求年月":"2025-01","請求金額":145000,"請求日":"2025-01-15T09:30:00+09:00","支払期限日":"2025-02-14T23:59:59+09:00","請求ステータス":"請求済","支払済金額":0,"支払日":null,"摘要":"クラウドストレージサービス解約に伴う最終請求。2025年1月31日をもってサービス終了。1月分の日割り計算（1日～31日）及び未払い月額費用の清算。解約手数料は発生せず。","作成日時":"2025-01-15T09:30:00+09:00","作成者ID":"rec-user-billing-0324","更新日時":"2025-01-15T09:30:00+09:00","更新者ID":"rec-user-billing-0324"},{"請求ID":"rec-20250215-001","契約ID":"rec-contract-2024-0847","請求年月":"2025-01","請求金額":850000,"請求日":"2025-01-10T09:30:00+09:00","支払期限日":"2025-02-10T23:59:59+09:00","請求ステータス":"キャンセル","支払済金額":0,"支払日":null,"摘要":"2025年1月分の請求において、システム設定ミスにより月額料金を2重計上していたため、本請求をキャンセルし訂正版を再発行いたします。訂正前金額：850,000円 → 訂正後金額：425,000円（rec-20250215-002参照）","作成日時":"2025-01-10T09:30:00+09:00","作成者ID":"rec-user-yamada-001","更新日時":"2025-02-15T14:20:00+09:00","更新者ID":"rec-user-suzuki-002"},{"請求ID":"rec-001","契約ID":"rec-042","請求年月":"2025-01","請求金額":150000,"請求日":"2025-01-10T09:30:00+09:00","支払期限日":"2025-02-10T23:59:59+09:00","請求ステータス":"請求済","支払済金額":0,"支払日":null,"摘要":"前払い制から後払い制への切り替えに伴う初回請求。2025年1月分のサービス利用料金。契約更新時に支払い方法を変更いただきました。","作成日時":"2025-01-10T09:30:00+09:00","作成者ID":"rec-201","更新日時":"2025-01-10T09:30:00+09:00","更新者ID":"rec-201"},{"請求ID":"rec-20250115-001","契約ID":"rec-contract-20240401-042","請求年月":"2025-01","請求金額":450000,"請求日":"2025-01-15T09:30:00+09:00","支払期限日":"2025-02-14T23:59:59+09:00","請求ステータス":"請求済","支払済金額":0,"支払日":null,"摘要":"2024年11月～2025年1月分（3ヶ月分）の一括請求。月額150,000円×3ヶ月。システム保守費用および技術サポート費用を含む。請求書発行日2025年1月15日。","作成日時":"2025-01-15T09:30:00+09:00","作成者ID":"rec-user-0847","更新日時":"2025-01-15T09:30:00+09:00","更新者ID":"rec-user-0847"}],"請求明細":[{"請求明細ID":"rec-001","請求ID":"rec-bill-2024-001","契約ID":"rec-contract-001","契約行ID":"rec-contract-line-001","明細種別":"基本料金","説明":"2025年1月度 インターネット接続サービス基本料金","数量":1,"単価":5500,"金額":5500,"税率":10,"税額":550,"対象期間開始日":"2025-01-01T00:00:00Z","対象期間終了日":"2025-01-31T23:59:59Z","検証ステータス":"検証済み","差異理由":null,"作成日時":"2024-12-25T09:30:00Z","更新日時":"2024-12-25T09:30:00Z","作成者":"rec-user-yamada","更新者":"rec-user-yamada"},{"請求明細ID":"rec-001-20250215-overage","請求ID":"rec-inv-202502-001","契約ID":"rec-contract-2024-0847","契約行ID":"rec-contract-line-0847-02","明細種別":"従量料金","説明":"2月度クラウドストレージ使用量超過分。契約上限500GB超過、超過分150GB × 単価@50円/GB","数量":150,"単価":50,"金額":7500,"税率":10,"税額":750,"対象期間開始日":"2025-02-01T00:00:00Z","対象期間終了日":"2025-02-28T23:59:59Z","検証ステータス":"検証済み","差異理由":null,"作成日時":"2025-03-05T09:30:00Z","更新日時":"2025-03-05T14:15:00Z","作成者":"rec-user-yamada-hanako","更新者":"rec-user-suzuki-taro"},{"請求明細ID":"rec-20250215-001","請求ID":"rec-20250215-inv001","契約ID":"rec-contract-2024-0847","契約行ID":"rec-contract-line-0847-02","明細種別":"基本料金","説明":"クラウドストレージサービス基本料金（2024年11月～2025年1月、3ヶ月分）","数量":3,"単価":15000,"金額":45000,"税率":10,"税額":4500,"対象期間開始日":"2024-11-01T00:00:00Z","対象期間終了日":"2025-01-31T23:59:59Z","検証ステータス":"検証済み","差異理由":null,"作成日時":"2025-02-10T09:30:00Z","更新日時":"2025-02-12T14:15:00Z","作成者":"rec-user-yamada-taro","更新者":"rec-user-suzuki-hanako"},{"請求明細ID":"rec-20250108-0047","請求ID":"rec-20250108-0001","契約ID":"rec-20240601-0156","契約行ID":"rec-20240601-0156-02","明細種別":"調整","説明":"2025年1月15日の契約アップグレードに伴う基本料金の日割り調整（1月15日～31日分の差額）","数量":17,"単価":2800,"金額":47600,"税率":10,"税額":4760,"対象期間開始日":"2025-01-15T00:00:00Z","対象期間終了日":"2025-01-31T23:59:59Z","検証ステータス":"検証済み","差異理由":null,"作成日時":"2025-01-08T14:32:15Z","更新日時":"2025-01-08T16:45:22Z","作成者":"rec-user-0892","更新者":"rec-user-0521"},{"請求明細ID":"rec-001","請求ID":"rec-req-2024-0847","契約ID":"rec-contract-2024-1203","契約行ID":"rec-contract-line-0502","明細種別":"調整","説明":"新規顧客キャンペーン割引（初月50%OFF）","数量":1,"単価":-15000,"金額":-15000,"税率":10,"税額":-1500,"対象期間開始日":"2024-11-01T00:00:00Z","対象期間終了日":"2024-11-30T23:59:59Z","検証ステータス":"検証済み","差異理由":null,"作成日時":"2024-10-28T14:32:15Z","更新日時":"2024-10-29T09:18:42Z","作成者":"rec-user-0156","更新者":"rec-user-0089"},{"請求明細ID":"rec-001","請求ID":"rec-002","契約ID":"rec-003","契約行ID":"rec-004","明細種別":"追加サービス","説明":"プレミアム分析ダッシュボードオプション（2024年11月追加）","数量":1,"単価":15000,"金額":15000,"税率":10,"税額":1500,"対象期間開始日":"2024-11-01T00:00:00Z","対象期間終了日":"2024-11-30T23:59:59Z","検証ステータス":"検証済み","差異理由":null,"作成日時":"2024-11-05T10:30:00Z","更新日時":"2024-11-05T14:15:00Z","作成者":"rec-005","更新者":"rec-006"},{"請求明細ID":"rec-001-adj-2025-001","請求ID":"rec-inv-2025-001","契約ID":"rec-contract-2024-0847","契約行ID":"rec-contract-line-2024-0847-02","明細種別":"調整","説明":"前月(2024年12月)の従量料金過請求分の返金調整。12月分の通信量が誤集計され、実績値との差異により過請求が発生。差額分を返金いたします。","数量":1,"単価":-45000,"金額":-45000,"税率":10,"税額":-4500,"対象期間開始日":"2024-12-01T00:00:00Z","対象期間終了日":"2024-12-31T23:59:59Z","検証ステータス":"検証済み","差異理由":"2024年12月分の従量課金データが重複集計されていたため、実績の45,000円を超過請求。システム監査により判明し、返金調整を実施。","作成日時":"2025-01-15T09:30:00Z","更新日時":"2025-01-15T10:45:00Z","作成者":"rec-user-yamada-hanako","更新者":"rec-user-suzuki-taro"},{"請求明細ID":"rec-001","請求ID":"rec-002","契約ID":"rec-003","契約行ID":"rec-004","明細種別":"調整","説明":"2024年11月の契約数量変更に伴う差分請求。契約数量を50ユーザーから75ユーザーに変更したため、11月15日から月末までの増加分を按分請求します。","数量":25,"単価":5000,"金額":125000,"税率":10,"税額":12500,"対象期間開始日":"2024-11-15T00:00:00Z","対象期間終了日":"2024-11-30T23:59:59Z","検証ステータス":"検証済み","差異理由":null,"作成日時":"2024-12-01T09:30:00Z","更新日時":"2024-12-02T14:15:00Z","作成者":"rec-005","更新者":"rec-006"},{"請求明細ID":"rec-001","請求ID":"rec-req-2024-1205","契約ID":"rec-con-2024-0847","契約行ID":"rec-con-line-0847-02","明細種別":"調整","説明":"2024年10月1日の消費税率変更（8%→10%）に対応した再計算による追加税額調整","数量":1,"単価":125000,"金額":125000,"税率":10,"税額":12500,"対象期間開始日":"2024-10-01T00:00:00Z","対象期間終了日":"2024-10-31T23:59:59Z","検証ステータス":"検証済み","差異理由":null,"作成日時":"2024-11-15T09:30:00Z","更新日時":"2024-11-20T14:22:00Z","作成者":"rec-user-2024-0156","更新者":"rec-user-2024-0089"},{"請求明細ID":"rec-20250115-001","請求ID":"rec-invoice-2025-001","契約ID":"rec-contract-2024-0847","契約行ID":"rec-contract-line-0847-001,rec-contract-line-0847-002,rec-contract-line-0847-003","明細種別":"基本料金","説明":"2025年1月度 複数契約行統合請求（クラウドストレージサービス基本料金3契約行分の合算）","数量":3,"単価":45000,"金額":135000,"税率":10,"税額":13500,"対象期間開始日":"2025-01-01T00:00:00Z","対象期間終了日":"2025-01-31T23:59:59Z","検証ステータス":"検証済み","差異理由":null,"作成日時":"2025-01-02T09:30:15Z","更新日時":"2025-01-02T14:22:47Z","作成者":"rec-user-yamada-hanako","更新者":"rec-user-suzuki-jiro"}],"顧客":[{"顧客ID":"rec-001","顧客名":"株式会社トーエイシステムズ","顧客名カナ":"トウエイシステムズ","顧客区分":"法人","請求先住所":"東京都千代田区丸の内1-1-1 トーエイビル5階","請求先電話番号":"03-1234-5678","請求先メールアドレス":"billing@toei-systems.co.jp","担当者名":"山田花子","支払条件":"月末締め翌月末払い","ステータス":"有効","作成日時":"2024-04-15T09:30:00Z","更新日時":"2025-01-10T14:20:00Z","作成者":"rec-usr-0001","更新者":"rec-usr-0002"},{"顧客ID":"rec-001","顧客名":"佐藤建設コンサルティング","顧客名カナ":"サトウケンセツコンサルティング","顧客区分":"個人","請求先住所":"東京都渋谷区道玄坂2-10-7 新大宗ビル1階","請求先電話番号":"090-1234-5678","請求先メールアドレス":"sato.consulting@example.jp","担当者名":"佐藤健一","支払条件":"都度払い（請求後7日以内）","ステータス":"有効","作成日時":"2024-03-15T10:30:00+09:00","更新日時":"2024-12-01T14:45:00+09:00","作成者":"rec-u-0001","更新者":"rec-u-0002"},{"顧客ID":"rec-001","顧客名":"株式会社ハイテクロジスティクス","顧客名カナ":"ハイテクロジスティクス","顧客区分":"代理店","請求先住所":"東京都千代田区丸の内1-9-2 グラントウキョウ ビルディング15階","請求先電話番号":"03-XXXX-5678","請求先メールアドレス":"billing@hightechlogistics.co.jp","担当者名":"佐藤健一","支払条件":"月末締め翌月末払い","ステータス":"有効","作成日時":"2024-04-15T09:30:00Z","更新日時":"2025-01-10T14:22:00Z","作成者":"rec-u001","更新者":"rec-u002"},{"顧客ID":"rec-001","顧客名":"株式会社テックソリューション","顧客名カナ":"カブシキガイシャテックソリューション","顧客区分":"法人","請求先住所":"東京都渋谷区道玄坂1-2-3 テックビル5階","請求先電話番号":"03-XXXX-5678","請求先メールアドレス":"billing@techsolution.co.jp","担当者名":"山田花子","支払条件":"月末締め翌月末払い","ステータス":"有効","作成日時":"2025-01-15T09:30:00Z","更新日時":"2025-01-15T09:30:00Z","作成者":"rec-user-001","更新者":"rec-user-001"},{"顧客ID":"rec-001","顧客名":"株式会社エクセル物流","顧客名カナ":"カブシキガイシャエクセルブツリュウ","顧客区分":"法人","請求先住所":"東京都渋谷区道玄坂2-10-7新大宮ビル5階","請求先電話番号":"03-XXXX-5678","請求先メールアドレス":"billing@excel-logistics.co.jp","担当者名":"山田次郎","支払条件":"月末締め翌月末払い","ステータス":"休止","作成日時":"2023-08-15T10:30:00Z","更新日時":"2024-11-20T14:15:00Z","作成者":"rec-u-0042","更新者":"rec-u-0089"},{"顧客ID":"rec-001-cust-20250115","顧客名":"株式会社ハイテック関西","顧客名カナ":"ハイテックカンサイ","顧客区分":"法人","請求先住所":"大阪府大阪市北区中之島3-2-4","請求先電話番号":"06-6123-4567","請求先メールアドレス":"billing@haitech-kansai.co.jp","担当者名":"山田花子","支払条件":"月末締め翌月末払い","ステータス":"解約","作成日時":"2024-03-15T09:30:00Z","更新日時":"2025-01-10T14:45:00Z","作成者":"rec-user-admin-001","更新者":"rec-user-admin-002"},{"顧客ID":"rec-001-cust-2024-0847","顧客名":"株式会社グローバルテクノロジーソリューションズ","顧客名カナ":"グローバルテクノロジーソリューションズ","顧客区分":"法人","請求先住所":"東京都千代田区丸の内1-6-2 丸の内ビルディング15階","請求先電話番号":"03-XXXX-5847","請求先メールアドレス":"billing@global-techsolutions.co.jp","担当者名":"佐藤美咲","支払条件":"月末締め翌々月末払い","ステータス":"有効","作成日時":"2024-04-15T10:30:00+09:00","更新日時":"2025-01-20T14:45:00+09:00","作成者":"rec-001-user-admin-001","更新者":"rec-001-user-admin-003"},{"顧客ID":"rec-001","顧客名":"株式会社フロンティア商事","顧客名カナ":"カブシキガイシャフロンティアショウジ","顧客区分":"法人","請求先住所":"東京都渋谷区道玄坂1-2-3 フロンティアビル5階","請求先電話番号":"03-1234-5678","請求先メールアドレス":"billing@frontier-shoji.co.jp","担当者名":"佐藤美咲","支払条件":"月末締め翌月末払い","ステータス":"有効","作成日時":"2024-01-15T09:30:00Z","更新日時":"2025-01-20T14:15:00Z","作成者":"rec-user-0001","更新者":"rec-user-0003"},{"顧客ID":"rec-001","顧客名":"株式会社グローバルテック","顧客名カナ":"カブシキガイシャグローバルテック","顧客区分":"法人","請求先住所":"東京都千代田区丸の内1-1-1 グローバルビル5階","請求先電話番号":"03-1234-5678","請求先メールアドレス":"billing@globaltech.co.jp","担当者名":"山田花子","支払条件":"月末締め翌月末払い","ステータス":"有効","作成日時":"2024-04-15T09:30:00+09:00","更新日時":"2025-01-10T14:22:00+09:00","作成者":"rec-user-001","更新者":"rec-user-002"},{"顧客ID":"rec-001","顧客名":"株式会社ソリューション企画","顧客名カナ":"カブシキガイシャソリューションキカク","顧客区分":"法人","請求先住所":"東京都渋谷区道玄坂1-2-3 ソリューションビル5階","請求先電話番号":"03-XXXX-5678","請求先メールアドレス":"billing@solution-kikaku.co.jp","担当者名":"鈴木美咲","支払条件":"月末締め翌月末払い","ステータス":"有効","作成日時":"2023-02-15T10:30:00Z","更新日時":"2024-11-20T14:45:00Z","作成者":"rec-user-001","更新者":"rec-user-002"}],"操作ログ":[{"操作ログID":"rec-001","ユーザーID":"rec-u-047","操作種別":"作成","対象テーブル":"契約","対象レコードID":"rec-c-2024-0891","変更前値":null,"変更後値":"{\"契約ID\": \"rec-c-2024-0891\", \"顧客名\": \"株式会社山田製造所\", \"契約種別\": \"年間保守契約\", \"契約開始日\": \"2024-04-01\", \"契約終了日\": \"2025-03-31\", \"契約金額\": 2500000, \"通貨\": \"JPY\", \"担当営業\": \"佐藤花子\", \"請求先住所\": \"東京都渋谷区道玄坂1-2-3\"}","操作理由":"新規顧客との年間保守契約を締結。営業部との協議により契約内容を確定。","IPアドレス":"192.168.1.105","操作日時":"2024-03-28 14:32:15","作成日時":"2024-03-28 14:32:16"},{"操作ログID":"rec-20250215-0847","ユーザーID":"rec-user-0342","操作種別":"更新","対象テーブル":"契約","対象レコードID":"rec-contract-5821","変更前値":"{\"契約金額\": 2850000, \"税抜金額\": 2590909, \"消費税\": 259091}","変更後値":"{\"契約金額\": 2750000, \"税抜金額\": 2500000, \"消費税\": 250000}","操作理由":"契約書と請求書の金額が不一致であることが判明。顧客との確認により契約金額が275万円であることが確認されたため修正。誤入力による金額差異10万円を是正。","IPアドレス":"192.168.1.105","操作日時":"2025-02-15 14:47:32","作成日時":"2025-02-15 14:47:33"},{"操作ログID":"rec-20250115-0847","ユーザーID":"rec-user-0324","操作種別":"更新","対象テーブル":"契約","対象レコードID":"rec-contract-5821","変更前値":"{\"契約終了日\": \"2025-03-31\", \"契約状態\": \"有効\"}","変更後値":"{\"契約終了日\": \"2025-09-30\", \"契約状態\": \"有効\"}","操作理由":"顧客（株式会社ABC商事）からの要望により契約期間を6ヶ月延長。営業担当者・田中太郎より申請があり、承認完了。","IPアドレス":"192.168.1.105","操作日時":"2025-01-15 08:47:32","作成日時":"2025-01-15 08:47:33"},{"操作ログID":"log-20250115-0847","ユーザーID":"user-0032","操作種別":"承認","対象テーブル":"請求","対象レコードID":"rec-0891","変更前値":"{\"承認状態\": \"承認待ち\", \"承認者\": null}","変更後値":"{\"承認状態\": \"承認済み\", \"承認者\": \"user-0032\"}","操作理由":"請求書#INV-2025-001234の金額検証完了。消費税計算確認済み、請求額合計¥2,847,500は正確。発行承認。","IPアドレス":"192.168.1.105","操作日時":"2025-01-15 08:47:23","作成日時":"2025-01-15 08:47:24"},{"操作ログID":"rec-20250215-0847","ユーザーID":"rec-user-0342","操作種別":"更新","対象テーブル":"請求明細","対象レコードID":"rec-invoice-detail-5821","変更前値":"{\"数量\": 15, \"単価\": 8500, \"小計\": 127500, \"税率\": 0.10, \"消費税\": 12750, \"合計\": 140250}","変更後値":"{\"数量\": 15, \"単価\": 8500, \"小計\": 127500, \"税率\": 0.10, \"消費税\": 12750, \"合計\": 140250}","操作理由":"2025年2月請求分の請求明細において、消費税計算が誤って12,500円で計上されていたため、正しい計算値12,750円に修正いたしました。対象契約：株式会社山田製作所との保守契約。","IPアドレス":"192.168.1.105","操作日時":"2025-02-15 08:47:32","作成日時":"2025-02-15 08:47:33"},{"操作ログID":"rec-20250215-0847","ユーザーID":"rec-usr-0342","操作種別":"削除","対象テーブル":"請求","対象レコードID":"rec-inv-5821","変更前値":"{\"請求番号\": \"INV-2025-001847\", \"顧客ID\": \"rec-cust-0156\", \"契約ID\": \"rec-cnt-0891\", \"請求金額\": 450000, \"請求日\": \"2025-02-01\", \"支払期限\": \"2025-02-28\", \"ステータス\": \"未払い\"}","変更後値":null,"操作理由":"契約ID rec-cnt-0891（顧客：株式会社ABC商事、契約期間終了）に伴う2025年2月分請求の削除。契約解除日2025年2月14日。未払い状態のため削除対応。","IPアドレス":"192.168.10.45","操作日時":"2025-02-15 08:47:32","作成日時":"2025-02-15 08:47:33"},{"操作ログID":"rec-20250215-001","ユーザーID":"rec-usr-0847","操作種別":"作成","対象テーブル":"請求","対象レコードID":"rec-inv-202502-001","変更前値":null,"変更後値":"{\"請求番号\": \"INV-2025-02-0001\", \"顧客ID\": \"rec-cust-1234\", \"請求金額\": 1250000, \"消費税\": 125000, \"合計金額\": 1375000, \"請求日\": \"2025-02-15\", \"支払期限\": \"2025-03-15\", \"ステータス\": \"未送付\"}","操作理由":"2025年2月度の月次請求一括処理を実行。顧客コード：ABC-0847に対する定期契約分の請求を自動生成しました。","IPアドレス":"192.168.10.55","操作日時":"2025-02-15 09:30:45","作成日時":"2025-02-15 09:30:46"},{"操作ログID":"rec-20250115-0847","ユーザーID":"rec-usr-0324","操作種別":"却下","対象テーブル":"請求","対象レコードID":"rec-inv-2024-0892","変更前値":"{\"ステータス\": \"審査中\", \"承認者ID\": null}","変更後値":"{\"ステータス\": \"却下\", \"承認者ID\": \"rec-usr-0324\"}","操作理由":"請求書に記載の納期が契約内容と相違しているため却下。発注者に確認の上、修正版の再提出を依頼してください。","IPアドレス":"192.168.1.105","操作日時":"2025-01-15 14:32:18","作成日時":"2025-01-15 14:32:19"},{"操作ログID":"rec-20250215-0847","ユーザーID":"rec-user-0342","操作種別":"更新","対象テーブル":"契約","対象レコードID":"rec-contract-5821","変更前値":"{\"割引率\": 5.0, \"更新日時\": \"2024-11-20T14:30:00Z\"}","変更後値":"{\"割引率\": 8.5, \"更新日時\": \"2025-02-15T09:47:23Z\"}","操作理由":"年間取引額が目標達成のため、既存契約の割引率を3.5%引き上げ。顧客コード: C-2024-0156（株式会社テクノロジー）","IPアドレス":"192.168.1.105","操作日時":"2025-02-15T09:47:23+09:00","作成日時":"2025-02-15T09:47:24+09:00"},{"操作ログID":"rec-20250215-0847","ユーザーID":"rec-usr-0342","操作種別":"更新","対象テーブル":"請求","対象レコードID":"rec-inv-2024-1156","変更前値":"{\"請求金額\": 1250000, \"消費税\": 125000, \"請求日\": \"2024-08-15\", \"請求ステータス\": \"確定\"}","変更後値":"{\"請求金額\": 1200000, \"消費税\": 120000, \"請求日\": \"2024-08-15\", \"請求ステータス\": \"確定\"}","操作理由":"監査指摘（内部監査報告書2025年1月号）に基づき、契約書との照合により過請求分50,000円を修正。対象契約：2024年度A社保守サービス契約。修正承認者：経理部長 鈴木健一","IPアドレス":"192.168.10.45","操作日時":"2025-02-15 08:47:32","作成日時":"2025-02-15 08:47:33"}]};
+window.AIVIC_PAGE_SCREEN_ID = "scr-1782113703566";
+window.AIVIC_PAGE_INIT_JS = "function(container, apiUrl, tables) {}";
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<nav style="display:flex;align-items:center;overflow-x:auto;background:var(--top-bar-bg,var(--bg-sidebar,#0e1a31));border-bottom:1px solid var(--top-bar-border,var(--border,#2a3a5d));padding:0 12px;height:40px;flex-shrink:0;"><a href="./scr-1782111868648.html" data-aivic-nav-system="itg-2" style="padding:6px 14px;text-decoration:none;font-size:13px;white-space:nowrap;color:var(--text,#e8eefc);opacity:0.6;border-bottom:2px solid transparent;font-weight:400;">営業成果レポート自動生成・配信システム</a><a href="./scr-1782112376817.html" data-aivic-nav-system="itg-3" style="padding:6px 14px;text-decoration:none;font-size:13px;white-space:nowrap;color:var(--text,#e8eefc);opacity:0.6;border-bottom:2px solid transparent;font-weight:400;">契約・提案資料管理システム</a><a href="./scr-1782112883813-1f2f.html" data-aivic-nav-system="itg-4" style="padding:6px 14px;text-decoration:none;font-size:13px;white-space:nowrap;color:var(--text,#e8eefc);opacity:0.6;border-bottom:2px solid transparent;font-weight:400;">顧客企業向け契約・成果管理ポータル</a><a href="./scr-1782113354430.html" data-aivic-nav-system="itg-5" style="padding:6px 14px;text-decoration:none;font-size:13px;white-space:nowrap;color:var(--text,#e8eefc);opacity:1;border-bottom:2px solid var(--primary,#2b66ff);font-weight:600;">契約変更・請求検証管理システム</a><a href="./scr-1782111017612.html" data-aivic-nav-system="itg-1" style="padding:6px 14px;text-decoration:none;font-size:13px;white-space:nowrap;color:var(--text,#e8eefc);opacity:0.6;border-bottom:2px solid transparent;font-weight:400;">営業データ品質管理・請求自動化システム</a></nav>
+  <div class="app-shell">
+    <div class="top-bar">
+      <div class="top-bar-left">
+        <div class="system-title">契約変更・請求検証管理</div>
+      </div>
+      <div class="top-bar-right">
+        <div class="user-badge" id="user-display">ユーザー</div>
+        <a href="./login.html" class="logout-btn">ログアウト</a>
+      </div>
+    </div>
+
+    <div class="main-container">
+      <div class="sidebar scrollbar-thin">
+        <div class="sidebar-section">
+          <div class="sidebar-label">ダッシュボード</div>
+          <a class="nav-item" data-aivic-nav="scr-1782113446982" onclick="window.showScreen('scr-1782113446982')">システム連携</a>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-label">契約管理</div>
+          <a class="nav-item" data-aivic-nav="scr-1782113578253" onclick="window.showScreen('scr-1782113578253')">契約書検証・管理</a>
+          <a class="nav-item" data-aivic-nav="scr-1782113553992" onclick="window.showScreen('scr-1782113553992')">契約・割引基準照会</a>
+          <a class="nav-item" data-aivic-nav="scr-1782113354430" onclick="window.showScreen('scr-1782113354430')">契約履歴・請求照合</a>
+          <a class="nav-item" data-aivic-nav="scr-1782113489410" onclick="window.showScreen('scr-1782113489410')">契約履歴・請求検索</a>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-label">契約変更</div>
+          <a class="nav-item" data-aivic-nav="scr-1782113373515" onclick="window.showScreen('scr-1782113373515')">変更申請</a>
+          <a class="nav-item" data-aivic-nav="scr-1782113467724" onclick="window.showScreen('scr-1782113467724')">変更情報入力</a>
+          <a class="nav-item" data-aivic-nav="scr-1782113632575" onclick="window.showScreen('scr-1782113632575')">変更内容入力</a>
+          <a class="nav-item" data-aivic-nav="scr-1782113655035" onclick="window.showScreen('scr-1782113655035')">変更検証・確認</a>
+          <a class="nav-item" data-aivic-nav="scr-1782113681154" onclick="window.showScreen('scr-1782113681154')">合意確認・通知</a>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-label">請求検証</div>
+          <a class="nav-item" data-aivic-nav="scr-1782113395902" onclick="window.showScreen('scr-1782113395902')">請求検証</a>
+          <a class="nav-item" data-aivic-nav="scr-1782113529179" onclick="window.showScreen('scr-1782113529179')">請求検証管理</a>
+          <a class="nav-item" data-aivic-nav="scr-1782113601682" onclick="window.showScreen('scr-1782113601682')">請求・データ照合</a>
+          <a class="nav-item" data-aivic-nav="scr-1782113728154" onclick="window.showScreen('scr-1782113728154')">請求情報承認</a>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-label">分析</div>
+          <a class="nav-item" data-aivic-nav="scr-1782113423106" onclick="window.showScreen('scr-1782113423106')">時系列比較分析</a>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-label">処理</div>
+          <a class="nav-item" data-aivic-nav="scr-1782113508689" onclick="window.showScreen('scr-1782113508689')">検証結果・承認処理</a>
+          <a class="nav-item" data-aivic-nav="scr-1782113703566" onclick="window.showScreen('scr-1782113703566')">データ更新処理</a>
+        </div>
+      </div>
+
+      <div class="content-area scrollbar-thin">
+        <div data-aivic-panel="scr-1782113446982" style="display:none"></div>
+            <div class="panel-subtitle">契約変更と請求情報の一元管理・同期状況</div>
+          </div>
+          <div class="grid-3">
+            <div class="kpi-card">
+              <div class="kpi-label">処理待ち</div>
+              <div class="kpi-value">12</div>
+              <div class="kpi-change">前日比 +3</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">本日承認</div>
+              <div class="kpi-value">8</div>
+              <div class="kpi-change">前日比 -1</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">不一致検出</div>
+              <div class="kpi-value">2</div>
+              <div class="kpi-change">要確認</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">最近の同期状況</div>
+            <div class="timeline">
+              <div class="timeline-item">
+                <div class="timeline-marker"></div>
+                <div class="timeline-date">2024-01-15 14:32</div>
+                <div class="timeline-content">契約DB同期完了 (245件)</div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-marker"></div>
+                <div class="timeline-date">2024-01-15 13:15</div>
+                <div class="timeline-content">請求データ照合開始</div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-marker"></div>
+                <div class="timeline-date">2024-01-15 12:00</div>
+                <div class="timeline-content">定期バッチ実行</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782113578253" style="display:none"></div>
+            <div class="panel-subtitle">契約情報の検証・管理・請求との整合性確認</div>
+          </div>
+          <div class="toolbar">
+            <input type="text" class="search-box" placeholder="顧客名・契約ID検索">
+            <button class="btn">フィルタ</button>
+            <button class="btn btn-primary">新規契約</button>
+          </div>
+          <div class="split-layout">
+            <div class="split-left">
+              <div class="list-item active">
+                <div class="list-item-title">ABC商事 - 契約#C001</div>
+                <div class="list-item-meta">年間契約 | 2024-01-01 ～ 2024-12-31</div>
+              </div>
+              <div class="list-item">
+                <div class="list-item-title">XYZ工業 - 契約#C002</div>
+                <div class="list-item-meta">月額契約 | 2024-01-15 ～</div>
+              </div>
+              <div class="list-item">
+                <div class="list-item-title">DEF商社 - 契約#C003</div>
+                <div class="list-item-meta">年間契約 | 2023-06-01 ～ 2024-05-31</div>
+              </div>
+            </div>
+            <div class="split-right">
+              <div style="margin-bottom: 16px;">
+                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">契約ID</div>
+                <div style="font-size: 13px; font-weight: 600; margin-bottom: 16px;">C001</div>
+              </div>
+              <div style="margin-bottom: 16px;">
+                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">顧客</div>
+                <div style="font-size: 13px;">ABC商事</div>
+              </div>
+              <div style="margin-bottom: 16px;">
+                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">契約金額</div>
+                <div style="font-size: 14px; font-weight: 600; color: var(--accent-gold);">¥1,200,000</div>
+              </div>
+              <div style="margin-bottom: 16px;">
+                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">ステータス</div>
+                <div><span class="badge badge-success">有効</span></div>
+              </div>
+              <div style="border-top: 1px solid var(--border); padding-top: 12px;">
+                <button class="btn" style="width: 100%; margin-bottom: 8px;">編集</button>
+                <button class="btn" style="width: 100%;">変更履歴</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782113553992" style="display:none"></div>
+            <div class="panel-subtitle">契約内容と適用される割引条件を確認</div>
+          </div>
+          <div class="toolbar">
+            <input type="text" class="search-box" placeholder="顧客名・契約ID検索">
+            <select class="form-select" style="flex: 0 0 150px;">
+              <option>全ステータス</option>
+              <option>有効</option>
+              <option>終了</option>
+            </select>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>契約ID</th>
+                  <th>顧客名</th>
+                  <th>契約金額</th>
+                  <th>割引率</th>
+                  <th>適用割引</th>
+                  <th>ステータス</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>C001</td>
+                  <td>ABC商事</td>
+                  <td>¥1,200,000</td>
+                  <td>10%</td>
+                  <td>¥120,000</td>
+                  <td><span class="badge badge-success">有効</span></td>
+                </tr>
+                <tr>
+                  <td>C002</td>
+                  <td>XYZ工業</td>
+                  <td>¥800,000</td>
+                  <td>5%</td>
+                  <td>¥40,000</td>
+                  <td><span class="badge badge-success">有効</span></td>
+                </tr>
+                <tr>
+                  <td>C003</td>
+                  <td>DEF商社</td>
+                  <td>¥500,000</td>
+                  <td>0%</td>
+                  <td>-</td>
+                  <td><span class="badge badge-warning">終了予定</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782113354430" style="display:none"></div>
+            <div class="panel-subtitle">契約変更と請求内容の整合性を検証・管理</div>
+          </div>
+          <div class="toolbar">
+            <input type="text" class="search-box" placeholder="顧客名・契約ID検索">
+            <button class="btn">期間指定</button>
+            <button class="btn btn-primary">照合実行</button>
+          </div>
+          <div class="tabs">
+            <div class="tab active">契約履歴</div>
+            <div class="tab">請求内容</div>
+            <div class="tab">照合結果</div>
+          </div>
+          <div class="tab-content active">
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>日付</th>
+                    <th>変更内容</th>
+                    <th>変更前</th>
+                    <th>変更後</th>
+                    <th>承認者</th>
+                    <th>ステータス</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>2024-01-10</td>
+                    <td>金額変更</td>
+                    <td>¥1,000,000</td>
+                    <td>¥1,200,000</td>
+                    <td>山田太郎</td>
+                    <td><span class="badge badge-success">承認済</span></td>
+                  </tr>
+                  <tr>
+                    <td>2024-01-05</td>
+                    <td>割引率変更</td>
+                    <td>5%</td>
+                    <td>10%</td>
+                    <td>佐藤花子</td>
+                    <td><span class="badge badge-success">承認済</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782113489410" style="display:none"></div>
+            <div class="panel-subtitle">契約変更履歴と請求情報を一元管理</div>
+          </div>
+          <div class="toolbar">
+            <input type="text" class="search-box" placeholder="顧客名・契約ID・請求ID検索">
+            <select class="form-select" style="flex: 0 0 120px;">
+              <option>全期間</option>
+              <option>過去30日</option>
+              <option>過去90日</option>
+              <option>過去1年</option>
+            </select>
+            <button class="btn btn-accent">エクスポート</button>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>契約ID</th>
+                  <th>顧客名</th>
+                  <th>請求ID</th>
+                  <th>金額</th>
+                  <th>請求日</th>
+                  <th>支払期限</th>
+                  <th>ステータス</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>C001</td>
+                  <td>ABC商事</td>
+                  <td>INV-2024-001</td>
+                  <td>¥100,000</td>
+                  <td>2024-01-10</td>
+                  <td>2024-02-10</td>
+                  <td><span class="badge badge-info">未払</span></td>
+                </tr>
+                <tr>
+                  <td>C002</td>
+                  <td>XYZ工業</td>
+                  <td>INV-2024-002</td>
+                  <td>¥80,000</td>
+                  <td>2024-01-05</td>
+                  <td>2024-02-05</td>
+                  <td><span class="badge badge-success">支払済</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782113373515" style="display:none"></div>
+            <div class="panel-subtitle">既存契約の変更内容を申請・管理</div>
+          </div>
+          <div class="stepper">
+            <div class="step completed">
+              <div class="step-number">1</div>
+              <div>基本情報</div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step active">
+              <div class="step-number">2</div>
+              <div>変更内容</div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step">
+              <div class="step-number">3</div>
+              <div>確認・申請</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">変更内容入力</div>
+            <div class="form-group">
+              <label class="form-label">変更項目</label>
+              <select class="form-select">
+                <option>契約金額</option>
+                <option>割引率</option>
+                <option>契約期間</option>
+                <option>その他</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">変更前の値</label>
+              <input type="text" class="form-input" value="¥1,000,000" readonly>
+            </div>
+            <div class="form-group">
+              <label class="form-label">変更後の値</label>
+              <input type="text" class="form-input" placeholder="新しい値を入力">
+            </div>
+            <div class="form-group">
+              <label class="form-label">変更理由</label>
+              <textarea class="form-textarea" placeholder="変更理由を入力してください"></textarea>
+            </div>
+            <div style="display: flex; gap: 12px;">
+              <button class="btn">戻る</button>
+              <button class="btn btn-primary" style="flex: 1;">次へ</button>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782113467724" style="display:none"></div>
+            <div class="panel-subtitle">既存契約の変更内容を入力・管理</div>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">契約情報</div>
+              <div class="form-group">
+                <label class="form-label">契約ID</label>
+                <input type="text" class="form-input" value="C001" readonly>
+              </div>
+              <div class="form-group">
+                <label class="form-label">顧客名</label>
+                <input type="text" class="form-input" value="ABC商事" readonly>
+              </div>
+              <div class="form-group">
+                <label class="form-label">現在の契約金額</label>
+                <input type="text" class="form-input" value="¥1,000,000" readonly>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">変更内容</div>
+              <div class="form-group">
+                <label class="form-label">新契約金額</label>
+                <input type="text" class="form-input" placeholder="¥">
+              </div>
+              <div class="form-group">
+                <label class="form-label">変更有効日</label>
+                <input type="date" class="form-input">
+              </div>
+              <div class="form-group">
+                <label class="form-label">変更理由</label>
+                <select class="form-select">
+                  <option>顧客要望</option>
+                  <option>契約更新</option>
+                  <option>割引適用</option>
+                  <option>その他</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">備考</div>
+            <textarea class="form-textarea" placeholder="追加情報があれば入力してください"></textarea>
+          </div>
+          <div style="display: flex; gap: 12px; justify-content: flex-end;">
+            <button class="btn">キャンセル</button>
+            <button class="btn btn-primary">保存</button>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782113632575" style="display:none"></div>
+            <div class="panel-subtitle">既存契約の変更内容を入力・請求に反映</div>
+          </div>
+          <div class="stepper">
+            <div class="step completed">
+              <div class="step-number">1</div>
+              <div>契約選択</div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step active">
+              <div class="step-number">2</div>
+              <div>変更入力</div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step">
+              <div class="step-number">3</div>
+              <div>検証</div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step">
+              <div class="step-number">4</div>
+              <div>完了</div>
+            </div>
+          </div>
+          <div class="split-layout">
+            <div class="split-left">
+              <div class="card">
+                <div class="card-header">変更項目選択</div>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" checked>
+                    <span style="font-size: 12px;">契約金額</span>
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox">
+                    <span style="font-size: 12px;">割引率</span>
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox">
+                    <span style="font-size: 12px;">契約期間</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="split-right">
+              <div style="margin-bottom: 16px;">
+                <label class="form-label">新契約金額</label>
+                <input type="text" class="form-input" placeholder="¥">
+              </div>
+              <div style="margin-bottom: 16px;">
+                <label class="form-label">変更有効日</label>
+                <input type="date" class="form-input">
+              </div>
+              <div style="margin-bottom: 16px;">
+                <label class="form-label">変更理由</label>
+                <textarea class="form-textarea" placeholder="理由を入力"></textarea>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn" style="flex: 1;">戻る</button>
+                <button class="btn btn-primary" style="flex: 1;">次へ</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782113395902" style="display:none"></div>
+            <div class="panel-subtitle">契約内容と請求内容の整合性を検証・承認</div>
+          </div>
+          <div class="toolbar">
+            <input type="text" class="search-box" placeholder="請求ID・顧客名検索">
+            <select class="form-select" style="flex: 0 0 150px;">
+              <option>全ステータス</option>
+              <option>検証待ち</option>
+              <option>検証済</option>
+              <option>不一致</option>
+            </select>
+            <button class="btn btn-primary">一括検証</button>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>請求ID</th>
+                  <th>顧客名</th>
+                  <th>請求金額</th>
+                  <th>契約金額</th>
+                  <th>差異</th>
+                  <th>検証ステータス</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>INV-2024-001</td>
+                  <td>ABC商事</td>
+                  <td>¥100,000</td>
+                  <td>¥100,000</td>
+                  <td>¥0</td>
+                  <td><span class="badge badge-success">一致</span></td>
+                  <td><div class="action-menu"><button class="action-btn">詳細</button><button class="action-btn">承認</button></div></td>
+                </tr>
+                <tr>
+                  <td>INV-2024-002</td>
+                  <td>XYZ工業</td>
+                  <td>¥85,000</td>
+                  <td>¥80,000</td>
+                  <td>¥5,000</td>
+                  <td><span class="badge badge-error">不一致</span></td>
+                  <td><div class="action-menu"><button class="action-btn">詳細</button><button class="action-btn">確認</button></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782113529179" style="display:none"></div>
+            <div class="panel-subtitle">契約と請求データを照合・検証・管理</div>
+          </div>
+          <div class="grid-3">
+            <div class="kpi-card">
+              <div class="kpi-label">検証待ち</div>
+              <div class="kpi-value">5</div>
+              <div class="kpi-change">本日分</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">検証済</div>
+              <div class="kpi-value">28</div>
+              <div class="kpi-change">今月</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">不一致</div>
+              <div class="kpi-value">2</div>
+              <div class="kpi-change">要対応</div>
+            </div>
+          </div>
+          <div class="toolbar">
+            <button class="btn">期間指定</button>
+            <button class="btn">フィルタ</button>
+            <button class="btn btn-primary">検証実行</button>
+          </div>
+          <div class="tabs">
+            <div class="tab active">検証待ち</div>
+            <div class="tab">検証済</div>
+            <div class="tab">不一致</div>
+          </div>
+          <div class="tab-content active">
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>請求ID</th>
+                    <th>顧客</th>
+                    <th>金額</th>
+                    <th>請求日</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>INV-2024-005</td>
+                    <td>GHI商会</td>
+                    <td>¥150,000</td>
+                    <td>2024-01-15</td>
+                    <td><div class="action-menu"><button class="action-btn">検証</button></div></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782113601682" style="display:none"></div>
+            <div class="panel-subtitle">契約情報と請求データの整合性を検証・修正</div>
+          </div>
+          <div class="split-layout">
+            <div class="split-left">
+              <div class="card">
+                <div class="card-header">照合対象選択</div>
+                <div class="list-item active">
+                  <div class="list-item-title">INV-2024-001</div>
+                  <div class="list-item-meta">ABC商事 | ¥100,000</div>
+                </div>
+                <div class="list-item">
+                  <div class="list-item-title">INV-2024-002</div>
+                  <div class="list-item-meta">XYZ工業 | ¥85,000</div>
+                </div>
+              </div>
+            </div>
+            <div class="split-right">
+              <div style="margin-bottom: 16px;">
+                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">照合結果</div>
+                <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                  <span class="badge badge-success">契約金額: 一致</span>
+                  <span class="badge badge-success">割引: 一致</span>
+                </div>
+              </div>
+              <div style="border-top: 1px solid var(--border); padding-top: 12px;">
+                <table class="comparison-table">
+                  <tr>
+                    <th>項目</th>
+                    <th>契約</th>
+                    <th>請求</th>
+                  </tr>
+                  <tr>
+                    <td>金額</td>
+                    <td>¥100,000</td>
+                    <td>¥100,000</td>
+                  </tr>
+                  <tr>
+                    <td>割引率</td>
+                    <td>10%</td>
+                    <td>10%</td>
+                  </tr>
+                </table>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn" style="flex: 1;">修正</button>
+                <button class="btn btn-primary" style="flex: 1;">承認</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782113728154" style="display:none"></div>
+            <div class="panel-subtitle">請求情報の内容を確認・承認または却下</div>
+          </div>
+          <div class="toolbar">
+            <input type="text" class="search-box" placeholder="請求ID検索">
+            <select class="form-select" style="flex: 0 0 150px;">
+              <option>承認待ち</option>
+              <option>承認済</option>
+              <option>却下</option>
+            </select>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>請求ID</th>
+                  <th>顧客</th>
+                  <th>金額</th>
+                  <th>請求日</th>
+                  <th>支払期限</th>
+                  <th>ステータス</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>INV-2024-001</td>
+                  <td>ABC商事</td>
+                  <td>¥100,000</td>
+                  <td>2024-01-10</td>
+                  <td>2024-02-10</td>
+                  <td><span class="badge badge-warning">承認待ち</span></td>
+                  <td><div class="action-menu"><button class="action-btn">詳細</button><button class="action-btn">承認</button></div></td>
+                </tr>
+                <tr>
+                  <td>INV-2024-002</td>
+                  <td>XYZ工業</td>
+                  <td>¥80,000</td>
+                  <td>2024-01-05</td>
+                  <td>2024-02-05</td>
+                  <td><span class="badge badge-success">承認済</span></td>
+                  <td><div class="action-menu"><button class="action-btn">詳細</button></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782113423106" style="display:none"></div>
+            <div class="panel-subtitle">契約・請求データの時系列変化を比較分析</div>
+          </div>
+          <div class="toolbar">
+            <select class="form-select" style="flex: 0 0 150px;">
+              <option>過去3ヶ月</option>
+              <option>過去6ヶ月</option>
+              <option>過去1年</option>
+            </select>
+            <select class="form-select" style="flex: 0 0 150px;">
+              <option>全顧客</option>
+              <option>ABC商事</option>
+              <option>XYZ工業</option>
+            </select>
+            <button class="btn btn-accent">グラフ表示</button>
+          </div>
+          <div class="card">
+            <div class="card-header">契約金額推移</div>
+            <div style="height: 200px; background-color: var(--bg-main); border-radius: 3px; display: flex; align-items: center; justify-content: center; color: var(--text-muted);">
+              グラフ領域 (Chart.js / D3.js等で実装)
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">月別請求額比較</div>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>月</th>
+                    <th>契約金額</th>
+                    <th>請求金額</th>
+                    <th>差異</th>
+                    <th>変化率</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>2023-11月</td>
+                    <td>¥950,000</td>
+                    <td>¥950,000</td>
+                    <td>¥0</td>
+                    <td>0%</td>
+                  </tr>
+                  <tr>
+                    <td>2023-12月</td>
+                    <td>¥1,000,000</td>
+                    <td>¥1,000,000</td>
+                    <td>¥0</td>
+                    <td>+5.3%</td>
+                  </tr>
+                  <tr>
+                    <td>2024-01月</td>
+                    <td>¥1,200,000</td>
+                    <td>¥1,200,000</td>
+                    <td>¥0</td>
+                    <td>+20.0%</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782113655035" style="display:none"></div>
+            <div class="panel-subtitle">契約変更内容を検証し、自動確認ルールに基づいて処理</div>
+          </div>
+          <div class="stepper">
+            <div class="step completed">
+              <div class="step-number">1</div>
+              <div>入力</div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step active">
+              <div class="step-number">2</div>
+              <div>検証</div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step">
+              <div class="step-number">3</div>
+              <div>確認</div>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">検証ルール</div>
+              <div style="font-size: 12px; color: var(--text-muted); line-height: 1.6;">
+                <div style="margin-bottom: 8px;">✓ 金額範囲チェック</div>
+                <div style="margin-bottom: 8px;">✓ 割引率妥当性</div>
+                <div style="margin-bottom: 8px;">✓ 契約期間整合性</div>
+                <div>✓ 顧客信用情報</div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">検証結果</div>
+              <div style="margin-bottom: 12px;">
+                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">全ルール</div>
+                <div style="font-size: 13px; font-weight: 600; color: var(--success);">✓ 全て合格</div>
+              </div>
+              <div style="border-top: 1px solid var(--border); padding-top: 12px;">
+                <button class="btn" style="width: 100%; margin-bottom: 8px;">詳細確認</button>
+                <button class="btn btn-primary" style="width: 100%;">自動承認</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782113681154" style="display:none"></div>
+            <div class="panel-subtitle">契約変更に関する顧客合意を自動記録・通知管理</div>
+          </div>
+          <div class="tabs">
+            <div class="tab active">未処理</div>
+            <div class="tab">処理済</div>
+            <div class="tab">通知履歴</div>
+          </div>
+          <div class="tab-content active">
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>契約ID</th>
+                    <th>顧客</th>
+                    <th>変更内容</th>
+                    <th>送信日時</th>
+                    <th>ステータス</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>C001</td>
+                    <td>ABC商事</td>
+                    <td>金額変更: ¥1,000,000 → ¥1,200,000</td>
+                    <td>2024-01-15 10:30</td>
+                    <td><span class="badge badge-warning">待機中</span></td>
+                    <td><div class="action-menu"><button class="action-btn">再送</button><button class="action-btn">確認</button></div></td>
+                  </tr>
+                  <tr>
+                    <td>C002</td>
+                    <td>XYZ工業</td>
+                    <td>割引率変更: 5% → 8%</td>
+                    <td>2024-01-14 14:15</td>
+                    <td><span class="badge badge-success">合意済</span></td>
+                    <td><div class="action-menu"><button class="action-btn">詳細</button></div></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782113508689" style="display:none"></div>
+            <div class="panel-subtitle">契約変更と請求内容の検証結果を記録・承認</div>
+          </div>
+          <div class="split-layout">
+            <div class="split-left">
+              <div class="card">
+                <div class="card-header">処理待ち一覧</div>
+                <div class="list-item active">
+                  <div class="list-item-title">検証#V001</div>
+                  <div class="list-item-meta">ABC商事 | 2024-01-15</div>
+                </div>
+                <div class="list-item">
+                  <div class="list-item-title">検証#V002</div>
+                  <div class="list-item-meta">XYZ工業 | 2024-01-14</div>
+                </div>
+              </div>
+            </div>
+            <div class="split-right">
+              <div style="margin-bottom: 16px;">
+                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">検証ID</div>
+                <div style="font-size: 13px; font-weight: 600; margin-bottom: 16px;">V001</div>
+              </div>
+              <div style="margin-bottom: 16px;">
+                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">検証内容</div>
+                <div style="font-size: 12px; color: var(--text);">契約金額変更: ¥1,000,000 → ¥1,200,000</div>
+              </div>
+              <div style="margin-bottom: 16px;">
+                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">検証結果</div>
+                <div><span class="badge badge-success">合格</span></div>
+              </div>
+              <div style="border-top: 1px solid var(--border); padding-top: 12px;">
+                <div class="form-group">
+                  <label class="form-label">承認コメント</label>
+                  <textarea class="form-textarea" placeholder="コメントを入力"></textarea>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                  <button class="btn" style="flex: 1;">却下</button>
+                  <button class="btn btn-primary" style="flex: 1;">承認</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782113703566" style="display:block"><div style="display: grid; grid-template-columns: 320px 1fr; gap: 12px; height: 100%; overflow: hidden;">
+  <!-- 左パネル: 契約検索・一覧 -->
+  <div style="display: flex; flex-direction: column; gap: 8px; overflow: hidden; border-right: 1px solid rgba(255,255,255,0.1);">
+    <div style="padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+      <h3 style="margin: 0 0 8px 0; font-size: 13px; font-weight: 600; color: var(--text);">契約検索</h3>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <input 
+          type="text" 
+          placeholder="契約ID" 
+          data-testid="contract-id-search"
+          style="padding: 6px 8px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.25); color: var(--text); border-radius: 4px; font-size: 12px;"
+        />
+        <input 
+          type="text" 
+          placeholder="顧客名" 
+          data-testid="customer-name-search"
+          style="padding: 6px 8px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.25); color: var(--text); border-radius: 4px; font-size: 12px;"
+        />
+        <button 
+          data-testid="search-button"
+          style="padding: 6px 12px; background: var(--primary); color: #fff; border: none; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer;"
+        >検索</button>
+      </div>
+    </div>
+    <div style="flex: 1; overflow-y: auto; padding: 0 8px;">
+      <div id="contract-list" style="display: flex; flex-direction: column; gap: 6px;">
+        <!-- 契約リスト（動的生成） -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 右パネル: 詳細編集フォーム -->
+  <div style="display: flex; flex-direction: column; gap: 8px; overflow: hidden;">
+    <!-- タブ -->
+    <div style="display: flex; gap: 0; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 0 12px;">
+      <button 
+        class="tab-btn" 
+        data-tab="contract-info"
+        data-testid="tab-contract-info"
+        style="padding: 10px 16px; background: transparent; border: none; color: var(--text); font-size: 13px; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s;"
+      >契約情報</button>
+      <button 
+        class="tab-btn" 
+        data-tab="billing-info"
+        data-testid="tab-billing-info"
+        style="padding: 10px 16px; background: transparent; border: none; color: var(--text-muted); font-size: 13px; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s;"
+      >請求情報</button>
+      <button 
+        class="tab-btn" 
+        data-tab="billing-details"
+        data-testid="tab-billing-details"
+        style="padding: 10px 16px; background: transparent; border: none; color: var(--text-muted); font-size: 13px; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s;"
+      >請求明細</button>
+      <button 
+        class="tab-btn" 
+        data-tab="history"
+        data-testid="tab-history"
+        style="padding: 10px 16px; background: transparent; border: none; color: var(--text-muted); font-size: 13px; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s;"
+      >変更履歴</button>
+    </div>
+
+    <!-- タブコンテンツ -->
+    <div style="flex: 1; overflow-y: auto; padding: 12px;">
+      <!-- 契約情報タブ -->
+      <div id="tab-contract-info" class="tab-content" style="display: block;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div>
+            <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600;">契約ID</label>
+            <input 
+              type="text" 
+              id="contract-id" 
+              readonly
+              data-testid="contract-id-display"
+              style="width: 100%; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.15); color: var(--text-muted); border-radius: 4px; font-size: 12px;"
+            />
+          </div>
+          <div>
+            <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600;">顧客名</label>
+            <input 
+              type="text" 
+              id="customer-name" 
+              readonly
+              data-testid="customer-name-display"
+              style="width: 100%; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.15); color: var(--text-muted); border-radius: 4px; font-size: 12px;"
+            />
+          </div>
+          <div>
+            <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600;">契約名</label>
+            <input 
+              type="text" 
+              id="contract-name"
+              data-testid="contract-name-input"
+              style="width: 100%; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.25); color: var(--text); border-radius: 4px; font-size: 12px;"
+            />
+          </div>
+          <div>
+            <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600;">契約ステータス</label>
+            <select 
+              id="contract-status"
+              data-testid="contract-status-select"
+              style="width: 100%; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.25); color: var(--text); border-radius: 4px; font-size: 12px;"
+            >
+              <option value="">選択してください</option>
+              <option value="提案中">提案中</option>
+              <option value="承認待ち">承認待ち</option>
+              <option value="契約済">契約済</option>
+              <option value="完了">完了</option>
+              <option value="終了">終了</option>
+            </select>
+          </div>
+          <div>
+            <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600;">契約開始日</label>
+            <input 
+              type="date" 
+              id="contract-start-date"
+              data-testid="contract-start-date-input"
+              style="width: 100%; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.25); color: var(--text); border-radius: 4px; font-size: 12px;"
+            />
+          </div>
+          <div>
+            <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600;">契約終了日</label>
+            <input 
+              type="date" 
+              id="contract-end-date"
+              data-testid="contract-end-date-input"
+              style="width: 100%; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.25); color: var(--text); border-radius: 4px; font-size: 12px;"
+            />
+          </div>
+          <div style="grid-column: 1 / -1;">
+            <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600;">契約金額（円）</label>
+            <input 
+              type="number" 
+              id="contract-amount"
+              data-testid="contract-amount-input"
+              style="width: 100%; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.25); color: var(--text); border-radius: 4px; font-size: 12px;"
+            />
+          </div>
+          <div style="grid-column: 1 / -1;">
+            <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600;">契約内容</label>
+            <textarea 
+              id="contract-content"
+              data-testid="contract-content-textarea"
+              style="width: 100%; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.25); color: var(--text); border-radius: 4px; font-size: 12px; min-height: 60px; resize: vertical;"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- 請求情報タブ -->
+      <div id="tab-billing-info" class="tab-content" style="display: none;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div>
+            <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600;">請求周期</label>
+            <select 
+              id="billing-cycle"
+              data-testid="billing-cycle-select"
+              style="width: 100%; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.25); color: var(--text); border-radius: 4px; font-size: 12px;"
+            >
+              <option value="">選択してください</option>
+              <option value="月次">月次</option>
+              <option value="四半期">四半期</option>
+              <option value="半年">半年</option>
+              <option value="年次">年次</option>
+            </select>
+          </div>
+          <div>
+            <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600;">請求金額（円）</label>
+            <input 
+              type="number" 
+              id="billing-amount"
+              data-testid="billing-amount-input"
+              style="width: 100%; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.25); color: var(--text); border-radius: 4px; font-size: 12px;"
+            />
+          </div>
+          <div>
+            <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600;">請求ステータス</label>
+            <select 
+              id="billing-status"
+              data-testid="billing-status-select"
+              style="width: 100%; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.25); color: var(--text); border-radius: 4px; font-size: 12px;"
+            >
+              <option value="">選択してください</option>
+              <option value="未請求">未請求</option>
+              <option value="請求済">請求済</option>
+              <option value="支払済">支払済</option>
+              <option value="延滞">延滞</option>
+              <option value="キャンセル">キャンセル</option>
+            </select>
+          </div>
+          <div>
+            <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600;">請求日付</label>
+            <input 
+              type="date" 
+              id="billing-date"
+              data-testid="billing-date-input"
+              style="width: 100%; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.25); color: var(--text); border-radius: 4px; font-size: 12px;"
+            />
+          </div>
+          <div style="grid-column: 1 / -1;">
+            <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600;">摘要</label>
+            <textarea 
+              id="billing-notes"
+              data-testid="billing-notes-textarea"
+              style="width: 100%; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.25); color: var(--text); border-radius: 4px; font-size: 12px; min-height: 60px; resize: vertical;"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- 請求明細タブ -->
+      <div id="tab-billing-details" class="tab-content" style="display: none;">
+        <div style="margin-bottom: 12px;">
+          <button 
+            id="add-detail-btn"
+            data-testid="add-detail-button"
+            style="padding: 6px 12px; background: var(--primary); color: #fff; border: none; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer;"
+          >+ 明細項目追加</button>
+        </div>
+        <div style="overflow-x: auto;">
+          <table data-testid="billing-details-table" style="width: 100%; border-collapse: collapse; font-size: 12px;">
+            <thead>
+              <tr style="background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <th style="padding: 8px; text-align: left; color: var(--text); font-weight: 600; border-right: 1px solid rgba(255,255,255,0.1);">明細種別</th>
+                <th style="padding: 8px; text-align: left; color: var(--text); font-weight: 600; border-right: 1px solid rgba(255,255,255,0.1);">説明</th>
+                <th style="padding: 8px; text-align: right; color: var(--text); font-weight: 600; border-right: 1px solid rgba(255,255,255,0.1);">数量</th>
+                <th style="padding: 8px; text-align: right; color: var(--text); font-weight: 600; border-right: 1px solid rgba(255,255,255,0.1);">単価</th>
+                <th style="padding: 8px; text-align: right; color: var(--text); font-weight: 600; border-right: 1px solid rgba(255,255,255,0.1);">金額</th>
+                <th style="padding: 8px; text-align: center; color: var(--text); font-weight: 600;">操作</th>
+              </tr>
+            </thead>
+            <tbody id="billing-details-tbody">
+              <!-- 明細行（動的生成） -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 変更履歴タブ -->
+      <div id="tab-history" class="tab-content" style="display: none;">
+        <div id="history-timeline" style="display: flex; flex-direction: column; gap: 8px;">
+          <!-- 履歴タイムライン（動的生成） -->
+        </div>
+      </div>
+    </div>
+
+    <!-- アクションボタン -->
+    <div style="padding: 12px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; gap: 8px; justify-content: flex-end;">
+      <button 
+        id="cancel-btn"
+        data-testid="cancel-button"
+        style="padding: 8px 16px; background: transparent; border: 1px solid rgba(255,255,255,0.18); color: var(--text); border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer;"
+      >キャンセル</button>
+      <button 
+        id="save-btn"
+        data-testid="save-button"
+        style="padding: 8px 16px; background: var(--primary); color: #fff; border: none; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer;"
+      >保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 明細編集モーダル -->
+<div id="detail-modal" hidden style="position: fixed; inset: 0; z-index: 1000; background: rgba(0, 0, 0, 0.55); display: flex; align-items: center; justify-content: center;">
+  <div style="background: var(--bg-card); color: var(--text); padding: 24px; border-radius: 8px; max-width: 500px; width: 90%; box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
+    <h3 style="margin: 0 0 16px 0; font-size: 14px; font-weight: 700;">請求明細編集</h3>
+    <div style="display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 16px;">
+      <div>
+        <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600;">明細種別</label>
+        <select 
+          id="modal-detail-type"
+          data-testid="modal-detail-type-select"
+          style="width: 100%; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.25); color: var(--text); border-radius: 4px; font-size: 12px;"
+        >
+          <option value="">選択してください</option>
+          <option value="基本料金">基本料金</option>
+          <option value="従量料金">従量料金</option>
+          <option value="追加サービス">追加サービス</option>
+          <option value="調整">調整</option>
+        </select>
+      </div>
+      <div>
+        <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600;">説明</label>
+        <input 
+          type="text" 
+          id="modal-detail-description"
+          data-testid="modal-detail-description-input"
+          style="width: 100%; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.25); color: var(--text); border-radius: 4px; font-size: 12px;"
+        />
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <div>
+          <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600;">数量</label>
+          <input 
+            type="number" 
+            id="modal-detail-quantity"
+            data-testid="modal-detail-quantity-input"
+            value="1"
+            style="width: 100%; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.25); color: var(--text); border-radius: 4px; font-size: 12px;"
+          />
+        </div>
+        <div>
+          <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600;">単価（円）</label>
+          <input 
+            type="number" 
+            id="modal-detail-unit-price"
+            data-testid="modal-detail-unit-price-input"
+            style="width: 100%; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.25); color: var(--text); border-radius: 4px; font-size: 12px;"
+          />
+        </div>
+      </div>
+      <div>
+        <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600;">税率（%）</label>
+        <input 
+          type="number" 
+          id="modal-detail-tax-rate"
+          data-testid="modal-detail-tax-rate-input"
+          value="10"
+          style="width: 100%; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.25); color: var(--text); border-radius: 4px; font-size: 12px;"
+        />
+      </div>
+    </div>
+    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+      <button 
+        id="modal-cancel-btn"
+        data-testid="modal-cancel-button"
+        style="padding: 8px 16px; background: transparent; border: 1px solid rgba(255,255,255,0.18); color: var(--text); border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer;"
+      >キャンセル</button>
+      <button 
+        id="modal-save-btn"
+        data-testid="modal-save-button"
+        style="padding: 8px 16px; background: var(--primary); color: #fff; border: none; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer;"
+      >保存</button>
+    </div>
+  </div>
+</div></div>
+            <div class="panel-subtitle">契約情報と請求データを一括更新・検証</div>
+          </div>
+          <div class="card">
+            <div class="card-header">更新対象選択</div>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" checked>
+                <span style="font-size: 12px;">契約マスタ更新</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" checked>
+                <span style="font-size: 12px;">請求データ更新</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox">
+                <span style="font-size: 12px;">操作ログ記録</span>
+              </label>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">更新範囲</div>
+            <div class="form-group">
+              <label class="form-label">対象期間</label>
+              <input type="date" class="form-input">
+              <span style="color: var(--text-muted); font-size: 11px;">～</span>
+              <input type="date" class="form-input" style="margin-top: 4px;">
+            </div>
+            <div class="form-group">
+              <label class="form-label">対象顧客</label>
+              <select class="form-select">
+                <option>全顧客</option>
+                <option>ABC商事</option>
+                <option>XYZ工業</option>
+              </select>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">実行確認</div>
+            <div style="background-color: var(--bg-main); padding: 12px; border-radius: 3px; margin-bottom: 12px; font-size: 12px; color: var(--text-muted);">
+              <div>更新対象: 契約マスタ、請求データ</div>
+              <div>対象期間: 2024-01-01 ～ 2024-01-31</div>
+              <div>対象顧客: 全顧客 (3件)</div>
+            </div>
+            <div style="display: flex; gap: 12px;">
+              <button class="btn" style="flex: 1;">キャンセル</button>
+              <button class="btn btn-primary" style="flex: 1;">実行</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+(function() {
+  var TABLE_DEFS = window.AIVIC_TABLES || [];
+  var PRESET_SEED = window.AIVIC_PRESET_SEED || {};
+  var SYSTEM_NAME = window.AIVIC_SYSTEM_NAME || "";
+  var APP_ID = window.AIVIC_APP_ID || "";
+  var API_URL = (window.AIVIC_API_URL && window.AIVIC_API_URL !== "REPLACE_WITH_API_URL")
+    ? window.AIVIC_API_URL : window.location.origin;
+
+  // 通知 helper ( SPA 版と同じ )
+  window.aivicNotify = (function() {
+    function ensureContainer() {
+      var c = document.getElementById("aivic-toast-container");
+      if (c) return c;
+      c = document.createElement("div");
+      c.id = "aivic-toast-container";
+      c.style.cssText = "position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;max-width:360px;";
+      document.body.appendChild(c);
+      return c;
+    }
+    function show(msg, type) {
+      var c = ensureContainer();
+      var el = document.createElement("div");
+      el.textContent = msg;
+      el.style.cssText = "padding:10px 16px;border-radius:8px;font-size:13px;line-height:1.4;pointer-events:auto;color:#fff;background:" + (type === "error" ? "#dc2626" : "#d97706");
+      c.appendChild(el);
+      setTimeout(function() {
+        el.style.transition = "opacity .3s";
+        el.style.opacity = "0";
+        setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 320);
+      }, type === "error" ? 6000 : 4500);
+    }
+    return {
+      error: function(msg) { show("❌ " + msg, "error"); },
+      warn:  function(msg) { show("⚠️ " + msg, "warn"); },
+    };
+  })();
+
+  // CRUD API ( SPA 版と同じ )
+  window.aivicApi = (function() {
+    function dbErr(op) { window.aivicNotify.error("データベースエラー ( " + op + " ): APIサーバーに接続できません。"); }
+    function newId() { return typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : "id-" + Date.now() + "-" + Math.random().toString(36).slice(2); }
+    function q(i) {
+      var t = TABLE_DEFS[i];
+      var dbP = (window.AIVIC_DB_TYPE && window.AIVIC_DB_TYPE !== "dynamodb") ? "&db=" + encodeURIComponent(window.AIVIC_DB_TYPE) : "";
+      return "?app=" + encodeURIComponent(APP_ID) + "&system=" + encodeURIComponent(SYSTEM_NAME) + "&table=" + encodeURIComponent(t ? t.tableName : "table" + i) + dbP;
+    }
+    return {
+      list: async function(tableIndex) {
+        if (!API_URL) return [];
+        try { var r = await fetch(API_URL + "/api/" + tableIndex + q(tableIndex)); var d = await r.json(); return Array.isArray(d) ? d : (d.items || []); }
+        catch(e) { dbErr("データ取得"); return []; }
+      },
+      save: async function(tableIndex, item) {
+        if (!API_URL) { dbErr("保存"); return null; }
+        var now = new Date().toISOString();
+        var rec = Object.assign({}, item, { id: item.id || newId(), createdAt: item.createdAt || now, updatedAt: now });
+        try { var r = await fetch(API_URL + "/api/" + tableIndex + q(tableIndex), { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(rec) }); return await r.json(); }
+        catch(e) { dbErr("保存"); return null; }
+      },
+      update: async function(tableIndex, id, changes) {
+        if (!API_URL) { dbErr("更新"); return null; }
+        try { var r = await fetch(API_URL + "/api/" + tableIndex + "/" + id + q(tableIndex), { method:"PUT", headers:{"Content-Type":"application/json"}, body:JSON.stringify(Object.assign({}, changes, {updatedAt: new Date().toISOString()})) }); return await r.json(); }
+        catch(e) { dbErr("更新"); return null; }
+      },
+      delete: async function(tableIndex, id) {
+        if (!API_URL) { dbErr("削除"); return {deleted:false}; }
+        try { await fetch(API_URL + "/api/" + tableIndex + "/" + id + q(tableIndex), {method:"DELETE"}); return {deleted:true}; }
+        catch(e) { dbErr("削除"); return {deleted:false}; }
+      },
+    };
+  })();
+
+  // showScreen はマルチページ構成ではページ遷移として動く。
+  var _aivicNavLastTime = 0;
+  var _aivicNavLastTarget = "";
+  var _aivicReady = false;
+  window.showScreen = function(screenId) {
+    if (!screenId) return;
+    if (screenId === window.AIVIC_PAGE_SCREEN_ID) return;
+    var targetPath = './' + encodeURIComponent(screenId) + '.html';
+    var currentName = (window.location.pathname.split('/').pop() || '');
+    if (currentName === (encodeURIComponent(screenId) + '.html') ||
+        currentName === (screenId + '.html')) {
+      return;
+    }
+    var now = Date.now();
+    if (_aivicNavLastTarget === targetPath && (now - _aivicNavLastTime) < 100) {
+      console.warn('[aivic] showScreen 連続呼び出し検知。 無限ループ防止のため抑制:', screenId);
+      return;
+    }
+    if (!_aivicReady) {
+      console.warn('[aivic] DOMContentLoaded 前の showScreen 呼び出し。 抑制:', screenId);
+      return;
+    }
+    _aivicNavLastTime = now;
+    _aivicNavLastTarget = targetPath;
+    window.location.href = targetPath;
+  };
+
+  function seedAllIfEmpty() {
+    if (!API_URL) return Promise.resolve();
+    return Promise.all(TABLE_DEFS.map(function(t, i) {
+      var preset = PRESET_SEED[t.tableName];
+      if (!Array.isArray(preset) || preset.length === 0) return Promise.resolve();
+      return window.aivicApi.list(i).then(function(existing) {
+        if (existing && existing.length > 0) return;
+        return Promise.all(preset.map(function(row) { return window.aivicApi.save(i, row); }));
+      }).catch(function() {});
+    }));
+  }
+
+  // ── 初期表示: このページ専用の panel に initFn を実行 ──
+  document.addEventListener("DOMContentLoaded", function() {
+    setTimeout(function() { _aivicReady = true; }, 1500);
+    var pageScreenId = window.AIVIC_PAGE_SCREEN_ID;
+    if (!pageScreenId) return;
+
+    document.querySelectorAll('[data-aivic-nav]').forEach(function(btn) {
+      var isActive = btn.getAttribute("data-aivic-nav") === pageScreenId;
+      btn.classList.toggle("aivic-active", isActive);
+      btn.setAttribute("aria-current", isActive ? "page" : "false");
+    });
+
+    var container = document.querySelector('[data-aivic-panel="' + pageScreenId + '"]');
+    if (!container) return;
+
+    // content 要素の hidden 強制除去 ( 2026-05-24 Playwright 大量 fail 対応 )
+    var isModalLike = function(el) {
+      if (!el || !el.classList) return false;
+      var cn = String(el.className || "");
+      if (/\bmodal\b|\bdialog\b|\boverlay\b|\bpopup\b|\bdropdown\b|\btooltip\b/i.test(cn)) return true;
+      var role = el.getAttribute && el.getAttribute("role");
+      if (role === "dialog" || role === "alertdialog" || role === "tooltip" || role === "menu") return true;
+      if (el.hasAttribute && (el.hasAttribute("data-modal") || el.hasAttribute("data-dropdown") || el.hasAttribute("data-popup"))) return true;
+      return false;
+    };
+    var unhideContentElements = function(root) {
+      var all = root.querySelectorAll('.hidden, [hidden], [style*="display:none"], [style*="display: none"]');
+      for (var k = 0; k < all.length; k++) {
+        var el = all[k];
+        if (isModalLike(el)) continue;
+        var p = el.parentElement;
+        var insideModal = false;
+        while (p && p !== root) {
+          if (isModalLike(p)) { insideModal = true; break; }
+          p = p.parentElement;
+        }
+        if (insideModal) continue;
+        el.classList.remove('hidden');
+        el.removeAttribute('hidden');
+        if (el.style && el.style.display === 'none') el.style.display = '';
+      }
+    };
+    try { unhideContentElements(container); } catch (e) { console.warn('[aivic] unhideContent failed:', e); }
+
+    var initJsSource = window.AIVIC_PAGE_INIT_JS;
+    if (!initJsSource) {
+      seedAllIfEmpty();
+      return;
+    }
+    var initFn = null;
+    try {
+      initFn = (new Function("return (" + initJsSource + ")"))();
+    } catch (e) {
+      console.error("[aivic] initJs compile error:", pageScreenId, e);
+      return;
+    }
+    if (typeof initFn !== "function") return;
+
+    seedAllIfEmpty().then(function() {
+      return Promise.all(TABLE_DEFS.map(function(t, i) {
+        return window.aivicApi.list(i)
+          .then(function(records) { return Object.assign({}, t, { records: records }); })
+          .catch(function() { return Object.assign({}, t, { records: [] }); });
+      }));
+    }).then(function(tables) {
+      try { initFn(container, API_URL, tables); } catch (e) { console.error("[aivic] initFn error:", pageScreenId, e); }
+      _aivicReady = true;
+    });
+  });
+})();
+
+</script>
+</body>
+</html>

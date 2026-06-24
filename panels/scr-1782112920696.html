@@ -1,0 +1,1646 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>契約・成果管理ポータル</title>
+  <style>
+:root {
+  --primary: #c92a2a;
+  --primary-hover: #a61e1e;
+  --accent-gold: #c9a23e;
+  --accent-gold-hover: #b8860b;
+  --bg-main: #1a0a0a;
+  --bg-card: #2a1515;
+  --bg-sidebar: #1f0d0d;
+  --top-bar-bg: #240f0f;
+  --border: #4a2a2a;
+  --border-light: #6a3a3a;
+  --text: #f5f5f5;
+  --text-muted: #b8b8b8;
+  --text-disabled: #6a6a6a;
+  --top-bar-border: #5a2a2a;
+  --success: #51cf66;
+  --warning: #ffd43b;
+  --error: #ff6b6b;
+  --info: #74c0fc;
+  --button-bg: #c92a2a;
+  --button-text: #ffffff;
+  --button-hover-bg: #a61e1e;
+  --button-active-bg: #8b1515;
+  --button-secondary-bg: #2a1515;
+  --button-secondary-text: #c9a23e;
+  --button-secondary-hover-bg: #3a2020;
+  --button-secondary-border: #c9a23e;
+  --input-bg: #2a1515;
+  --input-border: #4a2a2a;
+  --input-border-focus: #c9a23e;
+  --input-text: #f5f5f5;
+  --input-placeholder: #8a7a7a;
+  --table-header-bg: #240f0f;
+  --table-row-hover: #3a1f1f;
+  --table-border: #4a2a2a;
+  --badge-bg: #c92a2a;
+  --badge-text: #ffffff;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+  background: var(--bg-main);
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.shell {
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  background: var(--top-bar-bg);
+  border-bottom: 1px solid var(--top-bar-border);
+  padding: 0 20px;
+  flex-shrink: 0;
+}
+
+.logo {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--accent-gold);
+}
+
+.top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logout-link {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 3px;
+  transition: all 0.2s;
+}
+.logout-link:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.main-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 220px;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.sidebar-section {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-section:first-child {
+  padding-top: 8px;
+}
+
+.sidebar-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 8px 16px;
+  letter-spacing: 0.5px;
+}
+
+.nav-item {
+  display: block;
+  padding: 8px 16px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 13px;
+  transition: all 0.15s;
+  border-left: 2px solid transparent;
+}
+.nav-item:hover {
+  background: var(--border);
+  color: var(--text);
+}
+.nav-item.aivic-active {
+  background: var(--border-light);
+  color: var(--accent-gold);
+  border-left-color: var(--accent-gold);
+}
+
+.content-area {
+  flex: 1;
+  overflow-y: auto;
+  background: var(--bg-main);
+}
+
+.panel-container {
+  padding: 24px;
+  min-height: 100%;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 16px;
+}
+
+.kpi-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.kpi-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent-gold);
+  margin-bottom: 4px;
+}
+
+.kpi-change {
+  font-size: 12px;
+  color: var(--success);
+}
+.kpi-change.negative {
+  color: var(--error);
+}
+
+.section-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 16px;
+  margin-top: 24px;
+}
+.section-title:first-child {
+  margin-top: 0;
+}
+
+.table-wrapper {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  background: var(--table-header-bg);
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.table-header-cell {
+  padding: 10px 12px;
+  border-right: 1px solid var(--border);
+}
+.table-header-cell:last-child {
+  border-right: none;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  transition: background 0.15s;
+}
+.table-row:hover {
+  background: var(--table-row-hover);
+}
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.table-cell {
+  padding: 10px 12px;
+  border-right: 1px solid var(--border);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.table-cell:last-child {
+  border-right: none;
+}
+
+.badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--badge-bg);
+  color: var(--badge-text);
+}
+.badge.success {
+  background: var(--success);
+  color: #000;
+}
+.badge.warning {
+  background: var(--warning);
+  color: #000;
+}
+.badge.info {
+  background: var(--info);
+  color: #000;
+}
+
+.search-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 4px;
+  color: var(--input-text);
+  font-size: 13px;
+  transition: border-color 0.2s;
+}
+.search-input:focus {
+  outline: none;
+  border-color: var(--input-border-focus);
+}
+.search-input::placeholder {
+  color: var(--input-placeholder);
+}
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-primary {
+  background: var(--button-bg);
+  color: var(--button-text);
+}
+.btn-primary:hover {
+  background: var(--button-hover-bg);
+}
+.btn-primary:active {
+  background: var(--button-active-bg);
+}
+
+.btn-secondary {
+  background: var(--button-secondary-bg);
+  color: var(--button-secondary-text);
+  border: 1px solid var(--button-secondary-border);
+}
+.btn-secondary:hover {
+  background: var(--button-secondary-hover-bg);
+}
+
+.split-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  height: 100%;
+}
+
+.split-left {
+  overflow-y: auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.split-right {
+  overflow-y: auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 16px;
+}
+
+.list-item {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.list-item:hover {
+  background: var(--table-row-hover);
+}
+.list-item.active {
+  background: var(--border-light);
+  border-left: 2px solid var(--accent-gold);
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 4px;
+  color: var(--input-text);
+  font-size: 13px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--input-border-focus);
+}
+.form-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.stepper {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  align-items: center;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.step-number {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--border);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+.step.active .step-number {
+  background: var(--accent-gold);
+  color: #000;
+}
+.step.completed .step-number {
+  background: var(--success);
+  color: #000;
+}
+
+.step-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+  min-width: 20px;
+}
+
+.kanban-container {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.kanban-column {
+  flex: 0 0 300px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+}
+
+.kanban-header {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.kanban-cards {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.kanban-card {
+  background: var(--bg-main);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.kanban-card:hover {
+  border-color: var(--accent-gold);
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 24px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.timeline {
+  position: relative;
+  padding-left: 24px;
+}
+
+.timeline-item {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -24px;
+  top: 2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-gold);
+  border: 2px solid var(--bg-main);
+}
+
+.timeline-content {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.timeline-label {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.filter-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.filter-tag {
+  padding: 6px 12px;
+  background: var(--border);
+  border: 1px solid var(--border-light);
+  border-radius: 3px;
+  font-size: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.filter-tag.active {
+  background: var(--accent-gold);
+  color: #000;
+  border-color: var(--accent-gold);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state-text {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.empty-state-hint {
+  font-size: 12px;
+  color: var(--text-disabled);
+}
+
+  </style>
+  <script>
+window.AIVIC_API_URL = "https://mkwmoife37uqyv4zhy4yhweozq0oddxn.lambda-url.us-east-1.on.aws/";
+window.AIVIC_APP_ID = "session-1781935010162";
+window.AIVIC_SYSTEM_NAME = "顧客企業向け契約・成果管理ポータル";
+window.AIVIC_TABLES = [{"tableName":"顧客企業","purpose":"営業成果レポート自動生成・配信システムにおける顧客企業の基本情報を管理し、営業活動の対象企業として機能する","columns":[{"name":"顧客企業ID","type":"uuid","required":true,"description":"顧客企業の一意識別子"},{"name":"企業名","type":"varchar(100)","required":true,"description":"顧客企業の正式名称"},{"name":"業種","type":"varchar(100)","required":false,"description":"顧客企業の業種分類"},{"name":"所在地","type":"varchar(100)","required":false,"description":"顧客企業の本社所在地"},{"name":"代表者名","type":"varchar(100)","required":false,"description":"顧客企業の代表者名"},{"name":"電話番号","type":"varchar(100)","required":false,"description":"顧客企業の代表電話番号"},{"name":"メールアドレス","type":"varchar(100)","required":false,"description":"顧客企業の代表メールアドレス"},{"name":"担当営業ユーザーID","type":"uuid","required":true,"description":"ユーザーテーブルへの外部キー（担当営業）"},{"name":"ステータス","type":"varchar(100)","required":true,"description":"顧客企業のステータス（見込み客/既存顧客/休止中等）"},{"name":"作成日時","type":"timestamp","required":true,"description":"顧客企業レコード作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"顧客企業レコード最終更新日時"},{"name":"作成者ユーザーID","type":"uuid","required":true,"description":"ユーザーテーブルへの外部キー（作成者）"}]},{"tableName":"契約書","purpose":"契約・提案資料管理システムにおける契約書の基本情報を管理するマスタテーブル","columns":[{"name":"契約書ID","type":"uuid","required":true,"description":"契約書の一意識別子"},{"name":"契約書名","type":"varchar(100)","required":true,"description":"契約書のタイトル"},{"name":"契約書説明","type":"text","required":false,"description":"契約書の詳細説明"},{"name":"契約種別","type":"varchar(100)","required":true,"description":"契約の種類（例：売買契約、サービス契約、NDA等）"},{"name":"契約相手先ID","type":"uuid","required":true,"description":"契約相手先企業の識別子"},{"name":"契約開始日","type":"timestamp","required":true,"description":"契約の開始日"},{"name":"契約終了日","type":"timestamp","required":false,"description":"契約の終了日"},{"name":"契約金額","type":"integer","required":false,"description":"契約金額（円）"},{"name":"ステータス","type":"varchar(100)","required":true,"description":"契約状態（例：草案、承認待ち、有効、終了、キャンセル）"},{"name":"担当者ID","type":"uuid","required":true,"description":"契約の担当ユーザーID"},{"name":"ファイルパス","type":"varchar(100)","required":false,"description":"契約書ファイルの保存パス"},{"name":"作成日時","type":"timestamp","required":true,"description":"レコード作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"レコード最終更新日時"},{"name":"作成者ID","type":"uuid","required":true,"description":"レコード作成者のユーザーID"}]},{"tableName":"提案資料","purpose":"契約・提案資料管理システムにおいて、顧客への提案資料の情報を一元管理し、提案から契約への進捗を追跡するためのマスタテーブル","columns":[{"name":"提案資料ID","type":"uuid","required":true,"description":"提案資料の一意識別子"},{"name":"提案資料名","type":"varchar(100)","required":true,"description":"提案資料のタイトル・名称"},{"name":"説明","type":"text","required":false,"description":"提案資料の詳細説明"},{"name":"ユーザーID","type":"uuid","required":true,"description":"提案資料を作成・管理するユーザーの外部キー"},{"name":"ステータス","type":"varchar(100)","required":true,"description":"提案資料のステータス（下書き、提案中、承認待ち、契約済み、却下等）"},{"name":"提案日","type":"timestamp","required":true,"description":"顧客への提案実施日時"},{"name":"契約書ID","type":"uuid","required":false,"description":"関連する契約書の外部キー（契約成立時に設定）"},{"name":"作成日時","type":"timestamp","required":true,"description":"提案資料レコードの作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"提案資料レコードの最終更新日時"},{"name":"作成者ID","type":"uuid","required":true,"description":"提案資料を作成したユーザーの外部キー"}]},{"tableName":"契約","purpose":"顧客企業との契約情報を一元管理し、契約の締結、更新、ステータス追跡、成果管理を支援するマスタテーブル","columns":[{"name":"契約ID","type":"uuid","required":true,"description":"契約の一意識別子"},{"name":"顧客企業ID","type":"uuid","required":true,"description":"顧客企業テーブルへの外部キー"},{"name":"契約書ID","type":"uuid","required":false,"description":"契約書テーブルへの外部キー"},{"name":"提案資料ID","type":"uuid","required":false,"description":"提案資料テーブルへの外部キー"},{"name":"契約名","type":"varchar(100)","required":true,"description":"契約の名称"},{"name":"契約ステータス","type":"varchar(100)","required":true,"description":"契約状態（提案中/承認待ち/契約済/完了/終了等）"},{"name":"契約開始日","type":"timestamp","required":true,"description":"契約の開始日"},{"name":"契約終了日","type":"timestamp","required":true,"description":"契約の終了日"},{"name":"契約金額","type":"integer","required":true,"description":"契約金額（円）"},{"name":"契約内容","type":"text","required":false,"description":"契約の詳細内容"},{"name":"成果目標","type":"text","required":false,"description":"契約に基づく成果目標"},{"name":"作成日時","type":"timestamp","required":true,"description":"契約レコード作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"契約レコード最終更新日時"},{"name":"作成者","type":"varchar(100)","required":true,"description":"契約レコード作成者"},{"name":"更新者","type":"varchar(100)","required":false,"description":"契約レコード最終更新者"}]},{"tableName":"契約変更履歴","purpose":"契約の変更内容を時系列で記録し、変更前後の状態を追跡管理するための履歴テーブル","columns":[{"name":"変更履歴ID","type":"uuid","required":true,"description":"変更履歴レコードの一意識別子"},{"name":"契約ID","type":"uuid","required":true,"description":"変更対象の契約を特定するための外部キー"},{"name":"変更種別","type":"varchar(100)","required":true,"description":"変更の種類（金額変更、期間延長、条件変更、解除等）"},{"name":"変更前値","type":"text","required":false,"description":"変更前の値または状態"},{"name":"変更後値","type":"text","required":false,"description":"変更後の値または状態"},{"name":"変更理由","type":"text","required":false,"description":"変更の理由や背景"},{"name":"変更ステータス","type":"varchar(100)","required":true,"description":"変更の状態（申請中、承認済、却下、実行済等）"},{"name":"申請者ID","type":"uuid","required":true,"description":"変更を申請したユーザーの識別子"},{"name":"承認者ID","type":"uuid","required":false,"description":"変更を承認したユーザーの識別子"},{"name":"承認日時","type":"timestamp","required":false,"description":"変更が承認された日時"},{"name":"実行日時","type":"timestamp","required":false,"description":"変更が実際に反映された日時"},{"name":"作成日時","type":"timestamp","required":true,"description":"変更履歴レコードが作成された日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"変更履歴レコードが最後に更新された日時"},{"name":"備考","type":"text","required":false,"description":"その他の補足情報"}]},{"tableName":"成果物","purpose":"顧客企業向け契約に基づいて納品される成果物の管理。納品状況、品質、変更履歴を追跡し、契約の履行状況を把握するための中核テーブル","columns":[{"name":"成果物ID","type":"uuid","required":true,"description":"成果物の一意識別子"},{"name":"契約ID","type":"uuid","required":true,"description":"親契約への外部キー"},{"name":"成果物名","type":"varchar(100)","required":true,"description":"成果物の名称"},{"name":"説明","type":"text","required":false,"description":"成果物の詳細説明"},{"name":"ステータス","type":"varchar(100)","required":true,"description":"成果物の状態（計画中/進行中/完了/承認待ち/却下等）"},{"name":"納期","type":"timestamp","required":true,"description":"予定納期"},{"name":"実納期","type":"timestamp","required":false,"description":"実際の納期"},{"name":"品質評価","type":"varchar(100)","required":false,"description":"品質評価結果（合格/不合格/要修正等）"},{"name":"顧客承認状況","type":"varchar(100)","required":true,"description":"顧客による承認状況（未承認/承認/却下）"},{"name":"顧客承認日時","type":"timestamp","required":false,"description":"顧客が承認した日時"},{"name":"作成日時","type":"timestamp","required":true,"description":"成果物レコード作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"成果物レコード最終更新日時"},{"name":"作成者","type":"varchar(100)","required":true,"description":"成果物を作成したユーザー"},{"name":"更新者","type":"varchar(100)","required":true,"description":"成果物を最後に更新したユーザー"}]},{"tableName":"成果物納期","purpose":"成果物の納期管理と進捗追跡を行い、契約上の納期義務を履行するための基本台帳","columns":[{"name":"成果物納期ID","type":"uuid","required":true,"description":"成果物納期レコードの一意識別子"},{"name":"成果物ID","type":"uuid","required":true,"description":"成果物テーブルへの外部キー"},{"name":"契約ID","type":"uuid","required":true,"description":"契約テーブルへの外部キー"},{"name":"顧客企業ID","type":"uuid","required":true,"description":"顧客企業テーブルへの外部キー"},{"name":"予定納期日","type":"timestamp","required":true,"description":"契約で定められた成果物の納期予定日"},{"name":"実績納期日","type":"timestamp","required":false,"description":"実際に成果物が納期された日付"},{"name":"納期ステータス","type":"varchar(100)","required":true,"description":"納期状況（予定通り/遅延/完了等）"},{"name":"遅延日数","type":"integer","required":false,"description":"予定納期からの遅延日数（負数は早期納期）"},{"name":"遅延理由","type":"text","required":false,"description":"納期遅延が発生した場合の理由"},{"name":"納期変更履歴ID","type":"uuid","required":false,"description":"契約変更履歴テーブルへの外部キー（納期変更がある場合）"},{"name":"備考","type":"text","required":false,"description":"納期に関する追加情報やメモ"},{"name":"作成日時","type":"timestamp","required":true,"description":"レコード作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"レコード最終更新日時"},{"name":"作成者","type":"varchar(100)","required":true,"description":"レコード作成者のユーザーID"},{"name":"更新者","type":"varchar(100)","required":true,"description":"レコード最終更新者のユーザーID"}]},{"tableName":"納期変更履歴","purpose":"成果物の納期変更を履歴として記録し、変更の経緯、理由、承認状況を管理するテーブル","columns":[{"name":"納期変更履歴ID","type":"uuid","required":true,"description":"納期変更履歴の一意識別子"},{"name":"成果物納期ID","type":"uuid","required":true,"description":"成果物納期テーブルへの外部キー"},{"name":"契約ID","type":"uuid","required":true,"description":"契約テーブルへの外部キー"},{"name":"変更前納期","type":"timestamp","required":true,"description":"変更前の納期日時"},{"name":"変更後納期","type":"timestamp","required":true,"description":"変更後の納期日時"},{"name":"変更理由","type":"text","required":true,"description":"納期変更の理由"},{"name":"承認状況","type":"varchar(100)","required":true,"description":"承認状況（申請中/承認/却下）"},{"name":"承認者ID","type":"varchar(100)","required":false,"description":"承認者のユーザーID"},{"name":"承認日時","type":"timestamp","required":false,"description":"承認日時"},{"name":"承認コメント","type":"text","required":false,"description":"承認時のコメント"},{"name":"作成日時","type":"timestamp","required":true,"description":"変更申請の作成日時"},{"name":"作成者","type":"varchar(100)","required":true,"description":"変更申請を作成したユーザーID"},{"name":"更新日時","type":"timestamp","required":true,"description":"最終更新日時"}]},{"tableName":"請求書","purpose":"顧客企業への請求書を管理し、契約に基づく成果物納期と請求内容を紐付け、請求状況を追跡するトランザクションテーブル","columns":[{"name":"請求書ID","type":"uuid","required":true,"description":"請求書の一意識別子"},{"name":"顧客企業ID","type":"uuid","required":true,"description":"請求対象の顧客企業ID（顧客企業テーブルへの外部キー）"},{"name":"契約ID","type":"uuid","required":true,"description":"請求対象の契約ID（契約テーブルへの外部キー）"},{"name":"請求書番号","type":"varchar(100)","required":true,"description":"請求書の一意な番号（顧客向け表示用）"},{"name":"請求日","type":"timestamp","required":true,"description":"請求書発行日"},{"name":"請求期間開始日","type":"timestamp","required":true,"description":"請求対象期間の開始日"},{"name":"請求期間終了日","type":"timestamp","required":true,"description":"請求対象期間の終了日"},{"name":"請求金額","type":"integer","required":true,"description":"請求総額（税抜き、単位：円）"},{"name":"税額","type":"integer","required":true,"description":"消費税額（単位：円）"},{"name":"請求金額合計","type":"integer","required":true,"description":"請求総額（税込み、単位：円）"},{"name":"請求ステータス","type":"varchar(100)","required":true,"description":"請求状況（未送付/送付済/支払済/期限超過等）"},{"name":"支払期限日","type":"timestamp","required":true,"description":"支払期限日"},{"name":"支払日","type":"timestamp","required":false,"description":"実際の支払日（支払済の場合のみ）"},{"name":"備考","type":"text","required":false,"description":"請求書に関する備考・特記事項"},{"name":"作成日時","type":"timestamp","required":true,"description":"請求書レコード作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"請求書レコード最終更新日時"},{"name":"作成者","type":"varchar(100)","required":true,"description":"請求書を作成したユーザーID"}]},{"tableName":"メール履歴","purpose":"顧客企業との契約・成果に関するメール送受信の記録を管理し、コミュニケーション履歴の追跡と監査証跡を提供する","columns":[{"name":"メール履歴ID","type":"uuid","required":true,"description":"メール履歴の一意識別子"},{"name":"顧客企業ID","type":"uuid","required":true,"description":"関連する顧客企業への外部キー"},{"name":"契約ID","type":"uuid","required":false,"description":"関連する契約への外部キー（契約関連のメールの場合）"},{"name":"成果物ID","type":"uuid","required":false,"description":"関連する成果物への外部キー（成果物関連のメールの場合）"},{"name":"請求書ID","type":"uuid","required":false,"description":"関連する請求書への外部キー（請求関連のメールの場合）"},{"name":"送信者メールアドレス","type":"varchar(100)","required":true,"description":"メール送信者のメールアドレス"},{"name":"受信者メールアドレス","type":"varchar(100)","required":true,"description":"メール受信者のメールアドレス"},{"name":"CC","type":"text","required":false,"description":"CC対象のメールアドレス（複数の場合はカンマ区切り）"},{"name":"BCC","type":"text","required":false,"description":"BCC対象のメールアドレス（複数の場合はカンマ区切り）"},{"name":"件名","type":"varchar(100)","required":true,"description":"メールの件名"},{"name":"本文","type":"text","required":true,"description":"メール本文"},{"name":"メール種別","type":"varchar(100)","required":true,"description":"メールの種別（提案、契約確認、成果物納期通知、請求書送付、変更通知等）"},{"name":"送受信区分","type":"varchar(100)","required":true,"description":"送信または受信"},{"name":"送受信日時","type":"timestamp","required":true,"description":"メール送受信の日時"},{"name":"添付ファイル有無","type":"boolean","required":true,"description":"添付ファイルの有無"},{"name":"作成日時","type":"timestamp","required":true,"description":"レコード作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"レコード更新日時"},{"name":"作成者","type":"varchar(100)","required":true,"description":"レコード作成者"}]},{"tableName":"通知履歴","purpose":"顧客企業向けポータルで送信した通知の履歴を管理し、通知内容、送信状況、受信者情報を追跡する","columns":[{"name":"通知履歴ID","type":"uuid","required":true,"description":"通知履歴の一意識別子"},{"name":"顧客企業ID","type":"uuid","required":true,"description":"通知対象の顧客企業ID（外部キー）"},{"name":"通知タイプ","type":"varchar(100)","required":true,"description":"通知の種類（契約更新、成果物納期、請求書発行、契約変更等）"},{"name":"関連エンティティタイプ","type":"varchar(100)","required":false,"description":"通知の対象エンティティ種別（契約、成果物、請求書等）"},{"name":"関連エンティティID","type":"uuid","required":false,"description":"通知の対象エンティティID"},{"name":"通知タイトル","type":"varchar(100)","required":true,"description":"通知のタイトル"},{"name":"通知内容","type":"text","required":true,"description":"通知の本文内容"},{"name":"送信方法","type":"varchar(100)","required":true,"description":"通知の送信方法（メール、ポータル画面内通知等）"},{"name":"送信状態","type":"varchar(100)","required":true,"description":"送信状態（送信済、送信失敗、保留中等）"},{"name":"受信者メールアドレス","type":"varchar(100)","required":false,"description":"メール送信の場合の受信者メールアドレス"},{"name":"送信日時","type":"timestamp","required":true,"description":"通知の送信日時"},{"name":"既読フラグ","type":"boolean","required":true,"description":"ポータル内通知の既読状態"},{"name":"既読日時","type":"timestamp","required":false,"description":"通知が既読になった日時"},{"name":"エラーメッセージ","type":"text","required":false,"description":"送信失敗時のエラー内容"},{"name":"作成日時","type":"timestamp","required":true,"description":"通知履歴レコードの作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"通知履歴レコードの最終更新日時"}]},{"tableName":"ログインユーザー","purpose":"顧客企業向けポータルのログインユーザー管理。ユーザー認証、アクセス制御、監査ログの基盤となる。","columns":[{"name":"ユーザーID","type":"uuid","required":true,"description":"ログインユーザーの一意識別子"},{"name":"顧客企業ID","type":"uuid","required":true,"description":"所属する顧客企業への外部キー"},{"name":"メールアドレス","type":"varchar(100)","required":true,"description":"ログインID兼連絡先。企業内で一意"},{"name":"ユーザー名","type":"varchar(100)","required":true,"description":"ポータル上に表示されるユーザー名"},{"name":"パスワードハッシュ","type":"varchar(100)","required":true,"description":"認証用のハッシュ化されたパスワード"},{"name":"ロール","type":"varchar(100)","required":true,"description":"ユーザーの権限レベル（管理者/担当者/閲覧者等）"},{"name":"ステータス","type":"varchar(100)","required":true,"description":"ユーザーの状態（有効/無効/招待待機等）"},{"name":"最終ログイン日時","type":"timestamp","required":false,"description":"最後にログインした日時"},{"name":"作成日時","type":"timestamp","required":true,"description":"ユーザーアカウント作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"ユーザー情報最終更新日時"},{"name":"作成者","type":"uuid","required":true,"description":"ユーザーを作成した管理者のユーザーID"}]},{"tableName":"ユーザー権限","purpose":"ログインユーザーが顧客企業ポータル内で実行可能な操作を制御するための権限管理テーブル。ユーザーごとに契約書閲覧、成果物確認、請求書確認などの権限を付与・管理する。","columns":[{"name":"ユーザー権限ID","type":"uuid","required":true,"description":"ユーザー権限レコードの一意識別子"},{"name":"ログインユーザーID","type":"uuid","required":true,"description":"権限を付与されるログインユーザーへの外部キー"},{"name":"顧客企業ID","type":"uuid","required":true,"description":"権限が適用される顧客企業への外部キー"},{"name":"権限種別","type":"varchar(100)","required":true,"description":"付与する権限の種別（例：契約書閲覧、成果物確認、請求書確認、契約変更申請、通知受信等）"},{"name":"有効フラグ","type":"boolean","required":true,"description":"権限が有効か無効かを示すフラグ"},{"name":"権限開始日","type":"timestamp","required":false,"description":"権限の有効開始日時"},{"name":"権限終了日","type":"timestamp","required":false,"description":"権限の有効終了日時"},{"name":"備考","type":"text","required":false,"description":"権限付与の理由や特記事項"},{"name":"作成日時","type":"timestamp","required":true,"description":"権限レコード作成日時"},{"name":"作成者","type":"uuid","required":true,"description":"権限を作成したユーザーID"},{"name":"更新日時","type":"timestamp","required":true,"description":"権限レコード最終更新日時"},{"name":"更新者","type":"uuid","required":true,"description":"権限を最後に更新したユーザーID"}]}];
+window.AIVIC_PRESET_SEED = {"顧客企業":[{"顧客企業ID":"rec-001","企業名":"株式会社トヨタ部品工業","業種":"自動車部品製造","所在地":"愛知県豊田市","代表者名":"山田太郎","電話番号":"0565-28-2121","メールアドレス":"info@toyotaparts.co.jp","担当営業ユーザーID":"rec-u-045","ステータス":"既存顧客","作成日時":"2023-06-15T09:30:00Z","更新日時":"2025-01-20T14:15:00Z","作成者ユーザーID":"rec-u-012"},{"顧客企業ID":"rec-001","企業名":"株式会社デジタルソリューション","業種":"情報通信業","所在地":"東京都渋谷区道玄坂1-2-3","代表者名":"山田太郎","電話番号":"03-XXXX-5678","メールアドレス":"info@digitalsolution.co.jp","担当営業ユーザーID":"rec-u-042","ステータス":"見込み客","作成日時":"2024-11-15T10:30:00Z","更新日時":"2025-01-08T14:20:00Z","作成者ユーザーID":"rec-u-015"},{"顧客企業ID":"rec-001","企業名":"株式会社フレッシュマート関東","業種":"小売業（食品スーパー）","所在地":"神奈川県横浜市西区みなとみらい2-3-5","代表者名":"山田健一","電話番号":"045-XXX-XXXX","メールアドレス":"info@freshmart-kanto.co.jp","担当営業ユーザーID":"rec-u-0042","ステータス":"見込み客","作成日時":"2024-11-15T09:30:00Z","更新日時":"2024-11-15T09:30:00Z","作成者ユーザーID":"rec-u-0001"},{"顧客企業ID":"rec-001","企業名":"株式会社東京建設","業種":"建設業","所在地":"東京都渋谷区道玄坂1-2-3","代表者名":"山田太郎","電話番号":"03-1234-5678","メールアドレス":"info@tokyokensetu.co.jp","担当営業ユーザーID":"rec-usr-042","ステータス":"既存顧客","作成日時":"2022-03-15T09:30:00Z","更新日時":"2024-11-20T14:45:00Z","作成者ユーザーID":"rec-usr-001"},{"顧客企業ID":"rec-001","企業名":"株式会社東日本建設","業種":"建設業","所在地":"東京都渋谷区道玄坂1-2-3","代表者名":"山田太郎","電話番号":"03-XXXX-5678","メールアドレス":"yamada@tounicken.co.jp","担当営業ユーザーID":"rec-u-042","ステータス":"休止中","作成日時":"2023-06-15T09:30:00Z","更新日時":"2025-01-20T14:15:00Z","作成者ユーザーID":"rec-u-018"},{"顧客企業ID":"rec-001","企業名":"医療法人社団 新生会 新生病院","業種":"医療・福祉","所在地":"東京都渋谷区道玄坂2-10-12","代表者名":"山田健一","電話番号":"03-XXXX-5678","メールアドレス":"info@shinsei-hospital.jp","担当営業ユーザーID":"rec-user-042","ステータス":"見込み客","作成日時":"2024-11-15T09:30:00+09:00","更新日時":"2024-11-15T09:30:00+09:00","作成者ユーザーID":"rec-user-015"},{"顧客企業ID":"rec-001","企業名":"株式会社ユニバーサルロジスティクス","業種":"流通・卸売業","所在地":"東京都中央区日本橋3-2-14","代表者名":"山田健一","電話番号":"03-1234-5678","メールアドレス":"info@universal-logistics.co.jp","担当営業ユーザーID":"rec-u-042","ステータス":"既存顧客","作成日時":"2024-03-15T09:30:00Z","更新日時":"2025-01-08T14:22:00Z","作成者ユーザーID":"rec-u-018"},{"顧客企業ID":"rec-001","企業名":"株式会社NextWave","業種":"ソフトウェア開発・AI","所在地":"東京都渋谷区神宮前1-2-3","代表者名":"山田健太","電話番号":"03-XXXX-5678","メールアドレス":"info@nextwave-inc.jp","担当営業ユーザーID":"rec-102","ステータス":"見込み客","作成日時":"2024-11-15T10:30:00Z","更新日時":"2025-01-08T14:22:00Z","作成者ユーザーID":"rec-201"},{"顧客企業ID":"rec-001","企業名":"東京都福祉保健局","業種":"官公庁・行政機関","所在地":"東京都新宿区西新宿2-8-1","代表者名":"山田太郎","電話番号":"03-5320-4321","メールアドレス":"contact@fukushi.metro.tokyo.jp","担当営業ユーザーID":"rec-u-042","ステータス":"既存顧客","作成日時":"2023-06-15T09:30:00+09:00","更新日時":"2024-11-20T14:15:00+09:00","作成者ユーザーID":"rec-u-001"},{"顧客企業ID":"rec-001","企業名":"東京湾岸不動産開発株式会社","業種":"不動産開発・売買","所在地":"東京都港区芝浦3-1-1","代表者名":"山田健一","電話番号":"03-XXXX-5678","メールアドレス":"info@tokyobayarea-realty.jp","担当営業ユーザーID":"rec-u-042","ステータス":"既存顧客","作成日時":"2024-03-15T10:30:00Z","更新日時":"2025-01-20T14:45:00Z","作成者ユーザーID":"rec-u-015"}],"契約書":[{"契約書ID":"rec-001-2024-0847","契約書名":"2024年度電子部品年間供給契約書","契約書説明":"トヨタ自動車株式会社との電子制御ユニット（ECU）及び関連電子部品の年間供給に関する基本契約。納期厳守、品質基準ISO9001準拠、月次納入スケジュール管理を含む。","契約種別":"供給契約","契約相手先ID":"rec-partner-2024-0156","契約開始日":"2024-04-01T00:00:00Z","契約終了日":"2025-03-31T23:59:59Z","契約金額":850000000,"ステータス":"有効","担当者ID":"rec-user-2024-0523","ファイルパス":"/contracts/2024/supply_agreement_toyota_ece_20240401.pdf","作成日時":"2024-03-15T10:30:00Z","更新日時":"2024-03-28T14:45:00Z","作成者ID":"rec-user-2024-0089"},{"契約書ID":"rec-001","契約書名":"クラウド勤怠管理システム TimeCard Pro 利用契約書","契約書説明":"株式会社デジタルソリューションズが提供するクラウド型勤怠管理システム TimeCard Pro の利用に関する契約。月額利用料金は従業員数に応じた従量課金制。自動更新条項により、終了日の30日前までに解約通知がない場合は1年間自動更新される。","契約種別":"SaaS利用契約","契約相手先ID":"rec-0042","契約開始日":"2024-04-01T00:00:00Z","契約終了日":"2025-03-31T23:59:59Z","契約金額":480000,"ステータス":"有効","担当者ID":"rec-0156","ファイルパス":"/contracts/saas/2024/TimeCardPro_契約書_20240401.pdf","作成日時":"2024-03-15T10:30:00Z","更新日時":"2024-04-01T09:15:00Z","作成者ID":"rec-0089"},{"契約書ID":"rec-001","契約書名":"デジタル変革推進プロジェクト コンサルティング契約書","契約書説明":"クライアント企業のデジタル変革推進を目的とした、6ヶ月間のプロジェクト型コンサルティングサービス。業務プロセス分析、システム導入支援、人材育成を含む。","契約種別":"コンサルティング契約","契約相手先ID":"rec-c-0042","契約開始日":"2024-04-01T00:00:00Z","契約終了日":"2024-09-30T23:59:59Z","契約金額":8500000,"ステータス":"有効","担当者ID":"rec-u-0156","ファイルパス":"/contracts/2024/04/consulting_20240401_001.pdf","作成日時":"2024-03-15T09:30:00Z","更新日時":"2024-04-01T14:20:00Z","作成者ID":"rec-u-0089"},{"契約書ID":"rec-20250015","契約書名":"株式会社デジタルソリューション との秘密保持契約書","契約書説明":"新規事業開発プロジェクトに関する技術情報、ビジネス計画、顧客情報等の秘密情報の保護を目的とした秘密保持契約。契約期間中および終了後3年間の守秘義務を規定。","契約種別":"NDA","契約相手先ID":"rec-partner-0847","契約開始日":"2025-01-15T00:00:00Z","契約終了日":"2027-01-14T23:59:59Z","契約金額":0,"ステータス":"有効","担当者ID":"rec-user-0312","ファイルパス":"/contracts/nda/20250115_デジタルソリューション_NDA.pdf","作成日時":"2025-01-10T09:30:00Z","更新日時":"2025-01-15T14:20:00Z","作成者ID":"rec-user-0156"},{"契約書ID":"rec-20250115-001","契約書名":"システム保守サービス契約書（2025年度版）","契約書説明":"既存のシステム保守契約について、サービス範囲の拡大及び月額費用の改定に伴う条件変更契約。クラウドインフラ監視業務を新たに追加し、対応時間を24時間体制に変更。","契約種別":"サービス契約","契約相手先ID":"rec-vendor-0847","契約開始日":"2025-04-01T00:00:00Z","契約終了日":"2026-03-31T23:59:59Z","契約金額":4800000,"ステータス":"承認待ち","担当者ID":"rec-user-0523","ファイルパス":"/contracts/2025/system_maintenance_amendment_20250115.pdf","作成日時":"2025-01-15T09:30:00Z","更新日時":"2025-01-15T14:45:00Z","作成者ID":"rec-user-0523"},{"契約書ID":"rec-001","契約書名":"システム保守業務委託契約書","契約書説明":"既存システムの日次保守業務および軽微な改修作業を委託する契約。対象システムはERP基幹システムとなり、平日営業時間内のサポート対応を主業務とする。","契約種別":"業務委託契約","契約相手先ID":"rec-partner-042","契約開始日":"2025-01-15T00:00:00Z","契約終了日":"2025-03-31T23:59:59Z","契約金額":1500000,"ステータス":"有効","担当者ID":"rec-user-018","ファイルパス":"/contracts/2025/01/gyomu-itaku-20250115.pdf","作成日時":"2024-12-20T09:30:00Z","更新日時":"2025-01-10T14:15:00Z","作成者ID":"rec-user-005"},{"契約書ID":"rec-001","契約書名":"Microsoft 365 Enterprise ライセンス供与契約","契約書説明":"Microsoft 365 Enterprise E5プラン 500ユーザー分のライセンス供与契約。クラウドベースの生産性向上ツール、セキュリティソリューション、デバイス管理機能を含む。","契約種別":"ライセンス供与契約","契約相手先ID":"rec-partner-0847","契約開始日":"2025-04-01T00:00:00Z","契約終了日":"2026-03-31T23:59:59Z","契約金額":7500000,"ステータス":"承認待ち","担当者ID":"rec-user-0523","ファイルパス":"/contracts/2025/license/microsoft365_enterprise_20250115.pdf","作成日時":"2025-01-15T09:30:00Z","更新日時":"2025-01-20T14:15:00Z","作成者ID":"rec-user-0523"},{"契約書ID":"rec-001","契約書名":"システム保守・サポート契約書（2025年度更新版）","契約書説明":"既存ERP基幹システムの保守・運用サポート及び緊急対応サービスの提供に関する契約。24時間ホットライン対応、月次巡回保守、セキュリティパッチ適用を含む。","契約種別":"保守・サポート契約","契約相手先ID":"rec-102","契約開始日":"2025-04-01T00:00:00Z","契約終了日":"2026-03-31T23:59:59Z","契約金額":2400000,"ステータス":"承認待ち","担当者ID":"rec-205","ファイルパス":"/contracts/2025/maintenance_support_renewal_20250115.pdf","作成日時":"2025-01-15T09:30:00Z","更新日時":"2025-01-15T09:30:00Z","作成者ID":"rec-206"},{"契約書ID":"rec-20250115-jv-001","契約書名":"株式会社テクノグローバルとの合弁事業契約書","契約書説明":"AI技術を活用したデジタルマーケティングプラットフォーム開発に関する合弁事業契約。両社が共同で新会社を設立し、事業運営を行うもの。初期投資額は各社5,000万円、利益配分は出資比率に準ずる。","契約種別":"合弁事業契約","契約相手先ID":"rec-partner-2024-0847","契約開始日":"2025-04-01T00:00:00Z","契約終了日":"2030-03-31T23:59:59Z","契約金額":100000000,"ステータス":"承認待ち","担当者ID":"rec-user-yamada-2024","ファイルパス":"/contracts/2025/jv_techno_global_20250115.pdf","作成日時":"2025-01-15T10:30:00Z","更新日時":"2025-01-20T14:45:00Z","作成者ID":"rec-user-suzuki-2024"},{"契約書ID":"rec-0047","契約書名":"オフィス清掃サービス委託契約書","契約書説明":"東京本社ビルの日常清掃業務を委託する契約。毎営業日の定時清掃と月1回の定期メンテナンスを含む。","契約種別":"サービス契約","契約相手先ID":"rec-0156","契約開始日":"2023-04-01T00:00:00Z","契約終了日":"2025-03-31T23:59:59Z","契約金額":2400000,"ステータス":"キャンセル","担当者ID":"rec-0089","ファイルパス":"/contracts/2023/cleaning_service_2023.pdf","作成日時":"2023-03-15T10:30:00Z","更新日時":"2025-03-28T14:45:00Z","作成者ID":"rec-0042"}],"提案資料":[{"提案資料ID":"rec-001","提案資料名":"製造業向け生産管理システム導入提案書","説明":"大手自動車部品製造業向けの統合生産管理システム導入に関する提案資料。生産計画、在庫管理、品質管理、納期管理の機能を統合し、現在のレガシーシステムからの移行を提案。導入期間は12ヶ月を想定。","ユーザーID":"rec-u-0042","ステータス":"下書き","提案日":null,"契約書ID":null,"作成日時":"2024-11-15T10:30:00+09:00","更新日時":"2024-11-20T14:45:00+09:00","作成者ID":"rec-u-0015"},{"提案資料ID":"rec-20250047","提案資料名":"2025年度年間供給契約更新提案書","説明":"既存取引先である株式会社山田商事との2025年度年間供給契約の更新提案。電子部品・機械部品の安定供給を目的とし、昨年度実績に基づいた数量・価格条件を提示。納期短縮と品質保証体制の強化を新たに盛り込んだ提案内容。","ユーザーID":"usr-rec-8234","ステータス":"提案中","提案日":"2025-01-16T10:30:00","契約書ID":null,"作成日時":"2025-01-14T09:15:00","更新日時":"2025-01-16T10:30:00","作成者ID":"usr-rec-5891"},{"提案資料ID":"rec-001","提案資料名":"クラウド型プロジェクト管理SaaS導入提案書","説明":"スタートアップ企業向けのクラウド型プロジェクト管理ツール「CloudTask Pro」の導入提案。初期段階の20ユーザーライセンスと、3ヶ月間の導入支援サービスを含む包括的なパッケージ提案。月額利用料は20万円から段階的にスケール可能。","ユーザーID":"rec-u-042","ステータス":"承認待ち","提案日":"2024-11-15T10:30:00","契約書ID":null,"作成日時":"2024-11-10T14:22:15","更新日時":"2024-11-14T16:45:30","作成者ID":"rec-u-015"},{"提案資料ID":"rec-20250147","提案資料名":"既存システム向けAI分析機能アップセル提案","説明":"現在ご利用いただいている販売管理システムに、AI による売上予測・顧客分析機能を追加するアップセル提案。既存データを活用した高度な分析により、営業効率の向上と売上増加を実現します。導入期間は2ヶ月、月額利用料は現行比15%増となります。","ユーザーID":"rec-00892","ステータス":"契約済み","提案日":"2024-11-15T10:30:00+09:00","契約書ID":"rec-05634","作成日時":"2024-11-08T14:22:00+09:00","更新日時":"2025-01-20T16:45:00+09:00","作成者ID":"rec-00892"},{"提案資料ID":"rec-20250115-001","提案資料名":"〇〇市庁舎情報システム構築業務提案書","説明":"〇〇市の新庁舎向けネットワークインフラおよび業務システム統合構築の提案資料。セキュリティ要件、災害対応機能、ユーザーサポート体制を含む。初回提案は技術仕様の見直しが必要と指摘されたため、改善版を準備中。","ユーザーID":"user-rec-2024001","ステータス":"却下・再検討中","提案日":"2024-11-28T10:30:00+09:00","契約書ID":null,"作成日時":"2024-11-15T14:22:00+09:00","更新日時":"2025-01-10T16:45:00+09:00","作成者ID":"user-rec-2024002"},{"提案資料ID":"rec-20250115-001","提案資料名":"アジア太平洋地域向けクラウドERPシステム導入提案","説明":"グローバル企業の日本、シンガポール、オーストラリア、インド拠点における統合ERP導入提案。各地域の会計・人事・供給チェーン機能の統一化、現地法対応、マルチカレンシー対応を含む包括的なソリューション。実装期間24ヶ月、総事業費約4.5億円。","ユーザーID":"user-rec-2024-0847","ステータス":"提案中","提案日":"2025-01-15T10:30:00+09:00","契約書ID":null,"作成日時":"2024-12-20T14:22:15+09:00","更新日時":"2025-01-15T10:30:00+09:00","作成者ID":"user-rec-2024-0847"},{"提案資料ID":"rec-20250115-001","提案資料名":"株式会社山田製作所 デジタル化支援プラン","説明":"従業員50名規模の金属加工メーカーを対象とした初回デジタル化支援提案。既存の紙ベース業務フローをクラウド基盤に移行し、受発注管理システムと勤怠管理システムの導入を提案。第1フェーズでは基幹システムの導入、第2フェーズでは生産管理システムの統合を予定。","ユーザーID":"rec-user-2024-087","ステータス":"下書き","提案日":null,"契約書ID":null,"作成日時":"2025-01-15T10:30:00+09:00","更新日時":"2025-01-15T10:30:00+09:00","作成者ID":"rec-user-2024-087"},{"提案資料ID":"rec-20250115-0847","提案資料名":"ABC商事との既存契約更新提案書（2025年度版）","説明":"既存の販売代理店契約について、市場環境の変化に対応するため、手数料率の見直し（3.5%→4.2%）、取扱商品の追加（新製品ラインA〜C）、および支払条件の変更（30日→45日）を提案するもの。契約期間は2025年4月1日から2027年3月31日までの2年間。","ユーザーID":"usr-0342","ステータス":"承認待ち","提案日":"2025-01-15T10:30:00+09:00","契約書ID":null,"作成日時":"2025-01-14T16:45:23+09:00","更新日時":"2025-01-15T14:20:15+09:00","作成者ID":"usr-0342"},{"提案資料ID":"rec-001-prop-20250115","提案資料名":"既存システムからのマイグレーション提案書 - ABC物流株式会社様","説明":"現在ご利用のA社製WMS（倉庫管理システム）からの乗り換え提案です。当社のクラウド型WMSにより、月額コスト30%削減、処理速度2倍の実現が可能です。導入期間は3ヶ月、既存データの無償移行サポート付きです。価格交渉中のため、ボリュームディスカウント対応も検討中。","ユーザーID":"rec-user-20240615-yamada","ステータス":"提案中","提案日":"2025-01-15T10:30:00+09:00","契約書ID":null,"作成日時":"2025-01-10T14:22:15+09:00","更新日時":"2025-01-15T16:45:30+09:00","作成者ID":"rec-user-20240615-yamada"},{"提案資料ID":"rec-001","提案資料名":"グループ会社統合に伴う統一ERP システム導入提案書","説明":"A社とB社の経営統合に伴い、財務会計・人事給与・販売管理・在庫管理の各業務を統一するためのクラウド型ERPシステム導入提案。導入期間は6ヶ月、概算費用は1,200万円。段階的な移行計画と従業員教育プログラムを含む。","ユーザーID":"rec-102","ステータス":"契約済み","提案日":"2024-06-15T10:30:00","契約書ID":"rec-501","作成日時":"2024-06-10T14:20:00","更新日時":"2024-12-20T16:45:00","作成者ID":"rec-103"}],"契約":[{"契約ID":"rec-001","顧客企業ID":"rec-c-042","契約書ID":"rec-doc-018","提案資料ID":"rec-prop-025","契約名":"基幹業務システム刷新開発委託契約","契約ステータス":"契約済","契約開始日":"2024-04-01T00:00:00Z","契約終了日":"2025-03-31T23:59:59Z","契約金額":85000000,"契約内容":"既存の基幹業務システムをクラウドベースの新システムへ刷新する開発委託。要件定義から本番運用開始までを含む。技術スタックはJava、Spring Boot、PostgreSQL、AWS。","成果目標":"2025年3月末までのシステム本番運用開始。システム稼働率99.9%以上の達成。既存システムからのデータ移行完了率100%。ユーザー教育実施率95%以上。","作成日時":"2024-02-15T10:30:00Z","更新日時":"2024-03-28T14:15:00Z","作成者":"山田花子","更新者":"佐藤次郎"},{"契約ID":"rec-001","顧客企業ID":"rec-c-042","契約書ID":"rec-d-156","提案資料ID":"rec-p-089","契約名":"クラウド業務管理システム年間ライセンス契約","契約ステータス":"更新待ち","契約開始日":"2024-01-15T00:00:00Z","契約終了日":"2024-12-31T23:59:59Z","契約金額":1200000,"契約内容":"クラウド型業務管理システムの年間利用ライセンス。ユーザー数50名まで、月次サポート対応、セキュリティアップデート含む。","成果目標":"業務効率化により月間作業時間を20%削減。システム稼働率99.5%以上の維持。","作成日時":"2023-11-20T09:30:00Z","更新日時":"2024-11-08T14:15:00Z","作成者":"田中太郎","更新者":"佐藤花子"},{"契約ID":"rec-001","顧客企業ID":"rec-c-042","契約書ID":"rec-d-015","提案資料ID":"rec-p-028","契約名":"2025年度マーケティング支援サービス契約","契約ステータス":"提案中","契約開始日":"2025-04-01T00:00:00Z","契約終了日":"2026-03-31T23:59:59Z","契約金額":2400000,"契約内容":"デジタルマーケティング全般に関する支援サービス。SEO対策、SNS運用代行、コンテンツマーケティング、メールマーケティングの実施。月次レポーティングを含む。","成果目標":"Webサイト月間PV数を現在の15,000から25,000に増加させる。SNS総フォロワー数を12ヶ月で50,000に到達させる。メールマーケティング開封率を30%以上に維持する。","作成日時":"2025-01-15T10:30:00Z","更新日時":"2025-01-22T14:45:00Z","作成者":"佐藤花子","更新者":"鈴木健一"},{"契約ID":"rec-001","顧客企業ID":"rec-c-0847","契約書ID":"rec-doc-5621","提案資料ID":"rec-prop-3194","契約名":"基幹システム保守運用サービス契約","契約ステータス":"契約済","契約開始日":"2024-04-01T00:00:00Z","契約終了日":"2025-03-31T23:59:59Z","契約金額":2400000,"契約内容":"顧客企業の基幹システムに対する24時間365日の保守運用サービス。障害対応、定期メンテナンス、セキュリティパッチ適用、パフォーマンス監視を含む。初期対応時間SLA 30分以内。","成果目標":"システム稼働率 99.5%以上の維持、平均障害復旧時間 2時間以内、月次セキュリティアップデート 100%適用、四半期ごとの最適化提案 4回以上実施","作成日時":"2024-02-15T09:30:00Z","更新日時":"2024-03-28T14:15:00Z","作成者":"営業部 鈴木花子","更新者":"契約管理部 佐藤次郎"},{"契約ID":"rec-001","顧客企業ID":"rec-c-042","契約書ID":"rec-doc-156","提案資料ID":"rec-prop-089","契約名":"デジタル変革推進コンサルティング業務委託契約","契約ステータス":"完了","契約開始日":"2024-04-01T00:00:00Z","契約終了日":"2024-12-31T23:59:59Z","契約金額":4800000,"契約内容":"顧客企業のデジタル変革推進に向けた総合的なコンサルティング業務。経営戦略の策定、業務プロセス改善、システム導入支援、組織体制構築等を実施。月次レビュー会議を含む。","成果目標":"業務効率化率30%以上の達成、システム導入完了、従業員デジタルスキル向上（対象者の80%が基礎研修修了）、経営層向けデジタル戦略ロードマップの策定・承認","作成日時":"2024-02-15T09:30:00Z","更新日時":"2025-01-20T14:45:00Z","作成者":"佐藤花子","更新者":"鈴木一郎"},{"契約ID":"rec-001","顧客企業ID":"cust-0847","契約書ID":"doc-2401","提案資料ID":"prop-1523","契約名":"データ分析ツール導入・運用契約","契約ステータス":"承認待ち","契約開始日":"2025-04-01T00:00:00Z","契約終了日":"2027-03-31T23:59:59Z","契約金額":4800000,"契約内容":"クラウド型データ分析ツール（Analytics Pro）の導入、初期設定、ユーザートレーニング、および24ヶ月間の運用サポートを提供。月次レポート作成、システム保守、ユーザーサポート、機能アップデート対応を含む。","成果目標":"データ分析基盤の構築完了（3ヶ月以内）、ユーザー採用率70%以上達成（6ヶ月以内）、月次レポート自動生成による業務効率化30%削減、経営意思決定の迅速化を実現。","作成日時":"2024-11-15T09:30:00Z","更新日時":"2025-01-22T14:15:00Z","作成者":"山田花子","更新者":"佐藤次郎"},{"契約ID":"rec-001","顧客企業ID":"rec-c-042","契約書ID":"rec-doc-156","提案資料ID":"rec-prop-089","契約名":"営業部門向け人材派遣サービス契約","契約ステータス":"契約済","契約開始日":"2024-04-01T00:00:00Z","契約終了日":"2025-03-31T23:59:59Z","契約金額":4800000,"契約内容":"営業スタッフ3名の派遣。勤務地は東京都渋谷区。勤務時間は月〜金の9:00〜17:30。社会保険加入、交通費支給。派遣スタッフの急病時は24時間以内に代替者を配置する。","成果目標":"月間新規顧客開拓件数50件以上、既存顧客満足度90%以上、派遣スタッフの出勤率98%以上を維持。四半期ごとに成果レビューを実施。","作成日時":"2024-02-15T10:30:00Z","更新日時":"2024-10-22T14:15:00Z","作成者":"山田花子","更新者":"佐藤次郎"},{"契約ID":"rec-001","顧客企業ID":"rec-c-042","契約書ID":"rec-d-156","提案資料ID":"rec-p-089","契約名":"クラウドインフラ利用契約（AWS環境構築・運用保守）","契約ステータス":"契約済","契約開始日":"2024-04-01T00:00:00Z","契約終了日":"2025-03-31T23:59:59Z","契約金額":2400000,"契約内容":"AWSクラウドインフラの構築、運用、保守サービス。EC2インスタンス20台、RDS（PostgreSQL）、S3ストレージ、CloudFrontCDN、VPC構成等を含む。月次レポート提出、24時間サポート対応、セキュリティパッチ適用を実施。","成果目標":"システム稼働率99.9%以上の維持、月間平均応答時間200ms以下、セキュリティ脆弱性ゼロ件達成、コスト最適化による月間5%以上のコスト削減","作成日時":"2024-02-15T10:30:00Z","更新日時":"2024-03-28T16:45:00Z","作成者":"山田花子","更新者":"佐藤次郎"},{"契約ID":"rec-001","顧客企業ID":"cust-0847","契約書ID":"doc-0512","提案資料ID":"prop-0289","契約名":"Google広告・Yahoo広告運用代行契約（2025年1月～12月）","契約ステータス":"提案中","契約開始日":"2025-01-15T00:00:00Z","契約終了日":"2025-12-31T23:59:59Z","契約金額":1800000,"契約内容":"Google広告およびYahoo広告の運用代行サービス。月間予算150万円の範囲内で、検索広告・ディスプレイ広告・ショッピング広告の最適化運用を実施。毎月のレポート提出と定期コンサルティングを含む。","成果目標":"月間コンバージョン数150件以上、ROAS3.5倍以上、クリック単価平均150円以下、品質スコア平均7.5以上を達成","作成日時":"2024-12-10T09:30:00Z","更新日時":"2024-12-20T14:15:00Z","作成者":"山田花子","更新者":"鈴木健一"},{"契約ID":"rec-001","顧客企業ID":"rec-c-042","契約書ID":"rec-d-156","提案資料ID":"rec-p-089","契約名":"営業プロセス効率化業務改善プロジェクト","契約ステータス":"終了","契約開始日":"2024-04-01T00:00:00Z","契約終了日":"2025-02-28T23:59:59Z","契約金額":2850000,"契約内容":"営業部門の業務フローを分析し、営業支援システムの導入、営業プロセスの標準化、営業チームの研修実施を通じて、営業効率を向上させるプロジェクト。対象部門は営業部全体（営業員25名、管理職5名）。","成果目標":"営業案件化率を現状の32%から40%以上に向上させる。営業提案資料作成時間を平均4時間から2時間以下に短縮する。顧客初回接触から契約までのリードタイムを平均90日から60日以下に短縮する。","作成日時":"2024-03-15T09:30:00Z","更新日時":"2025-03-10T14:20:00Z","作成者":"山田花子","更新者":"鈴木健太"}],"契約変更履歴":[{"変更履歴ID":"rec-20250115-0847","契約ID":"rec-contract-2023-0512","変更種別":"金額変更","変更前値":"月額 850,000円（年間 10,200,000円）","変更後値":"月額 765,000円（年間 9,180,000円）","変更理由":"既存顧客との長期取引継続に向けた値下げ交渉。競合他社の提案価格を踏まえた価格調整。顧客満足度向上と契約継続を目的とした戦略的な値下げ。","変更ステータス":"実行済","申請者ID":"rec-user-0234","承認者ID":"rec-user-0089","承認日時":"2025-01-10T14:30:00+09:00","実行日時":"2025-01-15T00:00:00+09:00","作成日時":"2025-01-08T09:15:00+09:00","更新日時":"2025-01-15T08:47:00+09:00","備考":"営業部の鈴木から提案。顧客（株式会社ABC製造）との交渉により10%の値下げで合意。2025年1月度から新価格を適用。契約期間は2025年12月31日までの延長契約。"},{"変更履歴ID":"rec-001-20250115-ext","契約ID":"rec-contract-2023-0847","変更種別":"期間延長","変更前値":"2025年3月31日","変更後値":"2025年9月30日","変更理由":"顧客からの継続要望により、サービス提供期間を6ヶ月間延長する必要があるため","変更ステータス":"実行済","申請者ID":"rec-user-emp-2847","承認者ID":"rec-user-mgr-1523","承認日時":"2025-01-10 14:30:00","実行日時":"2025-01-15 09:00:00","作成日時":"2025-01-08 10:15:00","更新日時":"2025-01-15 09:05:00","備考":"顧客：株式会社アルファテック、営業担当者：鈴木花子、契約金額に変更なし、月額利用料は据え置き"},{"変更履歴ID":"rec-001","契約ID":"rec-002","変更種別":"数量変更","変更前値":"月間供給数量: 5,000ユニット","変更後値":"月間供給数量: 12,000ユニット","変更理由":"顧客の新規工場稼働に伴う事業規模拡大のため、供給数量の増加が必要となった","変更ステータス":"実行済","申請者ID":"rec-003","承認者ID":"rec-004","承認日時":"2024-11-15T10:30:00+09:00","実行日時":"2024-12-01T00:00:00+09:00","作成日時":"2024-11-08T14:22:00+09:00","更新日時":"2024-12-01T09:15:00+09:00","備考":"契約金額は月額2,400万円から月額5,760万円に変更。納期は2024年11月30日までに契約変更手続き完了予定。顧客担当者は鈴木営業部長。"},{"変更履歴ID":"rec-001","契約ID":"rec-002","変更種別":"解除","変更前値":"契約状態: 有効、契約期間: 2023年4月1日～2026年3月31日","変更後値":"契約状態: 解除、契約終了日: 2024年12月31日","変更理由":"顧客側による契約違反（納期遅延が連続3回発生、累積遅延日数45日超過）に基づく契約解除申請。当社からの改善指導にも応じられず、ビジネス継続が困難と判断。","変更ステータス":"実行済","申請者ID":"rec-003","承認者ID":"rec-004","承認日時":"2024-12-15T14:30:00+09:00","実行日時":"2024-12-31T23:59:59+09:00","作成日時":"2024-12-10T09:15:00+09:00","更新日時":"2024-12-31T16:45:00+09:00","備考":"契約解除に伴い、未納金¥2,450,000は2025年1月31日までに返金予定。紛争解決条項に基づき、仲裁手続きは実施しない旨を双方で合意。営業部（山田花子）、法務部（佐藤次郎）で協議完了。"},{"変更履歴ID":"rec-20250115-001","契約ID":"rec-contract-2024-0847","変更種別":"金額変更","変更前値":"月額利用料: 150,000円","変更後値":"月額利用料: 135,000円","変更理由":"2025年1月8日から1月12日のシステム障害（計72時間）による顧客への補償として、該当月の利用料を10%減額する","変更ステータス":"実行済","申請者ID":"rec-user-0342","承認者ID":"rec-user-0156","承認日時":"2025-01-13 14:30:00","実行日時":"2025-01-15 09:00:00","作成日時":"2025-01-13 09:15:00","更新日時":"2025-01-15 09:05:00","備考":"申請者: 佐藤花子、承認者: 山田太郎。障害報告書rec-incident-20250108参照。顧客(ABC商事)との協議済み。減額分15,000円は2025年1月請求分に反映済み。"},{"変更履歴ID":"rec-20250115-001","契約ID":"rec-contract-2024-0847","変更種別":"期間延長","変更前値":"納期: 2025年3月31日","変更後値":"納期: 2025年5月15日","変更理由":"顧客の事業計画変更に伴い、成果物の納期を45日間後ろ倒しする要望があった。顧客側の受け入れ体制整備に時間を要するため。","変更ステータス":"実行済","申請者ID":"rec-user-2024-0156","承認者ID":"rec-user-2024-0089","承認日時":"2025-01-10 14:30:00","実行日時":"2025-01-15 09:00:00","作成日時":"2025-01-08 10:15:00","更新日時":"2025-01-15 09:05:00","備考":"営業担当の山田花子が1月7日に顧客(ABC株式会社 調達部長 鈴木健一)との打ち合わせで確認。契約金額に変更なし。納期延長に伴う追加費用は発生しない旨を顧客に確認済み。プロジェクト管理システムのスケジュールは1月15日に更新完了。"},{"変更履歴ID":"rec-001","契約ID":"rec-0847","変更種別":"条件変更","変更前値":"契約期間：2022年4月1日～2025年3月31日、月額利用料：450,000円、サポート時間：平日9:00～17:00、最小利用ユーザー数：50名","変更後値":"契約期間：2025年4月1日～2027年3月31日、月額利用料：520,000円、サポート時間：平日8:00～19:00、最小利用ユーザー数：60名","変更理由":"契約更新に伴う定期見直し。ユーザー数増加に対応し、サポート体制を強化する必要があるため、利用料およびサポート時間を拡充。","変更ステータス":"実行済","申請者ID":"rec-1203","承認者ID":"rec-0891","承認日時":"2025-02-14T10:30:00+09:00","実行日時":"2025-03-31T23:59:59+09:00","作成日時":"2025-02-10T14:15:00+09:00","更新日時":"2025-03-31T23:59:59+09:00","備考":"営業部門からの要望により、サポート時間を拡大。2025年度予算承認済み。新契約書は2025年3月28日に締結完了。"},{"変更履歴ID":"rec-20250115-0847","契約ID":"rec-contract-2023-0156","変更種別":"契約統合","変更前値":"契約対象企業: 株式会社ソフトウェアテック、契約金額: 月額250万円、契約期間: 2023年4月1日～2026年3月31日","変更後値":"契約対象企業: 株式会社テックイノベーション（吸収合併後の新社名）、契約金額: 月額280万円、契約期間: 2025年1月1日～2026年3月31日","変更理由":"2024年12月15日付で株式会社ソフトウェアテックが株式会社テックイノベーションに吸収合併されたため、契約の統合と条件の見直しを実施。合併に伴うシステム統合費用として月額30万円を追加。","変更ステータス":"実行済","申請者ID":"rec-user-営業部-0042","承認者ID":"rec-user-契約管理課-0018","承認日時":"2024-12-28 14:30:00","実行日時":"2025-01-01 00:00:00","作成日時":"2024-12-20 09:15:00","更新日時":"2025-01-01 08:45:00","備考":"合併企業との契約統合により、旧契約rec-contract-2023-0155と統一。新契約書は2024年12月22日に両社間で署名済。請求先住所は新本社所在地（東京都渋谷区）に変更。"},{"変更履歴ID":"rec-20250115-001","契約ID":"rec-contract-2024-0847","変更種別":"条件変更","変更前値":"基本サービス利用料金：月額50,000円（通年固定）、サポート対応時間：平日9:00-17:00","変更後値":"冬季料金（11月-3月）：月額65,000円、夏季料金（6月-9月）：月額35,000円、春秋季料金（4月-5月、10月）：月額50,000円、サポート対応時間：冬季は平日8:00-19:00、その他季節は平日9:00-17:00","変更理由":"小売業向けサービスのため、年間を通じた需要変動に対応し、顧客の利便性向上と効率的なリソース配分を実現するための段階的料金体系の導入","変更ステータス":"実行済","申請者ID":"rec-user-2024-0312","承認者ID":"rec-user-2024-0108","承認日時":"2024-12-20T14:30:00+09:00","実行日時":"2025-01-01T00:00:00+09:00","作成日時":"2024-12-10T09:15:00+09:00","更新日時":"2025-01-01T10:45:00+09:00","備考":"契約者からの要望により2024年10月に変更提案を受け、11月の営業会議で承認。2025年1月より段階的運用開始。初年度は試行期間として3ヶ月ごとに効果測定を実施予定。"},{"変更履歴ID":"rec-20250115-001","契約ID":"rec-contract-2022-0847","変更種別":"金額変更","変更前値":"月額利用料: 150,000円、割引率: 5%","変更後値":"月額利用料: 150,000円、割引率: 15%","変更理由":"2022年4月より継続利用いただいている長期顧客であり、信頼関係構築と継続取引強化のため特別割引を適用","変更ステータス":"実行済","申請者ID":"rec-user-0234","承認者ID":"rec-user-0089","承認日時":"2025-01-10 14:30:00","実行日時":"2025-01-15 09:00:00","作成日時":"2025-01-08 10:15:00","更新日時":"2025-01-15 09:05:00","備考":"営業部門の鈴木花子より提案。顧客企業(株式会社ABC製造所)との定期面談で割引適用の要望があり、経営判断により承認。新割引率は2025年2月請求分より適用予定。"}],"成果物":[{"成果物ID":"rec-001","契約ID":"rec-contract-2024-08-001","成果物名":"大規模システム開発案件 基本設計書","説明":"顧客システムの要件定義に基づいた基本設計書。システムアーキテクチャ、データベース設計、インターフェース仕様、セキュリティ要件、運用要件を記載。","ステータス":"承認待ち","納期":"2024-11-15T17:00:00Z","実納期":"2024-11-14T10:30:00Z","品質評価":"合格","顧客承認状況":"未承認","顧客承認日時":null,"作成日時":"2024-10-20T09:15:00Z","更新日時":"2024-11-14T10:30:00Z","作成者":"山田太郎","更新者":"鈴木花子"},{"成果物ID":"rec-001","契約ID":"rec-c-042","成果物名":"顧客管理システム基本設計書","説明":"新規顧客管理システムの要件定義から基本設計までを含む設計書。データベース設計、画面設計、API仕様を網羅","ステータス":"進行中","納期":"2024-12-15T23:59:59Z","実納期":null,"品質評価":"保留中","顧客承認状況":"未承認","顧客承認日時":null,"作成日時":"2024-11-01T09:30:00Z","更新日時":"2024-12-20T14:45:00Z","作成者":"田中太郎","更新者":"佐藤花子"},{"成果物ID":"rec-001","契約ID":"rec-c-0847","成果物名":"システム要件定義書（修正版）","説明":"顧客システム刷新プロジェクトの要件定義書。顧客からの指摘事項（機能要件の不明確さ、非機能要件の詳細不足）を反映した修正版。","ステータス":"承認待ち","納期":"2025-01-20T17:00:00Z","実納期":"2025-01-18T14:30:00Z","品質評価":"合格","顧客承認状況":"未承認","顧客承認日時":null,"作成日時":"2024-12-10T09:15:00Z","更新日時":"2025-01-18T14:30:00Z","作成者":"鈴木花子","更新者":"鈴木花子"},{"成果物ID":"rec-001","契約ID":"rec-contract-0042","成果物名":"顧客管理システム UI/UXデザイン仕様書","説明":"新規顧客管理システムのUI/UXデザイン仕様書。画面遷移図、ワイヤーフレーム、デザインガイドラインを含む。","ステータス":"完了","納期":"2024-11-30T23:59:59Z","実納期":"2024-11-28T14:30:00Z","品質評価":"合格","顧客承認状況":"承認","顧客承認日時":"2024-12-02T10:15:00Z","作成日時":"2024-10-15T09:00:00Z","更新日時":"2024-11-28T14:30:00Z","作成者":"佐藤花子","更新者":"佐藤花子"},{"成果物ID":"rec-001","契約ID":"rec-contract-042","成果物名":"顧客管理システム ユーザーインターフェース設計書","説明":"新規顧客管理システムのUIデザイン仕様書。画面遷移図、ワイヤーフレーム、デザインガイドラインを含む。","ステータス":"進行中","納期":"2025-01-31T23:59:59Z","実納期":null,"品質評価":"不合格","顧客承認状況":"却下","顧客承認日時":"2025-01-28T14:30:00Z","作成日時":"2024-12-15T09:00:00Z","更新日時":"2025-01-29T11:45:00Z","作成者":"山田花子","更新者":"鈴木次郎"},{"成果物ID":"rec-20250087","契約ID":"rec-20250001","成果物名":"Webサイトリニューアル - フロントエンド実装","説明":"既存Webサイトのフロントエンド部分を最新フレームワークを用いてリニューアル。レスポンシブデザイン対応、アクセシビリティ基準WCAG 2.1 AA準拠、ページ読み込み速度最適化を実施。","ステータス":"完了","納期":"2025-02-28T23:59:59Z","実納期":"2025-02-14T17:30:00Z","品質評価":"合格","顧客承認状況":"未承認","顧客承認日時":null,"作成日時":"2025-01-10T09:15:00Z","更新日時":"2025-02-14T17:30:00Z","作成者":"山田太郎","更新者":"山田太郎"},{"成果物ID":"rec-001","契約ID":"rec-c-042","成果物名":"顧客管理システム 要件定義書","説明":"新規顧客管理システムの要件定義ドキュメント。顧客情報管理、営業パイプライン管理、レポート機能を含む。","ステータス":"進行中","納期":"2025-02-28T23:59:59Z","実納期":null,"品質評価":"要修正","顧客承認状況":"未承認","顧客承認日時":null,"作成日時":"2024-12-10T09:30:00Z","更新日時":"2025-01-22T14:15:00Z","作成者":"鈴木花子","更新者":"佐藤次郎"},{"成果物ID":"rec-001","契約ID":"rec-c-042","成果物名":"顧客管理システム要件定義書","説明":"新規顧客管理システムの機能要件、非機能要件、システムアーキテクチャ、画面遷移図を含む包括的な要件定義書。ステークホルダーレビュー済み。","ステータス":"計画中","納期":"2025-03-15T17:00:00Z","実納期":null,"品質評価":null,"顧客承認状況":"未承認","顧客承認日時":null,"作成日時":"2025-01-08T09:30:00Z","更新日時":"2025-01-08T09:30:00Z","作成者":"山田花子","更新者":"山田花子"},{"成果物ID":"rec-20250147","契約ID":"rec-20250089","成果物名":"顧客管理システム ユーザーインターフェース設計書","説明":"顧客管理システムのUIデザイン仕様書。画面遷移図、ワイヤーフレーム、デザインガイドラインを含む。顧客承認後、レスポンシブ対応の追加要件が発生したため、修正版を作成中。","ステータス":"進行中","納期":"2024-11-15T17:00:00Z","実納期":"2024-11-14T14:30:00Z","品質評価":"要修正","顧客承認状況":"却下","顧客承認日時":"2024-11-20T10:15:00Z","作成日時":"2024-10-28T09:00:00Z","更新日時":"2025-01-08T16:45:00Z","作成者":"佐藤花子","更新者":"鈴木健太"},{"成果物ID":"rec-001","契約ID":"rec-contract-2024-0847","成果物名":"顧客管理システム基本設計書","説明":"新規顧客管理システムの要件定義から基本設計までをまとめた設計書。ユーザーインターフェース、データベース構造、API仕様を含む。","ステータス":"承認待ち","納期":"2024-12-20T00:00:00Z","実納期":"2024-12-15T14:30:00Z","品質評価":"合格","顧客承認状況":"未承認","顧客承認日時":null,"作成日時":"2024-12-01T09:15:00Z","更新日時":"2024-12-15T16:45:00Z","作成者":"佐藤花子","更新者":"鈴木一郎"}],"成果物納期":[{"成果物納期ID":"rec-001","成果物ID":"rec-002","契約ID":"rec-003","顧客企業ID":"rec-004","予定納期日":"2024-12-15T17:00:00+09:00","実績納期日":"2024-12-15T14:30:00+09:00","納期ステータス":"完了","遅延日数":-3,"遅延理由":null,"納期変更履歴ID":null,"備考":"基本設計書は予定より3日早く納期。顧客との事前レビューにより品質確認が完了し、納期前倒しが可能となった。","作成日時":"2024-09-01T09:15:00+09:00","更新日時":"2024-12-15T15:45:00+09:00","作成者":"山田太郎","更新者":"鈴木花子"},{"成果物納期ID":"rec-001","成果物ID":"rec-002","契約ID":"rec-003","顧客企業ID":"rec-004","予定納期日":"2024-11-15T17:00:00Z","実績納期日":"2024-11-18T14:30:00Z","納期ステータス":"遅延","遅延日数":3,"遅延理由":"プロジェクト開始時の人員配置が計画比で不足し、実装フェーズの工数が当初見積もりを上回ったため","納期変更履歴ID":"rec-005","備考":"11月12日に顧客企業（株式会社サンプル）と納期延期について協議し、11月18日での納期変更を承認いただきました。品質は契約仕様を満たしています。","作成日時":"2024-10-20T09:15:00Z","更新日時":"2024-11-18T15:45:00Z","作成者":"山田花子","更新者":"佐藤次郎"},{"成果物納期ID":"rec-20250115-001","成果物ID":"rec-prod-0847","契約ID":"rec-cont-2024-0156","顧客企業ID":"rec-cust-0892","予定納期日":"2025-01-31T17:00:00Z","実績納期日":"2025-01-31T14:30:00Z","納期ステータス":"完了","遅延日数":0,"遅延理由":null,"納期変更履歴ID":null,"備考":"2025年1月度の月次レポートは予定通り納期されました。データ集計・分析・グラフ作成すべて完了。","作成日時":"2025-01-15T09:00:00Z","更新日時":"2025-01-31T15:00:00Z","作成者":"山田花子","更新者":"佐藤次郎"},{"成果物納期ID":"rec-001","成果物ID":"rec-002","契約ID":"rec-003","顧客企業ID":"rec-004","予定納期日":"2024-11-30T17:00:00Z","実績納期日":"2024-11-20T14:30:00Z","納期ステータス":"完了","遅延日数":-10,"遅延理由":null,"納期変更履歴ID":"rec-005","備考":"顧客企業からの要望により納期を10日前倒し。システム導入スケジュール前倒しに対応。品質確認済み。","作成日時":"2024-09-15T09:30:00Z","更新日時":"2024-11-20T15:45:00Z","作成者":"山田花子","更新者":"佐藤次郎"},{"成果物納期ID":"rec-001","成果物ID":"rec-002","契約ID":"rec-003","顧客企業ID":"rec-004","予定納期日":"2024-12-15T17:00:00+09:00","実績納期日":"2024-12-15T14:30:00+09:00","納期ステータス":"完了","遅延日数":-3,"遅延理由":null,"納期変更履歴ID":null,"備考":"障害対応レポートは予定より3日早く納期されました。顧客からの追加質問への回答も含まれています。","作成日時":"2024-11-20T09:15:00+09:00","更新日時":"2024-12-15T15:45:00+09:00","作成者":"鈴木花子","更新者":"佐藤次郎"},{"成果物納期ID":"rec-001","成果物ID":"rec-002","契約ID":"rec-003","顧客企業ID":"rec-004","予定納期日":"2024-11-15T17:00:00Z","実績納期日":"2024-11-16T14:30:00Z","納期ステータス":"遅延","遅延日数":1,"遅延理由":"クライアント側の承認プロセスが予定より1日遅れたため、最終版の納期が1日遅延しました","納期変更履歴ID":"rec-005","備考":"初版は予定通り11月15日に提出済み。クライアント（マーケティング部長・佐藤美咲氏）の確認待ちで、修正指示が11月16日朝に到着。同日14時30分に最終版を納期","作成日時":"2024-11-01T09:15:00Z","更新日時":"2024-11-16T15:45:00Z","作成者":"鈴木健一","更新者":"田中由美"},{"成果物納期ID":"rec-001","成果物ID":"rec-002","契約ID":"rec-003","顧客企業ID":"rec-004","予定納期日":"2024-12-20T17:00:00Z","実績納期日":"2024-12-25T14:30:00Z","納期ステータス":"遅延","遅延日数":5,"遅延理由":"本番環境でのデータ移行処理中に予期しないレガシーシステムとの連携エラーが発生。既存データの整合性検証に追加で3日間を要し、セキュリティ対応で2日間の追加検証が必要となった。","納期変更履歴ID":"rec-005","備考":"顧客企業との調整により最終納期を12月25日に変更。本番稼働は12月26日から開始予定。今後の類似案件ではレガシーシステム連携テストの期間を2週間延長することを推奨。","作成日時":"2024-11-15T09:30:00Z","更新日時":"2024-12-25T15:45:00Z","作成者":"山田花子","更新者":"佐藤次郎"},{"成果物納期ID":"rec-001","成果物ID":"rec-002","契約ID":"rec-003","顧客企業ID":"rec-004","予定納期日":"2024-11-30T17:00:00Z","実績納期日":"2024-12-05T14:30:00Z","納期ステータス":"完了","遅延日数":5,"遅延理由":"追加セキュリティ検査（脆弱性スキャン再実施）により納期を5日間延長","納期変更履歴ID":"rec-005","備考":"初回監査で重大度中の脆弱性が検出されたため、修復後の再検査を実施。顧客企業との協議により納期を2024年12月5日に変更。最終レポートは品質基準を満たしており、顧客企業から承認を得た。","作成日時":"2024-11-15T09:00:00Z","更新日時":"2024-12-05T15:45:00Z","作成者":"山田花子","更新者":"佐藤次郎"},{"成果物納期ID":"rec-001","成果物ID":"rec-002","契約ID":"rec-003","顧客企業ID":"rec-004","予定納期日":"2024-12-20T17:00:00Z","実績納期日":"2024-12-20T14:30:00Z","納期ステータス":"完了","遅延日数":"-3","遅延理由":null,"納期変更履歴ID":null,"備考":"12月度の月次作業報告書は予定より3日早く納期された。定期保守業務は順調に進捗しており、顧客対応も良好。","作成日時":"2024-12-20T14:35:00Z","更新日時":"2024-12-20T14:35:00Z","作成者":"山田花子","更新者":"山田花子"},{"成果物納期ID":"rec-001","成果物ID":"rec-002","契約ID":"rec-003","顧客企業ID":"rec-004","予定納期日":"2025-02-28T17:00:00Z","実績納期日":"2025-02-26T14:30:00Z","納期ステータス":"完了","遅延日数":-2,"遅延理由":null,"納期変更履歴ID":null,"備考":"クラウド移行プロジェクト最終納品。全システムの移行が予定より2日早く完了。顧客による検収テストも良好に進行し、本番環境への切り替えを予定通り実施。顧客満足度評価は9.2/10。","作成日時":"2024-11-15T09:00:00Z","更新日時":"2025-02-26T15:45:00Z","作成者":"山田花子","更新者":"佐藤次郎"}],"納期変更履歴":[{"納期変更履歴ID":"rec-001","成果物納期ID":"rec-002","契約ID":"rec-003","変更前納期":"2024-12-15 17:00:00","変更後納期":"2025-01-20 17:00:00","変更理由":"客先からの急な仕様追加要件により、画面UI設計の大幅な修正が必要となったため","承認状況":"承認","承認者ID":"yamada_hanako","承認日時":"2024-11-28 10:30:00","承認コメント":"客先との打ち合わせ議事録を確認しました。仕様変更の内容が妥当なため、納期延長を承認します。","作成日時":"2024-11-25 14:15:00","作成者":"suzuki_taro","更新日時":"2024-11-28 10:30:00"},{"納期変更履歴ID":"rec-001","成果物納期ID":"rec-042","契約ID":"rec-789","変更前納期":"2025-03-15 17:00:00","変更後納期":"2025-04-10 17:00:00","変更理由":"開発リソース不足により、予定していた2名の開発者が他プロジェクトへ配置転換となったため、納期の延長が必要となりました。","承認状況":"承認","承認者ID":"佐藤次郎","承認日時":"2025-02-28 10:30:00","承認コメント":"リソース配置の変更は已むを得ない判断と考えます。品質を維持した上での納期延長は妥当です。クライアントへの報告は速やかにお願いします。","作成日時":"2025-02-25 14:15:00","作成者":"鈴木花子","更新日時":"2025-02-28 10:30:00"},{"納期変更履歴ID":"rec-001","成果物納期ID":"rec-002","契約ID":"rec-003","変更前納期":"2025-03-15 17:00:00","変更後納期":"2025-02-28 17:00:00","変更理由":"顧客の営業活動加速化に伴い、システム導入時期を前倒ししたいとの要望","承認状況":"却下","承認者ID":"yamada_hanako","承認日時":"2025-02-10 14:30:00","承認コメント":"現在の開発スケジュールでは2週間の前倒しは対応不可。既に各工程が確定しており、品質保証期間の確保も困難なため却下とさせていただきます。別途ご相談ください。","作成日時":"2025-02-05 10:15:00","作成者":"suzuki_taro","更新日時":"2025-02-10 14:30:00"},{"納期変更履歴ID":"rec-001","成果物納期ID":"rec-002","契約ID":"rec-003","変更前納期":"2025-02-28 17:00:00","変更後納期":"2025-03-14 17:00:00","変更理由":"品質検査において基板の半田付け部分に微細なクラックが複数箇所で発見されたため、全数検査と不具合箇所の修正に14日間の期間延長が必要となりました。","承認状況":"申請中","承認者ID":null,"承認日時":null,"承認コメント":null,"作成日時":"2025-02-24 10:30:00","作成者":"山田花子","更新日時":"2025-02-24 10:30:00"},{"納期変更履歴ID":"rec-001","成果物納期ID":"rec-002","契約ID":"rec-003","変更前納期":"2025-02-28 17:00:00","変更後納期":"2025-03-14 17:00:00","変更理由":"外部委託先（株式会社テックソリューション）の部品調達遅延に伴う製造工程の遅延。当初予定していた2月28日納期が困難となったため、14日間の延期を申請いたします。","承認状況":"承認","承認者ID":"suzuki_hanako","承認日時":"2025-02-10 14:30:00","承認コメント":"外部委託先からの遅延通知確認済み。顧客への影響を最小限に抑えるため、本変更を承認します。顧客対応は営業部門で対応してください。","作成日時":"2025-02-07 09:15:00","作成者":"tanaka_taro","更新日時":"2025-02-10 14:30:00"},{"納期変更履歴ID":"rec-001","成果物納期ID":"rec-002","契約ID":"rec-003","変更前納期":"2025-03-31 17:00:00","変更後納期":"2025-03-15 17:00:00","変更理由":"顧客との協議により、プロジェクト全体のスケジュール前倒しが決定。顧客側の事業計画変更に伴い、相互合意のもと納期を16日間短縮することで合意した。","承認状況":"承認","承認者ID":"yamamoto_hanako","承認日時":"2025-02-10 10:30:00","承認コメント":"顧客との協議内容を確認しました。納期短縮による追加リソース配置は実行可能と判断します。品質維持のため、テスト期間を効率化することで対応可能です。承認いたします。","作成日時":"2025-02-05 14:15:00","作成者":"suzuki_taro","更新日時":"2025-02-10 10:30:00"},{"納期変更履歴ID":"rec-001","成果物納期ID":"rec-002","契約ID":"rec-003","変更前納期":"2025-02-28 17:00:00","変更後納期":"2025-03-14 17:00:00","変更理由":"2025年2月15日のシステム障害により開発環境が3日間停止。復旧後のテスト期間短縮のため、納期を2週間延長して品質確保を図る","承認状況":"承認","承認者ID":"yamada-hanako","承認日時":"2025-02-17 10:30:00","承認コメント":"システム障害の影響を考慮し、リカバリー計画に基づく妥当な変更と判断します。品質維持を優先として承認いたします。","作成日時":"2025-02-16 14:15:00","作成者":"suzuki-taro","更新日時":"2025-02-17 10:30:00"},{"納期変更履歴ID":"rec-001","成果物納期ID":"rec-002","契約ID":"rec-003","変更前納期":"2025-03-15T17:00:00+09:00","変更後納期":"2025-02-28T17:00:00+09:00","変更理由":"冬季から春季への需要転換に伴い、バレンタインデーおよびホワイトデーシーズンの販売機会を最大化するため、製品納期を前倒しする必要が生じた","承認状況":"承認","承認者ID":"user-佐藤花子","承認日時":"2025-01-22T10:30:00+09:00","承認コメント":"季節需要への対応は妥当と判断します。製造工程の前倒し可能性を確認済みのため、申請通り承認いたします。","作成日時":"2025-01-20T14:15:00+09:00","作成者":"user-鈴木太郎","更新日時":"2025-01-22T10:30:00+09:00"},{"納期変更履歴ID":"rec-001","成果物納期ID":"rec-042","契約ID":"rec-0156","変更前納期":"2025-03-15 17:00:00","変更後納期":"2025-04-30 17:00:00","変更理由":"個人情報保護方針改正に伴うシステム対応要件の追加により、セキュリティ監査及び法令適合性確認に追加で30日間を要するため","承認状況":"承認","承認者ID":"user-0089","承認日時":"2025-02-18 10:30:00","承認コメント":"法令対応は必須要件であり、品質確保の観点からも妥当な期間延長と判断します。承認いたします。","作成日時":"2025-02-10 14:20:00","作成者":"user-0045","更新日時":"2025-02-18 10:30:00"},{"納期変更履歴ID":"rec-20250115-001","成果物納期ID":"rec-20250110-prod-042","契約ID":"rec-20241201-contract-015","変更前納期":"2025-03-31T17:00:00+09:00","変更後納期":"2025-04-30T17:00:00+09:00","変更理由":"プロジェクト統合に伴う他部門との連携調整により、基盤システムの完成が1ヶ月遅延する見通しのため、依存する本成果物の納期を同期させる必要が生じた","承認状況":"承認","承認者ID":"user-yamamoto-hanako","承認日時":"2025-01-16T10:30:00+09:00","承認コメント":"統合プロジェクト全体のスケジュール確認済み。クライアント側の受け入れ体制も4月末対応で了承を得ているため、本変更を承認します。","作成日時":"2025-01-15T14:20:00+09:00","作成者":"user-suzuki-taro","更新日時":"2025-01-16T10:30:00+09:00"}],"請求書":[{"請求書ID":"rec-001-inv-20250115","顧客企業ID":"rec-001-cust-00012","契約ID":"rec-001-cont-00087","請求書番号":"INV-2025-001234","請求日":"2025-01-15T09:00:00Z","請求期間開始日":"2024-12-01T00:00:00Z","請求期間終了日":"2024-12-31T23:59:59Z","請求金額":2500000,"税額":250000,"請求金額合計":2750000,"請求ステータス":"支払済","支払期限日":"2025-01-31T23:59:59Z","支払日":"2025-01-28T14:30:00Z","備考":"12月分月次定期請求。前月からの継続サービス。請求額に変動なし。","作成日時":"2025-01-15T08:45:00Z","更新日時":"2025-01-28T15:00:00Z","作成者":"佐藤花子"},{"請求書ID":"rec-001-inv-20250115-001","顧客企業ID":"rec-001-cust-20240401-012","契約ID":"rec-001-cont-20240601-005","請求書番号":"INV-2025-001234","請求日":"2025-01-15T09:00:00Z","請求期間開始日":"2024-06-01T00:00:00Z","請求期間終了日":"2025-01-10T23:59:59Z","請求金額":4500000,"税額":450000,"請求金額合計":4950000,"請求ステータス":"送付済","支払期限日":"2025-02-14T23:59:59Z","支払日":null,"備考":"プロジェクト型契約「基幹システム刷新プロジェクト」の納期完了に伴う一括請求。成果物納入日：2025年1月10日。請求書は2025年1月15日に顧客企業に送付済み。","作成日時":"2025-01-15T08:30:00Z","更新日時":"2025-01-15T08:30:00Z","作成者":"山田花子"},{"請求書ID":"rec-20250156","顧客企業ID":"rec-10042","契約ID":"rec-30089","請求書番号":"INV-2024-0847","請求日":"2024-11-15T09:30:00Z","請求期間開始日":"2024-10-01T00:00:00Z","請求期間終了日":"2024-10-31T23:59:59Z","請求金額":850000,"税額":85000,"請求金額合計":935000,"請求ステータス":"期限超過","支払期限日":"2024-12-15T23:59:59Z","支払日":null,"備考":"支払期限超過のため催促対象。前月の請求INV-2024-0821も未払い。","作成日時":"2024-11-15T09:30:00Z","更新日時":"2025-01-20T14:15:00Z","作成者":"鈴木花子"},{"請求書ID":"rec-001-inv-2025-q1-001","顧客企業ID":"rec-001-cust-0042","契約ID":"rec-001-cont-0042-001","請求書番号":"INV-2025-Q1-000847","請求日":"2025-01-10T09:00:00","請求期間開始日":"2024-10-01T00:00:00","請求期間終了日":"2024-12-31T23:59:59","請求金額":1850000,"税額":185000,"請求金額合計":2035000,"請求ステータス":"未送付","支払期限日":"2025-02-10T23:59:59","支払日":null,"備考":"2024年第4四半期分の利用料金。10月～12月の3ヶ月分をまとめた請求となります。","作成日時":"2025-01-10T08:30:45","更新日時":"2025-01-10T08:30:45","作成者":"山田花子"},{"請求書ID":"rec-001-2025-001847","顧客企業ID":"rec-cust-000234","契約ID":"rec-contract-000891","請求書番号":"INV-2025-001847","請求日":"2025-01-15T09:30:00Z","請求期間開始日":"2024-12-01T00:00:00Z","請求期間終了日":"2024-12-31T23:59:59Z","請求金額":385000,"税額":38500,"請求金額合計":423500,"請求ステータス":"送付済","支払期限日":"2025-02-15T23:59:59Z","支払日":null,"備考":"12月の追加作業費用による増額請求。システム改修対応作業（80時間）の追加費用。詳細は別紙作業報告書を参照。","作成日時":"2025-01-15T09:30:00Z","更新日時":"2025-01-15T10:15:00Z","作成者":"山田花子"},{"請求書ID":"rec-20250115-001","顧客企業ID":"cust-rec-00847","契約ID":"cont-rec-02156","請求書番号":"CR-2025-001-A","請求日":"2025-01-15T09:30:00Z","請求期間開始日":"2024-12-01T00:00:00Z","請求期間終了日":"2024-12-31T23:59:59Z","請求金額":-450000,"税額":-45000,"請求金額合計":-495000,"請求ステータス":"クレジット処理済","支払期限日":"2025-02-14T23:59:59Z","支払日":"2025-01-15T14:22:00Z","備考":"前月請求分(INV-2024-12-156)の過請求に伴う返金処理。サービス利用期間の重複計上により¥495,000を返金対象とする。顧客企業側システム障害に伴う利用停止期間(12/15-12/20)の料金相殺。","作成日時":"2025-01-15T09:30:00Z","更新日時":"2025-01-15T14:22:00Z","作成者":"suzuki-yuki"},{"請求書ID":"rec-001","顧客企業ID":"cust-0847","契約ID":"cont-2024-0156","請求書番号":"INV-2024-001234","請求日":"2024-11-15T09:30:00Z","請求期間開始日":"2024-11-01T00:00:00Z","請求期間終了日":"2024-11-30T23:59:59Z","請求金額":"385000","税額":"38500","請求金額合計":"423500","請求ステータス":"送付済","支払期限日":"2024-12-15T23:59:59Z","支払日":null,"備考":"初回請求。基本料金11月分およびセットアップ費用を含む。","作成日時":"2024-11-15T09:30:00Z","更新日時":"2024-11-15T14:22:00Z","作成者":"田中太郎"},{"請求書ID":"rec-20250115-001","顧客企業ID":"cust-rec-0847","契約ID":"cont-rec-2024-0156","請求書番号":"INV-2025-01-0847","請求日":"2025-01-15T09:00:00Z","請求期間開始日":"2025-01-01T00:00:00Z","請求期間終了日":"2025-01-31T23:59:59Z","請求金額":"150000","税額":"15000","請求金額合計":"165000","請求ステータス":"送付済","支払期限日":"2025-02-15T23:59:59Z","支払日":null,"備考":"定期保守契約に基づく1月分の自動請求。システム保守・技術サポート費用を含む。","作成日時":"2025-01-15T08:30:00Z","更新日時":"2025-01-15T09:15:00Z","作成者":"山田花子"},{"請求書ID":"rec-20250145","顧客企業ID":"rec-00234","契約ID":"rec-01089","請求書番号":"INV-2025-001247","請求日":"2025-01-15T09:30:00Z","請求期間開始日":"2024-12-01T00:00:00Z","請求期間終了日":"2024-12-31T23:59:59Z","請求金額":450000,"税額":45000,"請求金額合計":495000,"請求ステータス":"キャンセル","支払期限日":"2025-02-14T23:59:59Z","支払日":null,"備考":"2025年1月20日に顧客より案件キャンセルの申し出があり、請求書を取り消し処理。返金手続きは別途進行予定。","作成日時":"2025-01-15T09:30:00Z","更新日時":"2025-01-21T14:22:35Z","作成者":"山田花子"},{"請求書ID":"rec-001-inv-2025-001","顧客企業ID":"rec-001-cust-0042","契約ID":"rec-001-contract-0156","請求書番号":"INV-2025-000847","請求日":"2025-01-15T09:00:00Z","請求期間開始日":"2024-12-01T00:00:00Z","請求期間終了日":"2024-12-31T23:59:59Z","請求金額":2850000,"税額":285000,"請求金額合計":3135000,"請求ステータス":"送付済","支払期限日":"2025-02-14T23:59:59Z","支払日":null,"備考":"12月分の複数契約（基本サービス、オプション機能、保守サポート）をまとめた統合請求書。契約番号：CTR-2024-0156-A、CTR-2024-0156-B、CTR-2024-0156-Cの3件分を含む。銀行振込にて支払いをお願いいたします。","作成日時":"2025-01-15T08:45:30Z","更新日時":"2025-01-15T08:45:30Z","作成者":"佐藤花子"}],"メール履歴":[{"メール履歴ID":"rec-001","顧客企業ID":"cust-0847","契約ID":"cont-2024-0156","成果物ID":null,"請求書ID":null,"送信者メールアドレス":"yamada.hanako@ourcompany.co.jp","受信者メールアドレス":"tanaka.jiro@techsolutions.co.jp","CC":"suzuki.taro@techsolutions.co.jp,yamamoto.kenji@ourcompany.co.jp","BCC":null,"件名":"【提案】システム導入コンサルティングサービスのご提案","本文":"いつもお世話になっております。\n\n貴社のビジネス課題解決に向けて、弊社システム導入コンサルティングサービスのご提案をさせていただきたく、ご連絡いたしました。\n\n提案内容：\n・基幹システム導入支援（6ヶ月間）\n・業務プロセス最適化コンサルティング\n・スタッフ研修・サポート\n\n詳細は別紙提案書をご参照ください。\n\nご質問やご不明な点がございましたら、いつでもお気軽にお問い合わせください。\n\nよろしくお願いいたします。\n\n山田花子\n営業部 営業一課\n株式会社アワーカンパニー","メール種別":"提案","送受信区分":"送信","送受信日時":"2024-11-15 09:30:00","添付ファイル有無":true,"作成日時":"2024-11-15 09:30:00","更新日時":"2024-11-15 09:30:00","作成者":"yamada.hanako@ourcompany.co.jp"},{"メール履歴ID":"rec-001","顧客企業ID":"cust-0847","契約ID":"cont-2024-0156","成果物ID":null,"請求書ID":null,"送信者メールアドレス":"yamamoto.hanako@techsolutions.jp","受信者メールアドレス":"tanaka.taro@ourcompany.co.jp","CC":"suzuki.jiro@ourcompany.co.jp,watanabe.sachiko@ourcompany.co.jp","BCC":null,"件名":"契約書の内容確認についてのご質問","本文":"いつもお世話になっております。\n\nテックソリューションズの山本花子です。\n\n先日お送りいただいた契約書（契約番号：cont-2024-0156）について、以下の点についてご確認させていただきたくご連絡いたしました。\n\n1. 納期について：2025年3月31日の納期で問題ございませんでしょうか？\n2. 支払い条件について：月末締め翌月末払いで確認いたしたく存じます。\n3. 保守期間について：納品後12ヶ月間の無償保守が含まれることを確認させていただきたいです。\n\nお手数ですが、ご確認のうえご返信いただけますでしょうか。\n\nよろしくお願いいたします。\n\n山本花子\nテックソリューションズ株式会社\n営業部","メール種別":"契約確認","送受信区分":"受信","送受信日時":"2024-12-15 10:45:00","添付ファイル有無":true,"作成日時":"2024-12-15 10:45:30","更新日時":"2024-12-15 10:45:30","作成者":"tanaka.taro@ourcompany.co.jp"},{"メール履歴ID":"rec-001","顧客企業ID":"cust-2024-0847","契約ID":"cont-2024-1523","成果物ID":null,"請求書ID":null,"送信者メールアドレス":"yamada.hanako@ourcompany.co.jp","受信者メールアドレス":"suzuki.taro@client-corp.co.jp","CC":"tanaka.jiro@client-corp.co.jp,nakamura.yuki@ourcompany.co.jp","BCC":null,"件名":"【契約確認】システム開発委託契約書のご確認のお願い","本文":"鈴木太郎様\n\nいつもお世話になっております。\n当社の山田花子です。\n\n先日ご締結いただきました「システム開発委託契約」の契約書を添付いたしました。\n\nお手数ですが、契約内容に誤りがないかご確認の上、署名捺印をいただき、2024年12月20日までにご返却いただきますようお願いいたします。\n\n契約期間：2025年1月1日～2025年12月31日\n契約金額：¥2,500,000（税抜）\n\nご不明な点やご質問がございましたら、お気軽にお問い合わせください。\n\nよろしくお願いいたします。\n\n山田花子\n営業部 営業課\n当社\ntel: 03-xxxx-xxxx\nemail: yamada.hanako@ourcompany.co.jp","メール種別":"契約確認","送受信区分":"送信","送受信日時":"2024-12-13 09:45:00","添付ファイル有無":true,"作成日時":"2024-12-13 09:45:00","更新日時":"2024-12-13 09:45:00","作成者":"yamada.hanako"},{"メール履歴ID":"rec-001","顧客企業ID":"cust-0847","契約ID":"cont-0521","成果物ID":"deliv-0389","請求書ID":null,"送信者メールアドレス":"yamada.hanako@our-company.co.jp","受信者メールアドレス":"suzuki.jiro@client-corp.co.jp","CC":"tanaka.saburo@client-corp.co.jp,nakamura.yuki@our-company.co.jp","BCC":null,"件名":"【事前通知】システム開発案件_納期確認のご連絡（2025年2月28日納品予定）","本文":"いつもお世話になっております。\n\n山田花子です。\n\nご契約いただいているシステム開発案件につきまして、納期が近づいてまいりましたため、事前にご連絡させていただきます。\n\n【納品予定日】\n2025年2月28日（金）\n\n【納品内容】\n- 顧客管理システム基本機能モジュール\n- ユーザーマニュアル（PDF版）\n- インストール手順書\n\n【確認事項】\n納品予定日に変更がないこと、また納品方法（クラウドストレージ共有予定）で問題ないことをご確認ください。\n\nご質問やご不明な点がございましたら、お気軽にお問い合わせください。\n\nよろしくお願いいたします。\n\n山田花子\nプロジェクト管理部\nご契約企業","メール種別":"成果物納期通知","送受信区分":"送信","送受信日時":"2025-02-14 09:30:00","添付ファイル有無":true,"作成日時":"2025-02-14 09:30:00","更新日時":"2025-02-14 09:30:00","作成者":"yamada.hanako@our-company.co.jp"},{"メール履歴ID":"rec-001","顧客企業ID":"cust-0847","契約ID":"cont-2024-0512","成果物ID":"deliv-2024-0891","請求書ID":null,"送信者メールアドレス":"yamada.hanako@techsolutions.co.jp","受信者メールアドレス":"suzuki.jiro@ourcompany.co.jp","CC":"tanaka.taro@ourcompany.co.jp,kobayashi.yuki@ourcompany.co.jp","BCC":null,"件名":"【重要】システム開発プロジェクト納期変更のご通知（成果物ID: deliv-2024-0891）","本文":"お疲れ様です。\n\nいつもお世話になっております。テックソリューションズの山田花子です。\n\n先日ご発注いただきました「顧客管理システム構築」プロジェクトにおきまして、やむを得ない事情により納期の変更をお願いしたくご連絡させていただきました。\n\n【変更内容】\n当初納期：2025年3月15日\n変更後納期：2025年4月10日\n変更理由：外部APIの仕様変更に伴う対応工数の増加\n\n詳細につきましては、別紙の変更通知書をご参照ください。\nご不明な点やご質問がございましたら、いつでもお気軽にお問い合わせください。\n\nご理解とご協力のほど、よろしくお願いいたします。\n\n山田花子\nテックソリューションズ株式会社\nプロジェクト管理部\n","メール種別":"変更通知","送受信区分":"受信","送受信日時":"2025-02-18 09:30:00","添付ファイル有無":true,"作成日時":"2025-02-18 09:30:15","更新日時":"2025-02-18 09:30:15","作成者":"system"},{"メール履歴ID":"rec-001","顧客企業ID":"rec-c-0042","契約ID":"rec-ct-0156","成果物ID":"rec-d-0089","請求書ID":null,"送信者メールアドレス":"tanaka.taro@ourcompany.jp","受信者メールアドレス":"suzuki.hanako@client-corp.jp","CC":"yamamoto.jiro@client-corp.jp,nakamura.yuki@ourcompany.jp","BCC":null,"件名":"【納品完了】システム要件定義書 - 2025年1月納期分","本文":"お疲れ様です。\n\n株式会社クライアント様\nプロジェクト担当の田中太郎です。\n\nこの度、ご発注いただいていたシステム要件定義書が完成いたしましたので、ご報告申し上げます。\n\n【納品内容】\n・成果物ID：rec-d-0089\n・成果物名：システム要件定義書 Ver1.0\n・ページ数：47ページ\n・納期：2025年1月31日（予定通り完了）\n\n添付ファイルにて、最終版のドキュメントをお送りいたします。\nご確認いただき、ご不明な点やご修正のご指示がございましたら、お気軽にお問い合わせください。\n\nご協力ありがとうございました。\n\n何かご質問やご不明な点がございましたら、お気軽にお声がけください。\n\nよろしくお願いいたします。\n\n---\n田中太郎\n株式会社アウアーカンパニー\nコンサルティング事業部\nTel: 03-XXXX-XXXX\nEmail: tanaka.taro@ourcompany.jp","メール種別":"成果物納期通知","送受信区分":"送信","送受信日時":"2025-01-31 14:32:00","添付ファイル有無":true,"作成日時":"2025-01-31 14:32:00","更新日時":"2025-01-31 14:32:00","作成者":"tanaka.taro@ourcompany.jp"},{"メール履歴ID":"rec-001","顧客企業ID":"cust-0847","契約ID":null,"成果物ID":null,"請求書ID":"inv-202501-0156","送信者メールアドレス":"billing@acmecorp.jp","受信者メールアドレス":"tanaka.taro@client-inc.jp","CC":"yamada.hanako@client-inc.jp,suzuki.jiro@client-inc.jp","BCC":"archive@acmecorp.jp","件名":"【2025年1月分】月次請求書のご送付","本文":"いつもお世話になっております。\n\nアクメコーポレーション営業推進部の佐藤と申します。\n\n2025年1月分の月次請求書をお送りいたします。\n\n【請求内容】\n請求書番号：INV-202501-0156\n請求金額：¥1,250,000（税込）\n請求期間：2025年1月1日～2025年1月31日\n支払期限：2025年2月28日\n\nご不明な点やご質問がございましたら、下記までお気軽にお問い合わせください。\n\n何卒よろしくお願いいたします。\n\n---\n佐藤花子\nアクメコーポレーション\n営業推進部 請求管理課\nTel: 03-XXXX-XXXX\nEmail: billing@acmecorp.jp","メール種別":"請求書送付","送受信区分":"送信","送受信日時":"2025-02-03 09:15:00","添付ファイル有無":true,"作成日時":"2025-02-03 09:15:00","更新日時":"2025-02-03 09:15:00","作成者":"佐藤花子"},{"メール履歴ID":"rec-001","顧客企業ID":"cust-0847","契約ID":null,"成果物ID":null,"請求書ID":"inv-2024-1523","送信者メールアドレス":"yamada.hanako@techsolutions.co.jp","受信者メールアドレス":"billing@ourcompany.co.jp","CC":"yamada.manager@techsolutions.co.jp","BCC":"","件名":"2024年11月分請求書の内容確認について","本文":"いつもお世話になっております。\n\n先日ご送付いただきました2024年11月分の請求書（請求番号：INV-2024-1523）について、確認させていただきたい点がございます。\n\n請求書内の「システム保守費」の金額が前月比で20%増加しているようですが、こちらは契約内容に基づいた正当な増額でしょうか？契約書を確認したところ、保守費は月額固定と認識しておりますが、ご確認いただけますでしょうか。\n\nまた、「追加開発作業費」として計上されている金額の詳細（作業内容、時間数等）についても、併せてご教示いただきたくお願いいたします。\n\nご多忙のところ恐れ入りますが、ご回答をお待ちしております。\n\n田中太郎","メール種別":"請求書内容質問","送受信区分":"受信","送受信日時":"2024-12-05 09:15:00","添付ファイル有無":false,"作成日時":"2024-12-05 09:15:00","更新日時":"2024-12-05 09:15:00","作成者":"system"},{"メール履歴ID":"rec-001","顧客企業ID":"cust-0847","契約ID":null,"成果物ID":null,"請求書ID":"inv-2024-1205","送信者メールアドレス":"yamada.hanako@clientcorp.jp","受信者メールアドレス":"tanaka.taro@ourcompany.jp","CC":"suzuki.jiro@ourcompany.jp","BCC":"","件名":"請求書No.2024-1205の支払い完了のご報告","本文":"お疲れ様です。\n\n株式会社クライアントコーポレーションの山田花子です。\n\n先日お送りいただきました請求書No.2024-1205（金額：¥1,250,000）につきまして、本日銀行振込にて支払い手続きを完了いたしましたのでご報告申し上げます。\n\n振込日：2024年12月20日\n振込金額：¥1,250,000\n振込先：お送りいただいた請求書記載の口座\n\nご不明な点やご質問がございましたら、いつでもお気軽にお問い合わせください。\n\n今後ともよろしくお願いいたします。\n\n山田花子\n株式会社クライアントコーポレーション\n経理部 部長\ntel: 03-XXXX-XXXX","メール種別":"請求書支払確認","送受信区分":"受信","送受信日時":"2024-12-20 14:35:00","添付ファイル有無":false,"作成日時":"2024-12-20 14:35:00","更新日時":"2024-12-20 14:35:00","作成者":"システム自動取込"},{"メール履歴ID":"rec-001","顧客企業ID":"cust-0847","契約ID":"cont-2024-0156","成果物ID":null,"請求書ID":null,"送信者メールアドレス":"yamada.hanako@ourcompany.co.jp","受信者メールアドレス":"suzuki.taro@clientcorp.co.jp","CC":"tanaka.jiro@clientcorp.co.jp,watanabe.sachiko@ourcompany.co.jp","BCC":null,"件名":"【重要】契約更新のご案内 - 2025年3月31日満了予定","本文":"いつもお世話になっております。\n\n株式会社アルファシステムズの山田花子です。\n\nこの度は、貴社との以下の契約について、更新時期が近づいてまいりましたのでご案内申し上げます。\n\n【契約情報】\n契約ID：cont-2024-0156\n契約名：クラウドシステム保守サービス\n現契約期間：2024年4月1日～2025年3月31日\n契約金額：月額150,000円（税抜き）\n\n契約更新につきましては、以下のスケジュールを予定しております。\n\n2025年2月14日（金）：更新内容のご提案\n2025年2月28日（金）：ご回答期限\n2025年3月15日（土）：更新契約書の締結\n\nご不明な点やご質問がございましたら、いつでもお気軽にお問い合わせください。\n\nよろしくお願いいたします。\n\n山田花子\n営業部 営業課\n株式会社アルファシステムズ\ntel: 03-XXXX-XXXX","メール種別":"契約確認","送受信区分":"送信","送受信日時":"2025-01-20 09:30:00","添付ファイル有無":true,"作成日時":"2025-01-20 09:30:00","更新日時":"2025-01-20 09:30:00","作成者":"yamada.hanako"}],"通知履歴":[{"通知履歴ID":"rec-20250115-001","顧客企業ID":"rec-cust-0847","通知タイプ":"契約更新","関連エンティティタイプ":"契約","関連エンティティID":"rec-contract-2156","通知タイトル":"【重要】契約更新期限のご案内（30日以内）","通知内容":"いつもお世話になっております。\n\nお客様との契約「システム保守・運用サービス」の更新期限が2025年2月10日に迫っております。\n\n契約番号：CTR-2022-0847-001\n現契約期間：2024年2月11日～2025年2月10日\n更新期限：2025年2月10日\n\n更新手続きをご希望の場合は、お早めにご連絡ください。\n本ポータル内の「契約管理」メニューより詳細をご確認いただけます。\n\nご不明な点がございましたら、営業担当の山田花子までお気軽にお問い合わせください。","送信方法":"メール","送信状態":"送信済","受信者メールアドレス":"tanaka.taro@example-company.co.jp","送信日時":"2025-01-15T09:30:00+09:00","既読フラグ":true,"既読日時":"2025-01-15T10:45:00+09:00","エラーメッセージ":null,"作成日時":"2025-01-15T09:25:00+09:00","更新日時":"2025-01-15T10:45:00+09:00"},{"通知履歴ID":"rec-20250115-0847","顧客企業ID":"cust-202401-0512","通知タイプ":"成果物納期催促","関連エンティティタイプ":"成果物","関連エンティティID":"deliv-202412-1203","通知タイトル":"【重要】成果物納入期限超過のお知らせ","通知内容":"いつもお世話になっております。\n\nご契約いただいております「ECサイトリニューアルプロジェクト」の成果物について、納期予定日の2025年1月10日を経過いたしました。\n\n納期予定日：2025年1月10日\n成果物名：フロントエンド実装ファイル一式\n現在の進捗状況：80%\n\nお手数ですが、至急納入予定日のご確認をいただきますようお願いいたします。\nご不明な点やご質問がございましたら、お気軽にお問い合わせください。\n\n本件に関するご連絡は、担当営業の鈴木花子までお願いいたします。","送信方法":"メール","送信状態":"送信済","受信者メールアドレス":"yamada.taro@example-corp.jp","送信日時":"2025-01-15 09:30:00","既読フラグ":false,"既読日時":null,"エラーメッセージ":null,"作成日時":"2025-01-15 09:30:00","更新日時":"2025-01-15 09:30:00"},{"通知履歴ID":"rec-20250115-001","顧客企業ID":"rec-cust-2024-0847","通知タイプ":"請求書発行","関連エンティティタイプ":"請求書","関連エンティティID":"rec-inv-2025-001234","通知タイトル":"【重要】2025年1月分請求書が発行されました","通知内容":"いつもお世話になっております。\n\n2025年1月分の請求書が発行されました。\n\n【請求書詳細】\n請求書番号：INV-2025-001234\n請求日：2025年1月15日\n請求金額：¥2,450,000\n支払期限：2025年2月15日\n\nポータル画面よりダウンロードいただくか、下記のリンクからご確認ください。\nご不明な点がございましたら、お気軽にお問い合わせください。","送信方法":"メール","送信状態":"送信済","受信者メールアドレス":"accounting@example-corp.jp","送信日時":"2025-01-15 09:30:00","既読フラグ":false,"既読日時":null,"エラーメッセージ":null,"作成日時":"2025-01-15 09:30:00","更新日時":"2025-01-15 09:30:00"},{"通知履歴ID":"rec-20250115-0847","顧客企業ID":"rec-cust-2024-0156","通知タイプ":"契約変更","関連エンティティタイプ":"契約","関連エンティティID":"rec-contract-2024-0892","通知タイトル":"契約条件変更のお知らせ","通知内容":"いつもお世話になっております。\n\n株式会社サクラテック様とのシステム保守契約（契約ID: REC-2024-0892）につきまして、契約条件の一部変更がございましたのでお知らせいたします。\n\n【変更内容】\n・月額保守料金: 150,000円 → 165,000円（税抜）\n・サポート対応時間: 平日9:00-17:00 → 平日9:00-18:00\n・応答時間SLA: 24時間以内 → 12時間以内\n\n【変更理由】\nサポート対応範囲の拡大およびSLA強化に伴う費用変更となります。\n\n【変更有効日】\n2025年2月1日\n\n詳細はポータル画面の契約管理画面よりご確認ください。\nご不明な点がございましたら、担当営業の山田花子までお問い合わせください。","送信方法":"メール","送信状態":"送信済","受信者メールアドレス":"procurement@sakura-tech.co.jp","送信日時":"2025-01-15T08:47:32Z","既読フラグ":true,"既読日時":"2025-01-15T09:23:15Z","エラーメッセージ":null,"作成日時":"2025-01-15T08:45:00Z","更新日時":"2025-01-15T09:23:15Z"},{"通知履歴ID":"rec-20250215-001","顧客企業ID":"cust-00847","通知タイプ":"契約更新","関連エンティティタイプ":"契約","関連エンティティID":"contract-05234","通知タイトル":"契約更新のお知らせ","通知内容":"いつもお世話になっております。\n\nご契約いただいております「クラウドシステム利用契約」の更新時期が近づいております。\n契約ID: contract-05234\n現契約終了日: 2025年3月31日\n\n更新手続きについては、別途ご連絡させていただきます。\nご不明な点がございましたら、お気軽にお問い合わせください。","送信方法":"メール","送信状態":"送信失敗","受信者メールアドレス":"yamada.hanako@example-corp.jp","送信日時":"2025-02-15T09:30:00+09:00","既読フラグ":false,"既読日時":null,"エラーメッセージ":"メールアドレスが無効です。受信者メールアドレス(yamada.hanako@example-corp.jp)へのメール配信に失敗しました。ドメイン検証エラー: MXレコードが見つかりません。","作成日時":"2025-02-15T09:30:00+09:00","更新日時":"2025-02-15T09:35:22+09:00"},{"通知履歴ID":"rec-20250115-001","顧客企業ID":"cust-20240601-042","通知タイプ":"契約更新","関連エンティティタイプ":"契約","関連エンティティID":"cont-20240915-018","通知タイトル":"【重要】システム保守契約の更新手続きのお願い","通知内容":"平素よりお世話になっております。\n\nご契約いただいているシステム保守契約（契約番号：MAINT-2024-0847）につきまして、2025年3月31日で契約期間が満了となります。\n\n継続ご希望の場合は、2025年2月28日までに更新手続きをお願いいたします。ご不明な点やご相談がございましたら、担当営業の山田花子までお気軽にお問い合わせください。\n\nよろしくお願いいたします。","送信方法":"ポータル画面内通知","送信状態":"送信済","受信者メールアドレス":null,"送信日時":"2025-01-15T09:30:00+09:00","既読フラグ":false,"既読日時":null,"エラーメッセージ":null,"作成日時":"2025-01-15T09:30:00+09:00","更新日時":"2025-01-15T09:30:00+09:00"},{"通知履歴ID":"rec-20250115-0847","顧客企業ID":"cust-00156","通知タイプ":"成果物納期","関連エンティティタイプ":"成果物","関連エンティティID":"deliv-02847","通知タイトル":"【最終催促】Webサイトリニューアル案件_デザイン案レビュー期限が本日中です","通知内容":"いつもお世話になっております。\n\n株式会社アクティブラボのプロジェクト管理チームです。\n\nWebサイトリニューアル案件におけるデザイン案のレビュー期限が本日（2025年1月15日）となっております。\n\n【対象成果物】\n- デザイン案（トップページ・下層ページ）\n- ワイヤーフレーム修正版\n\n【期限】2025年1月15日 17:00まで\n\nご多忙とは存じますが、本期限内でのレビュー完了をお願いいたします。\nレビューコメントはポータル画面内のレビュー機能よりご入力ください。\n\nご不明な点がございましたら、担当の山田花子（yamada.hanako@activelab.jp）までお気軽にお問い合わせください。\n\nよろしくお願いいたします。","送信方法":"メール","送信状態":"送信済","受信者メールアドレス":"review@clientcorp.jp","送信日時":"2025-01-15T09:00:00+09:00","既読フラグ":true,"既読日時":"2025-01-15T09:15:32+09:00","エラーメッセージ":null,"作成日時":"2025-01-15T08:47:23+09:00","更新日時":"2025-01-15T09:15:32+09:00"},{"通知履歴ID":"rec-20250115-001","顧客企業ID":"cust-00847","通知タイプ":"契約解除予定","関連エンティティタイプ":"契約","関連エンティティID":"contract-05234","通知タイトル":"契約解除予定日のご案内","通知内容":"いつもお世話になっております。\n\n貴社との契約について、以下の通り解除予定日をお知らせいたします。\n\n契約番号：CT-2022-0847-A\nサービス名：クラウドシステム利用サービス\n契約解除予定日：2025年3月31日\n\n解除手続きについてご不明な点がございましたら、営業担当の山田花子までお気軽にお問い合わせください。\n\nよろしくお願いいたします。","送信方法":"メール","送信状態":"送信済","受信者メールアドレス":"contact@suzuki-trading.jp","送信日時":"2025-01-15T09:30:00+09:00","既読フラグ":true,"既読日時":"2025-01-15T10:45:00+09:00","エラーメッセージ":null,"作成日時":"2025-01-15T09:15:00+09:00","更新日時":"2025-01-15T10:45:00+09:00"},{"通知履歴ID":"rec-20250215-001","顧客企業ID":"cust-0847-uuid","通知タイプ":"請求書支払期限超過","関連エンティティタイプ":"請求書","関連エンティティID":"inv-2024-12-0456","通知タイトル":"【重要】請求書INV-2024-12-0456の支払期限超過について","通知内容":"いつもお世話になっております。\n\n請求書INV-2024-12-0456の支払期限が2025年2月10日を経過いたしました。\n\n【請求書詳細】\n請求番号：INV-2024-12-0456\n請求金額：¥2,850,000\n支払期限：2025年2月10日\n経過日数：5日\n\nお手数ですが、至急お支払いいただきますようお願いいたします。\nご不明な点やお支払い済みの場合は、下記までお問い合わせください。\n\n経理部門\n電話：03-XXXX-XXXX\nメール：billing@example.co.jp","送信方法":"メール","送信状態":"送信済","受信者メールアドレス":"yamada.hanako@client-company.co.jp","送信日時":"2025-02-15T09:30:00+09:00","既読フラグ":true,"既読日時":"2025-02-15T10:45:00+09:00","エラーメッセージ":null,"作成日時":"2025-02-15T09:25:00+09:00","更新日時":"2025-02-15T10:45:00+09:00"},{"通知履歴ID":"rec-20250115-0847","顧客企業ID":"cust-20240501-1234","通知タイプ":"新規サービス利用開始","関連エンティティタイプ":"サービス契約","関連エンティティID":"svc-20250110-5678","通知タイトル":"新規追加サービス「データ分析ダッシュボード」のご利用開始について","通知内容":"平素よりお世話になっております。\n\nこの度、貴社のご契約内容に新規サービス「データ分析ダッシュボード」が追加されましたのでご案内いたします。\n\n【サービス概要】\nサービス名：データ分析ダッシュボード\n利用開始日：2025年1月15日\n月額料金：¥150,000（税別）\n\n【ご利用開始方法】\n管理画面よりアクティベーションキーを入力いただくことで、本日よりご利用いただけます。\nアクティベーションキー：DASH-2025-ABC123XYZ\n\n【ご不明な点】\nご不明な点やご質問がございましたら、カスタマーサポートチーム（support@company.jp）までお気軽にお問い合わせください。\n\nよろしくお願いいたします。","送信方法":"メール","送信状態":"送信済","受信者メールアドレス":"yamada.taro@example-corp.jp","送信日時":"2025-01-15T09:30:00+09:00","既読フラグ":true,"既読日時":"2025-01-15T10:15:00+09:00","エラーメッセージ":null,"作成日時":"2025-01-15T09:28:30+09:00","更新日時":"2025-01-15T10:15:00+09:00"}],"ログインユーザー":[{"ユーザーID":"rec-001-usr-8f2a","顧客企業ID":"rec-001-cmp-3k7m","メールアドレス":"yamamoto.keiko@steel-manufacturing.co.jp","ユーザー名":"山本圭子","パスワードハッシュ":"$2b$12$kL9mN3pQrS5tUvWxYzAbCd.efGhIjKlMnOpQrStUvWxYzAbCdEfGh","ロール":"管理者","ステータス":"有効","最終ログイン日時":"2025-01-15T09:32:47+09:00","作成日時":"2024-04-22T14:18:23+09:00","更新日時":"2024-12-10T16:45:12+09:00","作成者":"rec-001-usr-5g9n"},{"ユーザーID":"rec-001","顧客企業ID":"rec-101","メールアドレス":"suzuki.hanako@example-corp.jp","ユーザー名":"鈴木花子","パスワードハッシュ":"$2b$12$kL9mN2pQ5xR8vW3zY7aB1eC4dF6gH9jK2lM5nO8pQ1rS4tU7vW0xY","ロール":"担当者","ステータス":"有効","最終ログイン日時":"2025-01-15T09:30:00Z","作成日時":"2024-04-10T14:20:00Z","更新日時":"2024-12-20T16:45:00Z","作成者":"rec-002"},{"ユーザーID":"rec-001-u7f4k9m2","顧客企業ID":"rec-001-c3b8j5n1","メールアドレス":"yamada.sachiko@example-corp.jp","ユーザー名":"山田幸子","パスワードハッシュ":"$2b$12$kR9mN2xL8pQ5vJ3hF7dE6uW9sT4aB1cD2eF5gH6jK7mL8nO9pQ0r","ロール":"担当者","ステータス":"有効","最終ログイン日時":"2025-01-15T09:42:00+09:00","作成日時":"2024-06-20T14:30:00+09:00","更新日時":"2025-01-10T16:15:00+09:00","作成者":"rec-001-u2a6d4p8"},{"ユーザーID":"rec-001","顧客企業ID":"rec-cust-0042","メールアドレス":"yamada.taro@chuken-distribution.jp","ユーザー名":"山田太郎","パスワードハッシュ":"$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQR","ロール":"管理者","ステータス":"有効","最終ログイン日時":"2025-01-15T09:32:47+09:00","作成日時":"2024-04-01T10:00:00+09:00","更新日時":"2025-01-10T14:20:15+09:00","作成者":"rec-001"},{"ユーザーID":"rec-001","顧客企業ID":"rec-ent-042","メールアドレス":"yamada.hanako@example-corp.jp","ユーザー名":"山田花子","パスワードハッシュ":"$2b$12$K8mN9pQrStUvWxYzAbCdEfGhIjKlMnOpQrStUvWxYzAbCdEfGhIjKl","ロール":"担当者","ステータス":"招待待機","最終ログイン日時":null,"作成日時":"2025-04-01T09:30:00+09:00","更新日時":"2025-04-01T09:30:00+09:00","作成者":"rec-002"},{"ユーザーID":"rec-001-usr-8f2a4c9e","顧客企業ID":"rec-001-cmp-3b7d1f6a","メールアドレス":"suzuki.taro@innovate-tech.jp","ユーザー名":"鈴木太郎","パスワードハッシュ":"$2b$12$kL9mN4pQ2rS8tU1vW3xY4zAbCdEfGhIjKlMnOpQrStUvWxYzAbCd","ロール":"管理者","ステータス":"有効","最終ログイン日時":"2025-01-15 09:32:45","作成日時":"2024-03-20 14:15:30","更新日時":"2025-01-10 16:48:22","作成者":"rec-001-usr-8f2a4c9e"},{"ユーザーID":"rec-001-user-8f7e2c9d","顧客企業ID":"rec-001-corp-3a5b1d4f","メールアドレス":"yamamoto.hanako@largecorp.jp","ユーザー名":"山本花子","パスワードハッシュ":"$2b$12$kL9mN5pQ8rT2xY3vZ1aB4eC5dF6gH7iJ8kL9mN5pQ8rT2xY3vZ1aB","ロール":"担当者","ステータス":"無効","最終ログイン日時":"2024-07-15T14:32:00+09:00","作成日時":"2023-04-10T09:15:00+09:00","更新日時":"2024-08-01T10:45:00+09:00","作成者":"rec-001-user-2b4c6e8a"},{"ユーザーID":"rec-001-u7f2k9m","顧客企業ID":"rec-001-c4b8x3n","メールアドレス":"suzuki.hanako@example-corp.jp","ユーザー名":"鈴木花子","パスワードハッシュ":"$2b$12$8kL9mN2pQvR5xW3zJ4hU7eT6yS1bC9dE0fG2hI3jK4lM5nO6pP7q","ロール":"担当者","ステータス":"有効","最終ログイン日時":"2025-01-15T09:32:45Z","作成日時":"2024-03-20T14:22:10Z","更新日時":"2025-01-10T16:45:30Z","作成者":"rec-001-u2k5m8p"},{"ユーザーID":"rec-001","顧客企業ID":"rec-c-042","メールアドレス":"yamada.hanako@example-corp.jp","ユーザー名":"山田花子","パスワードハッシュ":"$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQR","ロール":"担当者","ステータス":"無効","最終ログイン日時":"2024-09-28 17:45:32","作成日時":"2023-04-15 09:30:00","更新日時":"2025-01-31 14:20:15","作成者":"rec-002"},{"ユーザーID":"rec-001","顧客企業ID":"rec-c001","メールアドレス":"tanaka.taro@example-corp.jp","ユーザー名":"田中太郎","パスワードハッシュ":"$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQR","ロール":"管理者","ステータス":"有効","最終ログイン日時":"2025-01-15T09:30:00+09:00","作成日時":"2024-12-20T14:15:00+09:00","更新日時":"2025-01-15T09:30:00+09:00","作成者":"rec-sys"}],"ユーザー権限":[{"ユーザー権限ID":"rec-001","ログインユーザーID":"user-2847","顧客企業ID":"cust-5021","権限種別":"契約書閲覧,成果物確認,請求書確認,契約変更申請","有効フラグ":true,"権限開始日":"2024-04-01T00:00:00Z","権限終了日":"2026-03-31T23:59:59Z","備考":"トヨタ自動車様経営層への全権限付与。CEO佐藤次郎氏による経営判断支援のため、契約・請求・成果物に関する全ての確認権限を付与。","作成日時":"2024-03-28T14:30:00Z","作成者":"user-0156","更新日時":"2024-03-28T14:30:00Z","更新者":"user-0156"},{"ユーザー権限ID":"rec-001","ログインユーザーID":"rec-u-2847","顧客企業ID":"rec-c-5634","権限種別":"成果物確認,通知受信","有効フラグ":true,"権限開始日":"2024-04-01T09:00:00+09:00","権限終了日":"2025-03-31T23:59:59+09:00","備考":"プロジェクトA成果物の確認権限および関連通知の受信権限を付与。担当者：山田花子","作成日時":"2024-03-28T14:30:00+09:00","作成者":"rec-u-1205","更新日時":"2024-03-28T14:30:00+09:00","更新者":"rec-u-1205"},{"ユーザー権限ID":"rec-001","ログインユーザーID":"rec-002","顧客企業ID":"rec-003","権限種別":"請求書確認","有効フラグ":true,"権限開始日":"2024-04-01T00:00:00Z","権限終了日":"2025-03-31T23:59:59Z","備考":"財務部門による月次請求書確認業務のため、請求書確認権限のみを付与。他の権限は不要。","作成日時":"2024-03-28T10:30:00Z","作成者":"rec-004","更新日時":"2024-03-28T10:30:00Z","更新者":"rec-004"},{"ユーザー権限ID":"rec-001","ログインユーザーID":"rec-002","顧客企業ID":"rec-003","権限種別":"契約変更申請","有効フラグ":true,"権限開始日":"2024-11-15T09:00:00+09:00","権限終了日":"2025-02-14T23:59:59+09:00","備考":"新規取引開始に伴い、顧客企業管理者に対して3ヶ月間の期間限定で契約変更申請権限を付与。初期契約交渉期間中の柔軟な対応を想定。","作成日時":"2024-11-14T14:30:00+09:00","作成者":"rec-004","更新日時":"2024-11-14T14:30:00+09:00","更新者":"rec-004"},{"ユーザー権限ID":"rec-001","ログインユーザーID":"rec-002","顧客企業ID":"rec-003","権限種別":"成果物確認","有効フラグ":false,"権限開始日":"2024-04-15 09:00:00","権限終了日":"2025-03-31 23:59:59","備考":"プロジェクト『システムリプレイスメント』完了に伴う成果物確認権限。プロジェクト期間中の納品物確認のため付与。期限満了により無効化。","作成日時":"2024-04-15 10:30:00","作成者":"rec-004","更新日時":"2025-04-01 08:00:00","更新者":"rec-005"},{"ユーザー権限ID":"rec-001","ログインユーザーID":"usr-2024-0847","顧客企業ID":"cust-2024-0312","権限種別":"契約書閲覧","有効フラグ":false,"権限開始日":"2024-04-01T09:00:00+09:00","権限終了日":"2025-03-31T17:00:00+09:00","備考":"人事異動に伴う権限無効化。営業部から経営企画部への異動のため、既存顧客企業への閲覧権限を無効化。","作成日時":"2024-04-01T10:30:00+09:00","作成者":"usr-2024-0001","更新日時":"2025-03-28T14:15:00+09:00","更新者":"usr-2024-0002"},{"ユーザー権限ID":"rec-001","ログインユーザーID":"rec-002","顧客企業ID":"rec-003","権限種別":"契約書閲覧,請求書確認","有効フラグ":true,"権限開始日":"2024-10-01T00:00:00+09:00","権限終了日":"2024-12-31T23:59:59+09:00","備考":"2024年度外部監査対応のため、監査法人アーサー・ヤング監査部の山田監査人に対して期間限定で契約書および請求書の閲覧権限を付与。監査対象期間は2024年1月〜9月。","作成日時":"2024-09-25T14:30:00+09:00","作成者":"rec-004","更新日時":"2024-09-25T14:30:00+09:00","更新者":"rec-004"},{"ユーザー権限ID":"rec-001","ログインユーザーID":"rec-u-0847","顧客企業ID":"rec-c-0523","権限種別":"成果物確認、通知受信","有効フラグ":true,"権限開始日":"2025-04-01T09:00:00+09:00","権限終了日":"2026-03-31T23:59:59+09:00","備考":"株式会社ビジネスソリューション新入社員の基本権限付与。成果物確認と通知受信権限を付与。","作成日時":"2025-03-25T14:30:00+09:00","作成者":"rec-u-0102","更新日時":"2025-03-25T14:30:00+09:00","更新者":"rec-u-0102"},{"ユーザー権限ID":"rec-001","ログインユーザーID":"rec-usr-0847","顧客企業ID":"rec-cust-0523","権限種別":"契約書閲覧","有効フラグ":true,"権限開始日":"2025-04-01T00:00:00Z","権限終了日":"2026-03-31T23:59:59Z","備考":"契約更新に伴い権限開始日を2025年4月1日に変更。前契約期間終了に伴う権限更新","作成日時":"2024-12-15T09:30:00Z","作成者":"rec-usr-0102","更新日時":"2025-03-10T14:15:00Z","更新者":"rec-usr-0103"},{"ユーザー権限ID":"rec-001","ログインユーザーID":"rec-0847","顧客企業ID":"rec-2341","権限種別":"請求書確認","有効フラグ":false,"権限開始日":"2024-04-01T09:00:00+09:00","権限終了日":"2025-01-15T17:00:00+09:00","備考":"権限の過剰付与に伴う削除。営業部門への異動に伴い、請求書確認権限は不要となったため権限を無効化。契約書閲覧権限は継続。","作成日時":"2024-04-01T10:30:00+09:00","作成者":"rec-0512","更新日時":"2025-01-15T14:45:00+09:00","更新者":"rec-0689"}]};
+window.AIVIC_PAGE_SCREEN_ID = "scr-1782112920696";
+window.AIVIC_PAGE_INIT_JS = "function(container, apiUrl, tables) {}";
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<nav style="display:flex;align-items:center;overflow-x:auto;background:var(--top-bar-bg,var(--bg-sidebar,#0e1a31));border-bottom:1px solid var(--top-bar-border,var(--border,#2a3a5d));padding:0 12px;height:40px;flex-shrink:0;"><a href="./scr-1782111868648.html" data-aivic-nav-system="itg-2" style="padding:6px 14px;text-decoration:none;font-size:13px;white-space:nowrap;color:var(--text,#e8eefc);opacity:0.6;border-bottom:2px solid transparent;font-weight:400;">営業成果レポート自動生成・配信システム</a><a href="./scr-1782112376817.html" data-aivic-nav-system="itg-3" style="padding:6px 14px;text-decoration:none;font-size:13px;white-space:nowrap;color:var(--text,#e8eefc);opacity:0.6;border-bottom:2px solid transparent;font-weight:400;">契約・提案資料管理システム</a><a href="./scr-1782112883813-1f2f.html" data-aivic-nav-system="itg-4" style="padding:6px 14px;text-decoration:none;font-size:13px;white-space:nowrap;color:var(--text,#e8eefc);opacity:1;border-bottom:2px solid var(--primary,#2b66ff);font-weight:600;">顧客企業向け契約・成果管理ポータル</a><a href="./scr-1782113354430.html" data-aivic-nav-system="itg-5" style="padding:6px 14px;text-decoration:none;font-size:13px;white-space:nowrap;color:var(--text,#e8eefc);opacity:0.6;border-bottom:2px solid transparent;font-weight:400;">契約変更・請求検証管理システム</a><a href="./scr-1782111017612.html" data-aivic-nav-system="itg-1" style="padding:6px 14px;text-decoration:none;font-size:13px;white-space:nowrap;color:var(--text,#e8eefc);opacity:0.6;border-bottom:2px solid transparent;font-weight:400;">営業データ品質管理・請求自動化システム</a></nav>
+  <div class="shell">
+    <div class="top-bar">
+      <div class="logo">📊 契約・成果管理</div>
+      <div class="top-bar-right">
+        <a href="./login.html" class="logout-link">ログアウト</a>
+      </div>
+    </div>
+
+    <div class="main-container">
+      <div class="sidebar">
+        <div class="sidebar-section">
+          <div class="sidebar-label">ダッシュボード</div>
+          <a data-aivic-nav="scr-1782112883813-1f2f" onclick="window.showScreen('scr-1782112883813-1f2f')" class="nav-item">成果指標ダッシュボード</a>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-label">管理業務</div>
+          <a data-aivic-nav="scr-1782112899078" onclick="window.showScreen('scr-1782112899078')" class="nav-item">契約管理</a>
+          <a data-aivic-nav="scr-1782112920696" onclick="window.showScreen('scr-1782112920696')" class="nav-item">成果物納期管理</a>
+          <a data-aivic-nav="scr-1782112945200" onclick="window.showScreen('scr-1782112945200')" class="nav-item">文書・データ検索</a>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-label">配信・通知</div>
+          <a data-aivic-nav="scr-1782112984707" onclick="window.showScreen('scr-1782112984707')" class="nav-item">請求書・成果データ配信</a>
+          <a data-aivic-nav="scr-1782113007822" onclick="window.showScreen('scr-1782113007822')" class="nav-item">ポータル自動掲載</a>
+          <a data-aivic-nav="scr-1782113070972" onclick="window.showScreen('scr-1782113070972')" class="nav-item">配信・通知機能</a>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-label">顧客ポータル</div>
+          <a data-aivic-nav="scr-1782113029932" onclick="window.showScreen('scr-1782113029932')" class="nav-item">ポータル確認画面</a>
+          <a data-aivic-nav="scr-1782113137090" onclick="window.showScreen('scr-1782113137090')" class="nav-item">回答・根拠資料公開</a>
+          <a data-aivic-nav="scr-1782113158491" onclick="window.showScreen('scr-1782113158491')" class="nav-item">合意確認入力</a>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-label">履歴・対応</div>
+          <a data-aivic-nav="scr-1782113049406" onclick="window.showScreen('scr-1782113049406')" class="nav-item">対応履歴更新</a>
+        </div>
+      </div>
+
+      <div class="content-area">
+        <div data-aivic-panel="scr-1782112883813-1f2f" class="panel-container" style="display:none"></div>
+          <div class="dashboard-grid">
+            <div class="kpi-card">
+              <div class="kpi-label">今月成約数</div>
+              <div class="kpi-value">24</div>
+              <div class="kpi-change">+12% 前月比</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">契約金額</div>
+              <div class="kpi-value">¥8.2M</div>
+              <div class="kpi-change">+18% 前月比</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">進行中案件</div>
+              <div class="kpi-value">156</div>
+              <div class="kpi-change negative">-3% 前月比</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">納期超過件数</div>
+              <div class="kpi-value">8</div>
+              <div class="kpi-change negative">+2件</div>
+            </div>
+          </div>
+
+          <div class="section-title">最近の契約</div>
+          <div class="table-wrapper">
+            <div class="table-header">
+              <div class="table-header-cell">顧客企業</div>
+              <div class="table-header-cell">契約金額</div>
+              <div class="table-header-cell">ステータス</div>
+              <div class="table-header-cell">成約日</div>
+            </div>
+            <div class="table-row">
+              <div class="table-cell">株式会社A</div>
+              <div class="table-cell">¥1.2M</div>
+              <div class="table-cell"><span class="badge success">成約</span></div>
+              <div class="table-cell">2024-01-15</div>
+            </div>
+            <div class="table-row">
+              <div class="table-cell">株式会社B</div>
+              <div class="table-cell">¥850K</div>
+              <div class="table-cell"><span class="badge">進行中</span></div>
+              <div class="table-cell">2024-01-14</div>
+            </div>
+          </div>
+
+          <div class="section-title">納期超過警告</div>
+          <div class="table-wrapper">
+            <div class="table-header">
+              <div class="table-header-cell">成果物</div>
+              <div class="table-header-cell">顧客企業</div>
+              <div class="table-header-cell">予定納期</div>
+              <div class="table-header-cell">遅延日数</div>
+            </div>
+            <div class="table-row">
+              <div class="table-cell">レポート</div>
+              <div class="table-cell">株式会社C</div>
+              <div class="table-cell">2024-01-10</div>
+              <div class="table-cell"><span class="badge warning">5日</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782112899078" class="panel-container" style="display:none"></div>
+          <div class="search-bar">
+            <input type="text" class="search-input" placeholder="顧客企業名、契約ID で検索...">
+            <button class="btn btn-primary">検索</button>
+          </div>
+
+          <div class="filter-bar">
+            <div class="filter-tag active">全て</div>
+            <div class="filter-tag">進行中</div>
+            <div class="filter-tag">成約</div>
+            <div class="filter-tag">終了</div>
+          </div>
+
+          <div class="table-wrapper">
+            <div class="table-header">
+              <div class="table-header-cell">契約ID</div>
+              <div class="table-header-cell">顧客企業</div>
+              <div class="table-header-cell">契約金額</div>
+              <div class="table-header-cell">ステータス</div>
+              <div class="table-header-cell">開始日</div>
+              <div class="table-header-cell">終了日</div>
+            </div>
+            <div class="table-row">
+              <div class="table-cell">CTR-2024-001</div>
+              <div class="table-cell">株式会社A</div>
+              <div class="table-cell">¥1.2M</div>
+              <div class="table-cell"><span class="badge success">成約</span></div>
+              <div class="table-cell">2024-01-01</div>
+              <div class="table-cell">2024-12-31</div>
+            </div>
+            <div class="table-row">
+              <div class="table-cell">CTR-2024-002</div>
+              <div class="table-cell">株式会社B</div>
+              <div class="table-cell">¥850K</div>
+              <div class="table-cell"><span class="badge">進行中</span></div>
+              <div class="table-cell">2024-01-05</div>
+              <div class="table-cell">2024-12-31</div>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782112920696" class="panel-container" style="display:block"><div style="display: flex; flex-direction: column; height: 100%; gap: 12px; padding: 12px;">
+  
+  <!-- ヘッダー -->
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+    <div>
+      <h1 style="margin: 0; font-size: 20px; font-weight: 600; color: var(--text);">成果物納期管理</h1>
+      <p style="margin: 4px 0 0 0; font-size: 12px; color: var(--text-muted);">契約に基づく成果物の納期を一元管理</p>
+    </div>
+    <button class="action-btn" data-testid="refresh-button" style="padding: 8px 16px; font-size: 13px;">
+      🔄 更新
+    </button>
+  </div>
+
+  <!-- フィルタバー -->
+  <div style="display: flex; gap: 12px; align-items: flex-end; background: var(--bg-card); padding: 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08);">
+    <div style="flex: 1; min-width: 200px;">
+      <label style="display: block; font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase;">契約を選択</label>
+      <select data-testid="contract-select" name="contract" style="width: 100%; padding: 8px 10px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.25); color: var(--text); border-radius: 4px; font-size: 13px;">
+        <option value="">すべての契約</option>
+        <option value="contract-001">契約001: 営業成果レポート自動生成</option>
+        <option value="contract-002">契約002: データ分析ダッシュボード構築</option>
+        <option value="contract-003">契約003: 顧客ポータル開発</option>
+      </select>
+    </div>
+    <div style="flex: 0 0 auto;">
+      <label style="display: block; font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase;">ステータス</label>
+      <select data-testid="status-filter" name="status" style="padding: 8px 10px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.25); color: var(--text); border-radius: 4px; font-size: 13px; min-width: 140px;">
+        <option value="">すべて</option>
+        <option value="予定通り">予定通り</option>
+        <option value="遅延">遅延</option>
+        <option value="完了">完了</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- KPI カード群 -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px;">
+    <div class="card" style="padding: 12px; border-left: 3px solid #ff6a00;">
+      <div style="font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">期限超過</div>
+      <div style="font-size: 24px; font-weight: 700; color: #ff6a00;" data-testid="kpi-overdue">0</div>
+      <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">件</div>
+    </div>
+    <div class="card" style="padding: 12px; border-left: 3px solid #ffc107;">
+      <div style="font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">変更待ち</div>
+      <div style="font-size: 24px; font-weight: 700; color: #ffc107;" data-testid="kpi-pending">0</div>
+      <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">件</div>
+    </div>
+    <div class="card" style="padding: 12px; border-left: 3px solid #4caf50;">
+      <div style="font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">完了</div>
+      <div style="font-size: 24px; font-weight: 700; color: #4caf50;" data-testid="kpi-completed">0</div>
+      <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">件</div>
+    </div>
+  </div>
+
+  <!-- メインコンテンツ: 左テーブル + 右詳細パネル -->
+  <div style="display: flex; gap: 12px; flex: 1; min-height: 0; overflow: hidden;">
+    
+    <!-- 左: 成果物一覧テーブル -->
+    <div style="flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden;">
+      <div class="table-wrap" style="flex: 1; overflow: auto; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px;">
+        <table data-testid="deliverable-list" style="width: 100%; font-size: 12px;">
+          <thead style="position: sticky; top: 0; background: var(--bg-card); border-bottom: 1px solid rgba(255,255,255,0.08);">
+            <tr>
+              <th style="padding: 10px; text-align: left; color: var(--text); font-weight: 600; width: 30%;">成果物名</th>
+              <th style="padding: 10px; text-align: center; color: var(--text); font-weight: 600; width: 18%;">予定納期</th>
+              <th style="padding: 10px; text-align: center; color: var(--text); font-weight: 600; width: 18%;">実績納期</th>
+              <th style="padding: 10px; text-align: center; color: var(--text); font-weight: 600; width: 16%;">ステータス</th>
+              <th style="padding: 10px; text-align: center; color: var(--text); font-weight: 600; width: 18%;">操作</th>
+            </tr>
+          </thead>
+          <tbody id="deliverable-tbody">
+            <tr style="background: var(--bg-main); border-bottom: 1px solid rgba(255,255,255,0.04); cursor: pointer;" data-id="deliv-001" class="deliverable-row">
+              <td style="padding: 10px; color: var(--text);">営業成果レポート（1月）</td>
+              <td style="padding: 10px; text-align: center; color: var(--text-muted);">2024-01-31</td>
+              <td style="padding: 10px; text-align: center; color: var(--text-muted);">2024-02-05</td>
+              <td style="padding: 10px; text-align: center;">
+                <span style="display: inline-block; padding: 4px 8px; background: rgba(255, 107, 107, 0.15); color: #ff6b6b; border-radius: 3px; font-size: 11px; font-weight: 600;">遅延</span>
+              </td>
+              <td style="padding: 10px; text-align: center;">
+                <button class="change-btn" data-id="deliv-001" style="padding: 4px 8px; background: transparent; border: 1px solid rgba(255,255,255,0.18); color: var(--text); border-radius: 3px; font-size: 11px; cursor: pointer;">変更</button>
+              </td>
+            </tr>
+            <tr style="background: var(--bg-main); border-bottom: 1px solid rgba(255,255,255,0.04); cursor: pointer;" data-id="deliv-002" class="deliverable-row">
+              <td style="padding: 10px; color: var(--text);">ダッシュボード初期構築</td>
+              <td style="padding: 10px; text-align: center; color: var(--text-muted);">2024-02-15</td>
+              <td style="padding: 10px; text-align: center; color: var(--text-muted);">—</td>
+              <td style="padding: 10px; text-align: center;">
+                <span style="display: inline-block; padding: 4px 8px; background: rgba(255, 193, 7, 0.15); color: #ffc107; border-radius: 3px; font-size: 11px; font-weight: 600;">予定通り</span>
+              </td>
+              <td style="padding: 10px; text-align: center;">
+                <button class="change-btn" data-id="deliv-002" style="padding: 4px 8px; background: transparent; border: 1px solid rgba(255,255,255,0.18); color: var(--text); border-radius: 3px; font-size: 11px; cursor: pointer;">変更</button>
+              </td>
+            </tr>
+            <tr style="background: var(--bg-main); border-bottom: 1px solid rgba(255,255,255,0.04); cursor: pointer;" data-id="deliv-003" class="deliverable-row">
+              <td style="padding: 10px; color: var(--text);">ポータル UI 設計書</td>
+              <td style="padding: 10px; text-align: center; color: var(--text-muted);">2024-02-28</td>
+              <td style="padding: 10px; text-align: center; color: var(--text-muted);">2024-02-28</td>
+              <td style="padding: 10px; text-align: center;">
+                <span style="display: inline-block; padding: 4px 8px; background: rgba(76, 175, 80, 0.15); color: #4caf50; border-radius: 3px; font-size: 11px; font-weight: 600;">完了</span>
+              </td>
+              <td style="padding: 10px; text-align: center;">
+                <button class="change-btn" data-id="deliv-003" style="padding: 4px 8px; background: transparent; border: 1px solid rgba(255,255,255,0.18); color: var(--text); border-radius: 3px; font-size: 11px; cursor: pointer;">変更</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 右: 詳細パネル + 納期変更フォーム -->
+    <div id="detail-panel" style="width: 320px; display: flex; flex-direction: column; gap: 12px; overflow: auto; padding-right: 4px;">
+      
+      <!-- 詳細情報 -->
+      <div class="card" style="padding: 12px; border-radius: 6px;">
+        <div style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">成果物詳細</div>
+        <div id="detail-content" style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 20px;">
+          行を選択してください
+        </div>
+      </div>
+
+      <!-- 納期変更フォーム -->
+      <div id="change-form-panel" class="card" style="padding: 12px; border-radius: 6px; display: none;">
+        <div style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 12px;">納期変更申請</div>
+        
+        <div style="margin-bottom: 12px;">
+          <label style="display: block; font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">新納期</label>
+          <input type="date" data-testid="new-deadline-input" id="new-deadline" style="width: 100%; padding: 8px 10px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.25); color: var(--text); border-radius: 4px; font-size: 12px; box-sizing: border-box;" />
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <label style="display: block; font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">変更理由</label>
+          <textarea data-testid="change-reason-input" id="change-reason" placeholder="変更理由を入力してください" style="width: 100%; padding: 8px 10px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.25); color: var(--text); border-radius: 4px; font-size: 12px; box-sizing: border-box; resize: vertical; min-height: 60px; font-family: inherit;"></textarea>
+        </div>
+
+        <div style="display: flex; gap: 8px;">
+          <button class="action-btn" data-testid="submit-change-button" id="submit-change" style="flex: 1; padding: 8px 12px; font-size: 12px; font-weight: 600;">申請</button>
+          <button class="action-btn secondary" data-testid="cancel-change-button" id="cancel-change" style="flex: 1; padding: 8px 12px; font-size: 12px; font-weight: 600;">キャンセル</button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- 下部: 納期変更履歴タイムライン -->
+  <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px;">
+    <div style="font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 10px;">納期変更履歴</div>
+    <div id="history-timeline" style="max-height: 140px; overflow-y: auto; padding-right: 4px;">
+      <div style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 20px;">
+        履歴がありません
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 納기変更確認モーダル -->
+<div id="confirm-modal" style="display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0, 0, 0, 0.55); display: flex; align-items: center; justify-content: center;">
+  <div style="background: var(--bg-card); color: var(--text); padding: 24px; border-radius: 8px; max-width: 400px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
+    <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">納期変更を申請しますか？</h2>
+    <div id="confirm-content" style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6;"></div>
+    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+      <button class="action-btn secondary" data-testid="confirm-cancel-button" id="confirm-cancel" style="padding: 8px 16px; font-size: 12px;">キャンセル</button>
+      <button class="action-btn" data-testid="confirm-submit-button" id="confirm-submit" style="padding: 8px 16px; font-size: 12px;">申請する</button>
+    </div>
+  </div>
+</div>
+
+<!-- エラーメッセージ -->
+<div id="error-message" style="display: none; position: fixed; bottom: 20px; right: 20px; background: rgba(255, 107, 107, 0.15); border: 1px solid #ff6b6b; color: #ff6b6b; padding: 12px 16px; border-radius: 6px; font-size: 12px; max-width: 300px; z-index: 999;"></div>
+
+<!-- 成功メッセージ -->
+<div id="success-message" style="display: none; position: fixed; bottom: 20px; right: 20px; background: rgba(76, 175, 80, 0.15); border: 1px solid #4caf50; color: #4caf50; padding: 12px 16px; border-radius: 6px; font-size: 12px; max-width: 300px; z-index: 999;"></div></div>
+          <div class="search-bar">
+            <input type="text" class="search-input" placeholder="成果物名、顧客企業で検索...">
+            <button class="btn btn-primary">検索</button>
+          </div>
+
+          <div class="kanban-container">
+            <div class="kanban-column">
+              <div class="kanban-header">予定中 (5)</div>
+              <div class="kanban-cards">
+                <div class="kanban-card">
+                  <div style="font-weight: 600; margin-bottom: 4px;">レポート A</div>
+                  <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px;">株式会社A</div>
+                  <div style="font-size: 11px; color: var(--accent-gold);">納期: 2024-02-15</div>
+                </div>
+                <div class="kanban-card">
+                  <div style="font-weight: 600; margin-bottom: 4px;">分析資料</div>
+                  <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px;">株式会社B</div>
+                  <div style="font-size: 11px; color: var(--accent-gold);">納期: 2024-02-20</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="kanban-column">
+              <div class="kanban-header">進行中 (8)</div>
+              <div class="kanban-cards">
+                <div class="kanban-card">
+                  <div style="font-weight: 600; margin-bottom: 4px;">提案書</div>
+                  <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px;">株式会社C</div>
+                  <div style="font-size: 11px; color: var(--warning);">進捗: 60%</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="kanban-column">
+              <div class="kanban-header">納期超過 (2)</div>
+              <div class="kanban-cards">
+                <div class="kanban-card" style="border-color: var(--error);">
+                  <div style="font-weight: 600; margin-bottom: 4px; color: var(--error);">レポート B</div>
+                  <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px;">株式会社D</div>
+                  <div style="font-size: 11px; color: var(--error);">遅延: 5日</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="kanban-column">
+              <div class="kanban-header">完了 (42)</div>
+              <div class="kanban-cards">
+                <div class="kanban-card">
+                  <div style="font-weight: 600; margin-bottom: 4px;">初期設定</div>
+                  <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px;">株式会社E</div>
+                  <div style="font-size: 11px; color: var(--success);">完了: 2024-01-10</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782112945200" class="panel-container" style="display:none"></div>
+          <div class="search-bar">
+            <input type="text" class="search-input" placeholder="文書名、顧客企業、キーワードで検索...">
+            <button class="btn btn-primary">検索</button>
+          </div>
+
+          <div class="filter-bar">
+            <div class="filter-tag active">全て</div>
+            <div class="filter-tag">契約書</div>
+            <div class="filter-tag">提案資料</div>
+            <div class="filter-tag">成果物</div>
+            <div class="filter-tag">請求書</div>
+          </div>
+
+          <div class="table-wrapper">
+            <div class="table-header">
+              <div class="table-header-cell">文書名</div>
+              <div class="table-header-cell">タイプ</div>
+              <div class="table-header-cell">顧客企業</div>
+              <div class="table-header-cell">作成日</div>
+              <div class="table-header-cell">操作</div>
+            </div>
+            <div class="table-row">
+              <div class="table-cell">契約書_A_2024</div>
+              <div class="table-cell"><span class="badge">契約書</span></div>
+              <div class="table-cell">株式会社A</div>
+              <div class="table-cell">2024-01-01</div>
+              <div class="table-cell"><button class="btn btn-secondary" style="padding: 4px 8px; font-size: 11px;">表示</button></div>
+            </div>
+            <div class="table-row">
+              <div class="table-cell">提案資料_B_Q1</div>
+              <div class="table-cell"><span class="badge info">提案資料</span></div>
+              <div class="table-cell">株式会社B</div>
+              <div class="table-cell">2024-01-05</div>
+              <div class="table-cell"><button class="btn btn-secondary" style="padding: 4px 8px; font-size: 11px;">表示</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782112984707" class="panel-container" style="display:none"></div>
+          <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 16px; margin-bottom: 16px;">
+            <div class="form-group">
+              <label class="form-label">配信対象顧客</label>
+              <select class="form-select">
+                <option>選択してください</option>
+                <option>株式会社A</option>
+                <option>株式会社B</option>
+                <option>株式会社C</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">配信内容</label>
+              <div style="display: flex; gap: 12px;">
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="checkbox" checked>
+                  <span>請求書</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="checkbox" checked>
+                  <span>成果物</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="checkbox">
+                  <span>進捗レポート</span>
+                </label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">配信メッセージ</label>
+              <textarea class="form-textarea" placeholder="顧客に送信するメッセージを入力..."></textarea>
+            </div>
+            <div style="display: flex; gap: 8px; justify-content: flex-end;">
+              <button class="btn btn-secondary">キャンセル</button>
+              <button class="btn btn-primary">配信実行</button>
+            </div>
+          </div>
+
+          <div class="section-title">配信履歴</div>
+          <div class="table-wrapper">
+            <div class="table-header">
+              <div class="table-header-cell">配信日時</div>
+              <div class="table-header-cell">顧客企業</div>
+              <div class="table-header-cell">内容</div>
+              <div class="table-header-cell">ステータス</div>
+            </div>
+            <div class="table-row">
+              <div class="table-cell">2024-01-15 14:30</div>
+              <div class="table-cell">株式会社A</div>
+              <div class="table-cell">請求書・成果物</div>
+              <div class="table-cell"><span class="badge success">完了</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782113007822" class="panel-container" style="display:none"></div>
+          <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 16px; margin-bottom: 16px;">
+            <div class="form-group">
+              <label class="form-label">掲載対象</label>
+              <select class="form-select">
+                <option>選択してください</option>
+                <option>全顧客</option>
+                <option>特定顧客</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">掲載情報</label>
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="checkbox" checked>
+                  <span>契約情報</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="checkbox" checked>
+                  <span>成果物進捗</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="checkbox" checked>
+                  <span>請求情報</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="checkbox">
+                  <span>対応履歴</span>
+                </label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">自動更新間隔</label>
+              <select class="form-select">
+                <option>リアルタイム</option>
+                <option>1時間ごと</option>
+                <option>1日1回</option>
+              </select>
+            </div>
+            <div style="display: flex; gap: 8px; justify-content: flex-end;">
+              <button class="btn btn-secondary">キャンセル</button>
+              <button class="btn btn-primary">設定保存</button>
+            </div>
+          </div>
+
+          <div class="section-title">掲載状況</div>
+          <div class="table-wrapper">
+            <div class="table-header">
+              <div class="table-header-cell">顧客企業</div>
+              <div class="table-header-cell">掲載情報</div>
+              <div class="table-header-cell">最終更新</div>
+              <div class="table-header-cell">ステータス</div>
+            </div>
+            <div class="table-row">
+              <div class="table-cell">株式会社A</div>
+              <div class="table-cell">契約・成果物・請求</div>
+              <div class="table-cell">2024-01-15 10:30</div>
+              <div class="table-cell"><span class="badge success">有効</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782113029932" class="panel-container" style="display:none"></div>
+          <div class="split-layout" style="height: auto;">
+            <div class="split-left">
+              <div style="padding: 12px;">
+                <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 12px; text-transform: uppercase;">契約一覧</div>
+                <div class="list-item active">
+                  <div style="font-weight: 600; margin-bottom: 4px;">CTR-2024-001</div>
+                  <div style="font-size: 12px; color: var(--text-muted);">株式会社A</div>
+                </div>
+                <div class="list-item">
+                  <div style="font-weight: 600; margin-bottom: 4px;">CTR-2024-002</div>
+                  <div style="font-size: 12px; color: var(--text-muted);">株式会社B</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="split-right">
+              <div style="margin-bottom: 20px;">
+                <div style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">契約詳細: CTR-2024-001</div>
+                <div style="display: grid; gap: 12px;">
+                  <div>
+                    <div style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">顧客企業</div>
+                    <div style="font-size: 13px;">株式会社A</div>
+                  </div>
+                  <div>
+                    <div style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">契約金額</div>
+                    <div style="font-size: 13px;">¥1,200,000</div>
+                  </div>
+                  <div>
+                    <div style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">ステータス</div>
+                    <div><span class="badge success">成約</span></div>
+                  </div>
+                  <div>
+                    <div style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">契約期間</div>
+                    <div style="font-size: 13px;">2024-01-01 ～ 2024-12-31</div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="border-top: 1px solid var(--border); padding-top: 16px;">
+                <div style="font-size: 13px; font-weight: 700; margin-bottom: 12px;">成果物納期</div>
+                <div class="timeline">
+                  <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-label">レポート A</div>
+                    <div class="timeline-content">納期: 2024-02-15</div>
+                  </div>
+                  <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-label">分析資料</div>
+                    <div class="timeline-content">納期: 2024-02-20</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782113049406" class="panel-container" style="display:none"></div>
+          <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 16px; margin-bottom: 16px;">
+            <div class="form-group">
+              <label class="form-label">対応対象</label>
+              <select class="form-select">
+                <option>選択してください</option>
+                <option>CTR-2024-001 (株式会社A)</option>
+                <option>CTR-2024-002 (株式会社B)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">対応内容</label>
+              <textarea class="form-textarea" placeholder="対応内容を記入..."></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">対応者</label>
+              <input type="text" class="form-input" placeholder="対応者名">
+            </div>
+            <div style="display: flex; gap: 8px; justify-content: flex-end;">
+              <button class="btn btn-secondary">キャンセル</button>
+              <button class="btn btn-primary">記録保存</button>
+            </div>
+          </div>
+
+          <div class="section-title">対応履歴</div>
+          <div class="table-wrapper">
+            <div class="table-header">
+              <div class="table-header-cell">日時</div>
+              <div class="table-header-cell">契約</div>
+              <div class="table-header-cell">対応内容</div>
+              <div class="table-header-cell">対応者</div>
+            </div>
+            <div class="table-row">
+              <div class="table-cell">2024-01-15 14:30</div>
+              <div class="table-cell">CTR-2024-001</div>
+              <div class="table-cell">納期変更相談</div>
+              <div class="table-cell">営業太郎</div>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782113070972" class="panel-container" style="display:none"></div>
+          <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 16px; margin-bottom: 16px;">
+            <div class="form-group">
+              <label class="form-label">通知対象</label>
+              <select class="form-select">
+                <option>全顧客</option>
+                <option>特定顧客</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">通知タイプ</label>
+              <div style="display: flex; gap: 12px;">
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="radio" name="notify-type" checked>
+                  <span>メール</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="radio" name="notify-type">
+                  <span>ポータル通知</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="radio" name="notify-type">
+                  <span>両方</span>
+                </label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">通知内容</label>
+              <textarea class="form-textarea" placeholder="通知メッセージを入力..."></textarea>
+            </div>
+            <div style="display: flex; gap: 8px; justify-content: flex-end;">
+              <button class="btn btn-secondary">キャンセル</button>
+              <button class="btn btn-primary">送信</button>
+            </div>
+          </div>
+
+          <div class="section-title">通知履歴</div>
+          <div class="table-wrapper">
+            <div class="table-header">
+              <div class="table-header-cell">送信日時</div>
+              <div class="table-header-cell">対象</div>
+              <div class="table-header-cell">タイプ</div>
+              <div class="table-header-cell">ステータス</div>
+            </div>
+            <div class="table-row">
+              <div class="table-cell">2024-01-15 10:00</div>
+              <div class="table-cell">全顧客</div>
+              <div class="table-cell">メール</div>
+              <div class="table-cell"><span class="badge success">送信完了</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782113094435" class="panel-container" style="display:none"></div>
+          <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 16px; margin-bottom: 16px;">
+            <div class="form-group">
+              <label class="form-label">質問内容</label>
+              <textarea class="form-textarea" placeholder="顧客からの質問を記入..." readonly style="background: var(--input-bg); opacity: 0.7;"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">回答内容</label>
+              <textarea class="form-textarea" placeholder="回答を記入..."></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">根拠資料</label>
+              <div style="border: 1px dashed var(--border); border-radius: 4px; padding: 16px; text-align: center; cursor: pointer;">
+                <div style="font-size: 12px; color: var(--text-muted);">ファイルをドラッグ&ドロップまたはクリック</div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px; justify-content: flex-end;">
+              <button class="btn btn-secondary">キャンセル</button>
+              <button class="btn btn-primary">公開</button>
+            </div>
+          </div>
+
+          <div class="section-title">公開済み回答</div>
+          <div class="table-wrapper">
+            <div class="table-header">
+              <div class="table-header-cell">質問</div>
+              <div class="table-header-cell">回答日</div>
+              <div class="table-header-cell">根拠資料</div>
+              <div class="table-header-cell">ステータス</div>
+            </div>
+            <div class="table-row">
+              <div class="table-cell">納期変更は可能か</div>
+              <div class="table-cell">2024-01-10</div>
+              <div class="table-cell"><button class="btn btn-secondary" style="padding: 4px 8px; font-size: 11px;">表示</button></div>
+              <div class="table-cell"><span class="badge success">公開</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782113137090" class="panel-container" style="display:none"></div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+            <div class="kpi-card">
+              <div class="kpi-label">契約数</div>
+              <div class="kpi-value">3</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">進行中成果物</div>
+              <div class="kpi-value">8</div>
+            </div>
+          </div>
+
+          <div class="section-title">契約情報</div>
+          <div class="table-wrapper">
+            <div class="table-header">
+              <div class="table-header-cell">契約ID</div>
+              <div class="table-header-cell">金額</div>
+              <div class="table-header-cell">期間</div>
+              <div class="table-header-cell">ステータス</div>
+            </div>
+            <div class="table-row">
+              <div class="table-cell">CTR-2024-001</div>
+              <div class="table-cell">¥1.2M</div>
+              <div class="table-cell">2024-01-01 ～ 12-31</div>
+              <div class="table-cell"><span class="badge success">成約</span></div>
+            </div>
+          </div>
+
+          <div class="section-title">成果物進捗</div>
+          <div class="table-wrapper">
+            <div class="table-header">
+              <div class="table-header-cell">成果物名</div>
+              <div class="table-header-cell">納期</div>
+              <div class="table-header-cell">進捗</div>
+              <div class="table-header-cell">ステータス</div>
+            </div>
+            <div class="table-row">
+              <div class="table-cell">レポート A</div>
+              <div class="table-cell">2024-02-15</div>
+              <div class="table-cell">60%</div>
+              <div class="table-cell"><span class="badge warning">進行中</span></div>
+            </div>
+          </div>
+
+          <div class="section-title">請求情報</div>
+          <div class="table-wrapper">
+            <div class="table-header">
+              <div class="table-header-cell">請求書ID</div>
+              <div class="table-header-cell">金額</div>
+              <div class="table-header-cell">発行日</div>
+              <div class="table-header-cell">ステータス</div>
+            </div>
+            <div class="table-row">
+              <div class="table-cell">INV-2024-001</div>
+              <div class="table-cell">¥600K</div>
+              <div class="table-cell">2024-01-15</div>
+              <div class="table-cell"><span class="badge success">支払済</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782113158491" class="panel-container" style="display:none"></div>
+          <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 16px;">
+            <div style="margin-bottom: 20px;">
+              <div style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">契約変更内容</div>
+              <div style="background: var(--bg-main); border: 1px solid var(--border); border-radius: 4px; padding: 12px; margin-bottom: 12px;">
+                <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">変更前</div>
+                <div style="font-size: 13px; margin-bottom: 12px;">納期: 2024-02-15</div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">変更後</div>
+                <div style="font-size: 13px; color: var(--accent-gold);">納期: 2024-02-28</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">変更理由</label>
+              <textarea class="form-textarea" placeholder="変更理由を記入..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer;">
+                <input type="checkbox" style="margin-top: 2px;">
+                <span style="font-size: 13px;">上記の契約変更内容に同意します</span>
+              </label>
+            </div>
+
+            <div style="display: flex; gap: 8px; justify-content: flex-end;">
+              <button class="btn btn-secondary">キャンセル</button>
+              <button class="btn btn-primary">合意確認</button>
+            </div>
+          </div>
+
+          <div class="section-title">変更履歴</div>
+          <div class="table-wrapper">
+            <div class="table-header">
+              <div class="table-header-cell">変更日</div>
+              <div class="table-header-cell">変更内容</div>
+              <div class="table-header-cell">確認状況</div>
+            </div>
+            <div class="table-row">
+              <div class="table-cell">2024-01-10</div>
+              <div class="table-cell">納期延長: 02-15 → 02-28</div>
+              <div class="table-cell"><span class="badge success">確認済</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+(function() {
+  var TABLE_DEFS = window.AIVIC_TABLES || [];
+  var PRESET_SEED = window.AIVIC_PRESET_SEED || {};
+  var SYSTEM_NAME = window.AIVIC_SYSTEM_NAME || "";
+  var APP_ID = window.AIVIC_APP_ID || "";
+  var API_URL = (window.AIVIC_API_URL && window.AIVIC_API_URL !== "REPLACE_WITH_API_URL")
+    ? window.AIVIC_API_URL : window.location.origin;
+
+  // 通知 helper ( SPA 版と同じ )
+  window.aivicNotify = (function() {
+    function ensureContainer() {
+      var c = document.getElementById("aivic-toast-container");
+      if (c) return c;
+      c = document.createElement("div");
+      c.id = "aivic-toast-container";
+      c.style.cssText = "position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;max-width:360px;";
+      document.body.appendChild(c);
+      return c;
+    }
+    function show(msg, type) {
+      var c = ensureContainer();
+      var el = document.createElement("div");
+      el.textContent = msg;
+      el.style.cssText = "padding:10px 16px;border-radius:8px;font-size:13px;line-height:1.4;pointer-events:auto;color:#fff;background:" + (type === "error" ? "#dc2626" : "#d97706");
+      c.appendChild(el);
+      setTimeout(function() {
+        el.style.transition = "opacity .3s";
+        el.style.opacity = "0";
+        setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 320);
+      }, type === "error" ? 6000 : 4500);
+    }
+    return {
+      error: function(msg) { show("❌ " + msg, "error"); },
+      warn:  function(msg) { show("⚠️ " + msg, "warn"); },
+    };
+  })();
+
+  // CRUD API ( SPA 版と同じ )
+  window.aivicApi = (function() {
+    function dbErr(op) { window.aivicNotify.error("データベースエラー ( " + op + " ): APIサーバーに接続できません。"); }
+    function newId() { return typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : "id-" + Date.now() + "-" + Math.random().toString(36).slice(2); }
+    function q(i) {
+      var t = TABLE_DEFS[i];
+      var dbP = (window.AIVIC_DB_TYPE && window.AIVIC_DB_TYPE !== "dynamodb") ? "&db=" + encodeURIComponent(window.AIVIC_DB_TYPE) : "";
+      return "?app=" + encodeURIComponent(APP_ID) + "&system=" + encodeURIComponent(SYSTEM_NAME) + "&table=" + encodeURIComponent(t ? t.tableName : "table" + i) + dbP;
+    }
+    return {
+      list: async function(tableIndex) {
+        if (!API_URL) return [];
+        try { var r = await fetch(API_URL + "/api/" + tableIndex + q(tableIndex)); var d = await r.json(); return Array.isArray(d) ? d : (d.items || []); }
+        catch(e) { dbErr("データ取得"); return []; }
+      },
+      save: async function(tableIndex, item) {
+        if (!API_URL) { dbErr("保存"); return null; }
+        var now = new Date().toISOString();
+        var rec = Object.assign({}, item, { id: item.id || newId(), createdAt: item.createdAt || now, updatedAt: now });
+        try { var r = await fetch(API_URL + "/api/" + tableIndex + q(tableIndex), { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(rec) }); return await r.json(); }
+        catch(e) { dbErr("保存"); return null; }
+      },
+      update: async function(tableIndex, id, changes) {
+        if (!API_URL) { dbErr("更新"); return null; }
+        try { var r = await fetch(API_URL + "/api/" + tableIndex + "/" + id + q(tableIndex), { method:"PUT", headers:{"Content-Type":"application/json"}, body:JSON.stringify(Object.assign({}, changes, {updatedAt: new Date().toISOString()})) }); return await r.json(); }
+        catch(e) { dbErr("更新"); return null; }
+      },
+      delete: async function(tableIndex, id) {
+        if (!API_URL) { dbErr("削除"); return {deleted:false}; }
+        try { await fetch(API_URL + "/api/" + tableIndex + "/" + id + q(tableIndex), {method:"DELETE"}); return {deleted:true}; }
+        catch(e) { dbErr("削除"); return {deleted:false}; }
+      },
+    };
+  })();
+
+  // showScreen はマルチページ構成ではページ遷移として動く。
+  var _aivicNavLastTime = 0;
+  var _aivicNavLastTarget = "";
+  var _aivicReady = false;
+  window.showScreen = function(screenId) {
+    if (!screenId) return;
+    if (screenId === window.AIVIC_PAGE_SCREEN_ID) return;
+    var targetPath = './' + encodeURIComponent(screenId) + '.html';
+    var currentName = (window.location.pathname.split('/').pop() || '');
+    if (currentName === (encodeURIComponent(screenId) + '.html') ||
+        currentName === (screenId + '.html')) {
+      return;
+    }
+    var now = Date.now();
+    if (_aivicNavLastTarget === targetPath && (now - _aivicNavLastTime) < 100) {
+      console.warn('[aivic] showScreen 連続呼び出し検知。 無限ループ防止のため抑制:', screenId);
+      return;
+    }
+    if (!_aivicReady) {
+      console.warn('[aivic] DOMContentLoaded 前の showScreen 呼び出し。 抑制:', screenId);
+      return;
+    }
+    _aivicNavLastTime = now;
+    _aivicNavLastTarget = targetPath;
+    window.location.href = targetPath;
+  };
+
+  function seedAllIfEmpty() {
+    if (!API_URL) return Promise.resolve();
+    return Promise.all(TABLE_DEFS.map(function(t, i) {
+      var preset = PRESET_SEED[t.tableName];
+      if (!Array.isArray(preset) || preset.length === 0) return Promise.resolve();
+      return window.aivicApi.list(i).then(function(existing) {
+        if (existing && existing.length > 0) return;
+        return Promise.all(preset.map(function(row) { return window.aivicApi.save(i, row); }));
+      }).catch(function() {});
+    }));
+  }
+
+  // ── 初期表示: このページ専用の panel に initFn を実行 ──
+  document.addEventListener("DOMContentLoaded", function() {
+    setTimeout(function() { _aivicReady = true; }, 1500);
+    var pageScreenId = window.AIVIC_PAGE_SCREEN_ID;
+    if (!pageScreenId) return;
+
+    document.querySelectorAll('[data-aivic-nav]').forEach(function(btn) {
+      var isActive = btn.getAttribute("data-aivic-nav") === pageScreenId;
+      btn.classList.toggle("aivic-active", isActive);
+      btn.setAttribute("aria-current", isActive ? "page" : "false");
+    });
+
+    var container = document.querySelector('[data-aivic-panel="' + pageScreenId + '"]');
+    if (!container) return;
+
+    // content 要素の hidden 強制除去 ( 2026-05-24 Playwright 大量 fail 対応 )
+    var isModalLike = function(el) {
+      if (!el || !el.classList) return false;
+      var cn = String(el.className || "");
+      if (/\bmodal\b|\bdialog\b|\boverlay\b|\bpopup\b|\bdropdown\b|\btooltip\b/i.test(cn)) return true;
+      var role = el.getAttribute && el.getAttribute("role");
+      if (role === "dialog" || role === "alertdialog" || role === "tooltip" || role === "menu") return true;
+      if (el.hasAttribute && (el.hasAttribute("data-modal") || el.hasAttribute("data-dropdown") || el.hasAttribute("data-popup"))) return true;
+      return false;
+    };
+    var unhideContentElements = function(root) {
+      var all = root.querySelectorAll('.hidden, [hidden], [style*="display:none"], [style*="display: none"]');
+      for (var k = 0; k < all.length; k++) {
+        var el = all[k];
+        if (isModalLike(el)) continue;
+        var p = el.parentElement;
+        var insideModal = false;
+        while (p && p !== root) {
+          if (isModalLike(p)) { insideModal = true; break; }
+          p = p.parentElement;
+        }
+        if (insideModal) continue;
+        el.classList.remove('hidden');
+        el.removeAttribute('hidden');
+        if (el.style && el.style.display === 'none') el.style.display = '';
+      }
+    };
+    try { unhideContentElements(container); } catch (e) { console.warn('[aivic] unhideContent failed:', e); }
+
+    var initJsSource = window.AIVIC_PAGE_INIT_JS;
+    if (!initJsSource) {
+      seedAllIfEmpty();
+      return;
+    }
+    var initFn = null;
+    try {
+      initFn = (new Function("return (" + initJsSource + ")"))();
+    } catch (e) {
+      console.error("[aivic] initJs compile error:", pageScreenId, e);
+      return;
+    }
+    if (typeof initFn !== "function") return;
+
+    seedAllIfEmpty().then(function() {
+      return Promise.all(TABLE_DEFS.map(function(t, i) {
+        return window.aivicApi.list(i)
+          .then(function(records) { return Object.assign({}, t, { records: records }); })
+          .catch(function() { return Object.assign({}, t, { records: [] }); });
+      }));
+    }).then(function(tables) {
+      try { initFn(container, API_URL, tables); } catch (e) { console.error("[aivic] initFn error:", pageScreenId, e); }
+      _aivicReady = true;
+    });
+  });
+})();
+
+</script>
+</body>
+</html>

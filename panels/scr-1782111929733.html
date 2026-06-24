@@ -1,0 +1,1525 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>営業成果レポート自動生成・配信システム</title>
+  <style>
+:root {
+  --primary: #c92a2a;
+  --primary-hover: #a61e1e;
+  --primary-light: #e03131;
+  --accent-gold: #c9a23e;
+  --accent-gold-hover: #b8860b;
+  --bg-main: #1a0a0a;
+  --bg-card: #2a1515;
+  --bg-sidebar: #251010;
+  --bg-hover: #3a2020;
+  --border: #4a2a2a;
+  --border-light: #5a3a3a;
+  --text: #f5f5f5;
+  --text-muted: #b8b8b8;
+  --text-disabled: #6a6a6a;
+  --top-bar-bg: #1a0a0a;
+  --top-bar-border: #4a2a2a;
+  --success: #51cf66;
+  --warning: #ffa94d;
+  --error: #ff6b6b;
+  --info: #74c0fc;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 12px rgba(201, 42, 42, 0.15);
+  --shadow-lg: 0 8px 24px rgba(201, 42, 42, 0.2);
+  --radius: 6px;
+  --transition: 0.2s ease-in-out;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-main);
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.shell-container {
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: var(--top-bar-bg);
+  border-bottom: 1px solid var(--top-bar-border);
+  flex-shrink: 0;
+  height: 56px;
+}
+
+.top-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--accent-gold);
+  text-transform: uppercase;
+}
+
+.top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.user-menu:hover {
+  background: var(--bg-hover);
+}
+
+.main-wrapper {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 240px;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-section {
+  padding: 16px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  padding: 0 8px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all var(--transition);
+  color: var(--text-muted);
+  font-size: 13px;
+  border-left: 2px solid transparent;
+}
+
+.nav-item:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.nav-item.aivic-active {
+  background: rgba(201, 42, 42, 0.15);
+  color: var(--accent-gold);
+  border-left-color: var(--accent-gold);
+}
+
+.content-area {
+  flex: 1;
+  overflow-y: auto;
+  background: var(--bg-main);
+}
+
+.panel-container {
+  padding: 24px;
+  min-height: 100%;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  transition: all var(--transition);
+}
+
+.kpi-card:hover {
+  border-color: var(--accent-gold);
+  box-shadow: var(--shadow-sm);
+}
+
+.kpi-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.kpi-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent-gold);
+  margin-bottom: 8px;
+}
+
+.kpi-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.kpi-trend {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.kpi-trend.up {
+  background: rgba(81, 207, 102, 0.2);
+  color: var(--success);
+}
+
+.kpi-trend.down {
+  background: rgba(255, 107, 107, 0.2);
+  color: var(--error);
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 16px;
+  margin-top: 24px;
+}
+
+.section-title:first-child {
+  margin-top: 0;
+}
+
+.table-wrapper {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.table-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+}
+
+.table-header-search {
+  flex: 1;
+  display: flex;
+  gap: 8px;
+}
+
+.search-input {
+  flex: 1;
+  background: var(--bg-main);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 6px 10px;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.search-input::placeholder {
+  color: var(--text-disabled);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--accent-gold);
+}
+
+.btn {
+  padding: 6px 12px;
+  border-radius: var(--radius);
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+}
+
+.btn-secondary {
+  background: var(--bg-hover);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: var(--border);
+}
+
+.btn-accent {
+  background: var(--accent-gold);
+  color: #000;
+}
+
+.btn-accent:hover {
+  background: var(--accent-gold-hover);
+}
+
+.btn-sm {
+  padding: 4px 8px;
+  font-size: 11px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+th {
+  padding: 10px 12px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border);
+}
+
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 13px;
+}
+
+tbody tr:hover {
+  background: rgba(201, 42, 42, 0.08);
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.status-active {
+  background: rgba(81, 207, 102, 0.2);
+  color: var(--success);
+}
+
+.status-pending {
+  background: rgba(255, 165, 77, 0.2);
+  color: var(--warning);
+}
+
+.status-inactive {
+  background: rgba(106, 106, 106, 0.2);
+  color: var(--text-disabled);
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  background: var(--bg-main);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  color: var(--text);
+  font-size: 13px;
+  transition: border-color var(--transition);
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  outline: none;
+  border-color: var(--accent-gold);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+}
+
+.modal-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.modal-body {
+  padding: 16px;
+}
+
+.modal-footer {
+  padding: 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.stepper {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  align-items: center;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-hover);
+  border: 2px solid var(--border);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.step.active .step-number {
+  background: var(--accent-gold);
+  border-color: var(--accent-gold);
+  color: #000;
+}
+
+.step.completed .step-number {
+  background: var(--success);
+  border-color: var(--success);
+  color: #fff;
+}
+
+.step-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.step.active .step-label {
+  color: var(--accent-gold);
+}
+
+.step-connector {
+  flex: 1;
+  height: 2px;
+  background: var(--border);
+  margin: 0 4px;
+}
+
+.step.completed .step-connector {
+  background: var(--success);
+}
+
+.kanban-board {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 4px;
+}
+
+.kanban-column {
+  flex: 0 0 320px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+}
+
+.kanban-header {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.kanban-cards {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kanban-card {
+  background: var(--bg-main);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.kanban-card:hover {
+  border-color: var(--accent-gold);
+  box-shadow: var(--shadow-sm);
+}
+
+.kanban-card-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.kanban-card-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.split-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  height: 100%;
+}
+
+.split-left, .split-right {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.split-left {
+  border-right: 1px solid var(--border);
+}
+
+.list-item {
+  padding: 12px;
+  border-bottom: 1px solid var(--border-light);
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.list-item:hover {
+  background: var(--bg-hover);
+}
+
+.list-item.active {
+  background: rgba(201, 42, 42, 0.15);
+  border-left: 3px solid var(--accent-gold);
+}
+
+.list-item-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.list-item-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.detail-panel {
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.detail-header {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.detail-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.detail-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.action-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  background: rgba(201, 42, 42, 0.2);
+  color: var(--accent-gold);
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.empty-state-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+
+.empty-state-text {
+  font-size: 12px;
+  margin-bottom: 16px;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  display: inline-block;
+  padding: 4px 8px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.scrollable {
+  overflow-y: auto;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.text-success {
+  color: var(--success);
+}
+
+.text-error {
+  color: var(--error);
+}
+
+.text-warning {
+  color: var(--warning);
+}
+
+.mt-8 { margin-top: 8px; }
+.mt-16 { margin-top: 16px; }
+.mb-8 { margin-bottom: 8px; }
+.mb-16 { margin-bottom: 16px; }
+.gap-8 { gap: 8px; }
+.gap-16 { gap: 16px; }
+  </style>
+  <script>
+window.AIVIC_API_URL = "https://mkwmoife37uqyv4zhy4yhweozq0oddxn.lambda-url.us-east-1.on.aws/";
+window.AIVIC_APP_ID = "session-1781935010162";
+window.AIVIC_SYSTEM_NAME = "営業成果レポート自動生成・配信システム";
+window.AIVIC_TABLES = [{"tableName":"ユーザー","purpose":"営業データ品質管理・請求自動化システムのユーザー管理。ユーザー認証、権限管理、監査ログ記録に必要なマスターテーブル","columns":[{"name":"ユーザーID","type":"uuid","required":true,"description":"ユーザーの一意識別子"},{"name":"ユーザー名","type":"varchar(100)","required":true,"description":"ログイン用のユーザー名"},{"name":"メールアドレス","type":"varchar(100)","required":true,"description":"ユーザーのメールアドレス"},{"name":"パスワードハッシュ","type":"varchar(255)","required":true,"description":"ハッシュ化されたパスワード"},{"name":"氏名","type":"varchar(100)","required":true,"description":"ユーザーの氏名"},{"name":"部門","type":"varchar(100)","required":false,"description":"ユーザーが属する部門"},{"name":"役割","type":"varchar(50)","required":true,"description":"ユーザーの役割（管理者/営業/品質管理者/請求担当者等）"},{"name":"ステータス","type":"varchar(20)","required":true,"description":"ユーザーステータス（有効/無効/休止）"},{"name":"最終ログイン日時","type":"timestamp","required":false,"description":"最後にログインした日時"},{"name":"作成日時","type":"timestamp","required":true,"description":"ユーザーレコード作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"ユーザーレコード最終更新日時"},{"name":"作成者","type":"varchar(100)","required":true,"description":"ユーザーレコード作成者"},{"name":"更新者","type":"varchar(100)","required":false,"description":"ユーザーレコード最終更新者"}]},{"tableName":"営業活動","purpose":"営業担当者の日々の営業活動を記録し、成果レポート生成の基礎データとなるトランザクションテーブル","columns":[{"name":"営業活動ID","type":"uuid","required":true,"description":"営業活動の一意識別子"},{"name":"ユーザーID","type":"uuid","required":true,"description":"営業担当者のユーザーID（ユーザーテーブルへの外部キー）"},{"name":"活動日","type":"timestamp","required":true,"description":"営業活動が実施された日時"},{"name":"活動種別","type":"varchar(100)","required":true,"description":"営業活動の種類（訪問、電話、メール、提案等）"},{"name":"顧客名","type":"varchar(100)","required":true,"description":"対象顧客の名称"},{"name":"案件名","type":"varchar(100)","required":false,"description":"関連する案件の名称"},{"name":"活動内容","type":"text","required":false,"description":"営業活動の詳細内容"},{"name":"成果金額","type":"integer","required":false,"description":"この活動に関連する売上金額（円）"},{"name":"成果有無","type":"boolean","required":true,"description":"営業活動が成果に結びついたかどうか"},{"name":"次回フォロー予定日","type":"timestamp","required":false,"description":"次回のフォローアップ予定日時"},{"name":"作成日時","type":"timestamp","required":true,"description":"レコード作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"レコード最終更新日時"},{"name":"作成者","type":"uuid","required":true,"description":"レコード作成者のユーザーID"}]},{"tableName":"顧客企業","purpose":"営業成果レポート自動生成・配信システムにおける顧客企業の基本情報を管理し、営業活動の対象企業として機能する","columns":[{"name":"顧客企業ID","type":"uuid","required":true,"description":"顧客企業の一意識別子"},{"name":"企業名","type":"varchar(100)","required":true,"description":"顧客企業の正式名称"},{"name":"業種","type":"varchar(100)","required":false,"description":"顧客企業の業種分類"},{"name":"所在地","type":"varchar(100)","required":false,"description":"顧客企業の本社所在地"},{"name":"代表者名","type":"varchar(100)","required":false,"description":"顧客企業の代表者名"},{"name":"電話番号","type":"varchar(100)","required":false,"description":"顧客企業の代表電話番号"},{"name":"メールアドレス","type":"varchar(100)","required":false,"description":"顧客企業の代表メールアドレス"},{"name":"担当営業ユーザーID","type":"uuid","required":true,"description":"ユーザーテーブルへの外部キー（担当営業）"},{"name":"ステータス","type":"varchar(100)","required":true,"description":"顧客企業のステータス（見込み客/既存顧客/休止中等）"},{"name":"作成日時","type":"timestamp","required":true,"description":"顧客企業レコード作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"顧客企業レコード最終更新日時"},{"name":"作成者ユーザーID","type":"uuid","required":true,"description":"ユーザーテーブルへの外部キー（作成者）"}]},{"tableName":"成約","purpose":"営業活動から成約に至った案件を記録し、営業成果レポート生成の基礎データとなるトランザクションテーブル","columns":[{"name":"成約ID","type":"uuid","required":true,"description":"成約レコードの一意識別子"},{"name":"営業活動ID","type":"uuid","required":true,"description":"関連する営業活動への外部キー"},{"name":"ユーザーID","type":"uuid","required":true,"description":"成約を達成した営業担当者への外部キー"},{"name":"顧客企業ID","type":"uuid","required":true,"description":"成約した顧客企業への外部キー"},{"name":"成約金額","type":"integer","required":true,"description":"成約時の契約金額（円）"},{"name":"成約日","type":"timestamp","required":true,"description":"成約が確定した日時"},{"name":"商品サービス名","type":"varchar(100)","required":true,"description":"成約した商品またはサービスの名称"},{"name":"契約期間開始日","type":"timestamp","required":false,"description":"契約の開始日"},{"name":"契約期間終了日","type":"timestamp","required":false,"description":"契約の終了日"},{"name":"備考","type":"text","required":false,"description":"成約に関する追加情報やメモ"},{"name":"作成日時","type":"timestamp","required":true,"description":"成約レコード作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"成約レコード最終更新日時"},{"name":"作成者","type":"uuid","required":true,"description":"成約レコードを作成したユーザーID"}]},{"tableName":"レポートテンプレート","purpose":"営業成果レポートの自動生成に使用するテンプレート定義を管理。レポート形式、含含める項目、配信先などを定義","columns":[{"name":"テンプレートID","type":"uuid","required":true,"description":"テンプレートの一意識別子"},{"name":"テンプレート名","type":"varchar(100)","required":true,"description":"テンプレートの名称（例：月次営業成果レポート）"},{"name":"説明","type":"text","required":false,"description":"テンプレートの詳細説明"},{"name":"レポート種別","type":"varchar(100)","required":true,"description":"レポートの種類（例：月次、週次、日次、カスタム）"},{"name":"対象ユーザーID","type":"uuid","required":true,"description":"このテンプレートを使用するユーザーID"},{"name":"含含める指標","type":"text","required":true,"description":"レポートに含める指標のリスト（カンマ区切り）"},{"name":"フィルター条件","type":"text","required":false,"description":"レポート生成時に適用するフィルター条件"},{"name":"配信先メールアドレス","type":"text","required":false,"description":"レポート配信先のメールアドレス（複数の場合はカンマ区切り）"},{"name":"配信スケジュール","type":"varchar(100)","required":false,"description":"配信スケジュール（例：毎月1日、毎週月曜日）"},{"name":"有効フラグ","type":"boolean","required":true,"description":"テンプレートが有効かどうか"},{"name":"作成日時","type":"timestamp","required":true,"description":"テンプレート作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"テンプレート最終更新日時"},{"name":"作成者ID","type":"uuid","required":true,"description":"テンプレート作成者のユーザーID"}]},{"tableName":"生成済みレポート","purpose":"営業成果レポートの生成履歴を管理し、配信状況、テンプレート適用、生成内容を追跡するためのトランザクションテーブル","columns":[{"name":"レポートID","type":"uuid","required":true,"description":"生成済みレポートの一意識別子"},{"name":"テンプレートID","type":"uuid","required":true,"description":"レポートテンプレートテーブルへの外部キー"},{"name":"ユーザーID","type":"uuid","required":true,"description":"レポート生成対象のユーザー（営業担当者）"},{"name":"レポート期間開始日","type":"timestamp","required":true,"description":"レポート対象期間の開始日時"},{"name":"レポート期間終了日","type":"timestamp","required":true,"description":"レポート対象期間の終了日時"},{"name":"生成日時","type":"timestamp","required":true,"description":"レポートが実際に生成された日時"},{"name":"レポートタイトル","type":"varchar(100)","required":true,"description":"生成されたレポートのタイトル"},{"name":"レポート内容","type":"text","required":true,"description":"生成されたレポートの本文内容"},{"name":"配信ステータス","type":"varchar(100)","required":true,"description":"配信状況（未配信/配信済み/配信失敗等）"},{"name":"配信日時","type":"timestamp","required":false,"description":"実際に配信された日時"},{"name":"配信先メールアドレス","type":"varchar(100)","required":false,"description":"レポート配信先のメールアドレス"},{"name":"成約件数","type":"integer","required":false,"description":"レポート期間内の成約件数"},{"name":"営業活動件数","type":"integer","required":false,"description":"レポート期間内の営業活動件数"},{"name":"作成日時","type":"timestamp","required":true,"description":"レコード作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"レコード最終更新日時"},{"name":"作成者ID","type":"uuid","required":true,"description":"レポート生成を実行したユーザーID（システムまたは管理者）"}]},{"tableName":"レポート配信履歴","purpose":"営業成果レポートの配信実績を記録し、配信状況の追跡、再配信管理、配信パフォーマンス分析を実現する","columns":[{"name":"配信履歴ID","type":"uuid","required":true,"description":"配信履歴の一意識別子"},{"name":"生成済みレポートID","type":"uuid","required":true,"description":"生成済みレポートテーブルへの外部キー"},{"name":"配信先ユーザーID","type":"uuid","required":true,"description":"ユーザーテーブルへの外部キー、配信対象ユーザー"},{"name":"配信先メールアドレス","type":"varchar(100)","required":true,"description":"配信時点のメールアドレス（ユーザー情報変更時の履歴保持用）"},{"name":"配信日時","type":"timestamp","required":true,"description":"実際の配信実行日時"},{"name":"配信ステータス","type":"varchar(100)","required":true,"description":"配信状況（成功/失敗/保留中/再配信待ち）"},{"name":"配信方法","type":"varchar(100)","required":true,"description":"配信チャネル（メール/システム内通知等）"},{"name":"エラーメッセージ","type":"text","required":false,"description":"配信失敗時のエラー詳細"},{"name":"開封日時","type":"timestamp","required":false,"description":"受信者がレポートを開封した日時"},{"name":"開封フラグ","type":"boolean","required":true,"description":"レポートが開封されたかどうか"},{"name":"再配信フラグ","type":"boolean","required":true,"description":"再配信対象かどうか"},{"name":"再配信回数","type":"integer","required":true,"description":"これまでの再配信実行回数"},{"name":"作成日時","type":"timestamp","required":true,"description":"配信履歴レコード作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"配信履歴レコード最終更新日時"},{"name":"作成者ID","type":"uuid","required":true,"description":"配信を実行したユーザーまたはシステムID"}]},{"tableName":"成果指標","purpose":"営業成果の定量的な目標値と実績値を管理し、レポート生成時の評価基準となるマスタデータ","columns":[{"name":"成果指標ID","type":"uuid","required":true,"description":"成果指標の一意識別子"},{"name":"指標名","type":"varchar(100)","required":true,"description":"成果指標の名称（例：売上高、受注件数、顧客満足度）"},{"name":"指標コード","type":"varchar(100)","required":true,"description":"成果指標の一意なコード（例：SALES_REVENUE、ORDER_COUNT）"},{"name":"説明","type":"text","required":false,"description":"成果指標の詳細説明"},{"name":"単位","type":"varchar(100)","required":true,"description":"測定単位（例：円、件、％）"},{"name":"計算方法","type":"text","required":false,"description":"指標の計算ロジック説明"},{"name":"目標値","type":"integer","required":false,"description":"期間内の目標値"},{"name":"警告閾値","type":"integer","required":false,"description":"警告を発する下限値（目標値に対する達成率など）"},{"name":"表示順序","type":"integer","required":false,"description":"レポート内での表示順序"},{"name":"有効フラグ","type":"boolean","required":true,"description":"指標が有効かどうか"},{"name":"作成日時","type":"timestamp","required":true,"description":"レコード作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"レコード最終更新日時"},{"name":"作成者","type":"uuid","required":true,"description":"作成したユーザーID"}]}];
+window.AIVIC_PRESET_SEED = {"ユーザー":[{"ユーザーID":"rec-001","ユーザー名":"admin_tanaka","メールアドレス":"tanaka.admin@company.jp","パスワードハッシュ":"$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQR","氏名":"田中太郎","部門":"システム企画部","役割":"管理者","ステータス":"有効","最終ログイン日時":"2025-01-15T09:32:45+09:00","作成日時":"2024-04-01T10:00:00+09:00","更新日時":"2025-01-10T14:22:30+09:00","作成者":"system","更新者":"田中太郎"},{"ユーザーID":"rec-001","ユーザー名":"tanaka.taro","メールアドレス":"tanaka.taro@company.jp","パスワードハッシュ":"$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQR","氏名":"田中太郎","部門":"営業部","役割":"営業","ステータス":"有効","最終ログイン日時":"2025-01-15 08:45:30","作成日時":"2024-04-01 10:00:00","更新日時":"2025-01-15 08:45:30","作成者":"佐藤花子","更新者":"田中太郎"},{"ユーザーID":"rec-001","ユーザー名":"suzuki.yuki","メールアドレス":"suzuki.yuki@company.co.jp","パスワードハッシュ":"$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQR","氏名":"鈴木由紀","部門":"品質管理部","役割":"品質管理者","ステータス":"有効","最終ログイン日時":"2025-01-15T09:30:45Z","作成日時":"2024-04-10T14:22:30Z","更新日時":"2025-01-10T16:45:20Z","作成者":"admin.tanaka","更新者":"admin.tanaka"},{"ユーザーID":"rec-001","ユーザー名":"tanaka.invoice","メールアドレス":"tanaka.invoice@company.jp","パスワードハッシュ":"$2b$12$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86E36P4/1Pq","氏名":"田中由美子","部門":"経理部","役割":"請求担当者","ステータス":"有効","最終ログイン日時":"2025-01-15T09:30:00+09:00","作成日時":"2024-04-01T10:15:00+09:00","更新日時":"2025-01-10T14:45:00+09:00","作成者":"鈴木太郎","更新者":"佐藤花子"},{"ユーザーID":"rec-001","ユーザー名":"tanaka.jiro","メールアドレス":"tanaka.jiro@company.jp","パスワードハッシュ":"$2b$12$abcdefghijklmnopqrstuvwxyz123456789ABCDEFGHIJKLMNOPQR","氏名":"田中次郎","部門":"営業部","役割":"営業部長","ステータス":"有効","最終ログイン日時":"2025-01-15 09:30:00","作成日時":"2024-04-01 10:00:00","更新日時":"2025-01-10 14:20:00","作成者":"佐藤花子","更新者":"佐藤花子"},{"ユーザーID":"rec-001","ユーザー名":"suzuki.hanako","メールアドレス":"suzuki.hanako@company.jp","パスワードハッシュ":"$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQR","氏名":"鈴木花子","部門":"営業部","役割":"営業","ステータス":"有効","最終ログイン日時":"2025-01-15 09:30:00","作成日時":"2024-12-01 10:00:00","更新日時":"2025-01-10 14:20:00","作成者":"佐藤太郎","更新者":"佐藤太郎"},{"ユーザーID":"rec-001","ユーザー名":"tanaka.taro","メールアドレス":"tanaka.taro@company.jp","パスワードハッシュ":"$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQR","氏名":"田中太郎","部門":"営業部","役割":"営業","ステータス":"無効","最終ログイン日時":"2024-11-15 14:32:00","作成日時":"2022-04-01 09:00:00","更新日時":"2025-01-10 10:15:00","作成者":"admin","更新者":"佐藤花子"},{"ユーザーID":"rec-001-2024-0847","ユーザー名":"suzuki.yuki","メールアドレス":"suzuki.yuki@company.co.jp","パスワードハッシュ":"$2b$12$kL9mN2pQrStUvWxYzAbCdEfGhIjKlMnOpQrStUvWxYzAbCdEfGhIj","氏名":"鈴木優希","部門":"営業支援部","役割":"分析担当者","ステータス":"有効","最終ログイン日時":"2025-01-15T09:32:47+09:00","作成日時":"2024-04-10T14:22:15+09:00","更新日時":"2025-01-10T16:45:30+09:00","作成者":"admin.tanaka","更新者":"admin.tanaka"},{"ユーザーID":"rec-001","ユーザー名":"tanaka.hanako","メールアドレス":"tanaka.hanako@company.jp","パスワードハッシュ":"$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQR","氏名":"田中花子","部門":"営業部","役割":"営業","ステータス":"休止","最終ログイン日時":"2024-10-15 14:32:00","作成日時":"2023-04-10 09:00:00","更新日時":"2024-10-15 16:45:00","作成者":"鈴木太郎","更新者":"佐藤次郎"},{"ユーザーID":"rec-001","ユーザー名":"audit_external_2024","メールアドレス":"suzuki.audit@external-firm.co.jp","パスワードハッシュ":"$2b$12$8kL9mN2pQ5rT7vW3xY6zZ1aB4cD5eF6gH7iJ8kL9mN2pQ5rT7vW3x","氏名":"鈴木監査太郎","部門":"外部監査部門","役割":"外部監査人","ステータス":"有効","最終ログイン日時":"2025-01-15T14:32:00+09:00","作成日時":"2024-10-01T09:00:00+09:00","更新日時":"2025-01-15T14:32:00+09:00","作成者":"佐藤管理者","更新者":"佐藤管理者"}],"営業活動":[{"営業活動ID":"rec-001","ユーザーID":"usr-0847","活動日":"2024-11-15T14:30:00Z","活動種別":"訪問","顧客名":"株式会社ソルテック","案件名":"生産管理システム追加ライセンス導入","活動内容":"既存顧客ソルテック様への定期訪問。現在利用中の生産管理システムの運用状況をヒアリング。新たに3部門での追加導入ニーズを確認。システム連携機能の強化提案を実施。導入スケジュール、予算について合意。年明け1月中の契約締結予定。","成果金額":2800000,"成果有無":true,"次回フォロー予定日":"2024-12-10T10:00:00Z","作成日時":"2024-11-15T15:45:00Z","更新日時":"2024-11-15T15:45:00Z","作成者":"usr-0847"},{"営業活動ID":"rec-001","ユーザーID":"usr-0847","活動日":"2024-11-15T14:30:00+09:00","活動種別":"提案","顧客名":"株式会社テクノロジーソリューションズ","案件名":"営業管理システム導入プロジェクト","活動内容":"新規見込み客への初回訪問。同社の営業部長・鈴木健一氏と面談し、現在の営業プロセスの課題（営業データの一元管理の困難さ、営業進捗の可視化不足）をヒアリング。当社の営業管理システムの機能概要と導入事例を説明。システムによる業務効率化で年間200時間の工数削減が可能な試算を提示。顧客の強い関心を得られ、詳細な提案資料作成と次回デモンストレーション実施で合意。","成果金額":0,"成果有無":false,"次回フォロー予定日":"2024-12-06T10:00:00+09:00","作成日時":"2024-11-15T16:45:00+09:00","更新日時":"2024-11-15T16:45:00+09:00","作成者":"usr-0847"},{"営業活動ID":"rec-001","ユーザーID":"usr-0847","活動日":"2024-11-15T14:30:00+09:00","活動種別":"電話","顧客名":"株式会社ナカムラシステムズ","案件名":"基幹システム更新プロジェクト","活動内容":"9月の提案時に検討中だった基幹システム更新について、現在の検討状況を確認。先月の競合提案との比較検討結果を聞いたところ、コスト面で他社を選定したとのこと。ただし、導入後の運用サポート体制に不安があるとのコメントがあったため、当社のサポート体制の強みを説明し、今後の追加案件での協業の可能性を探った。購買担当者の田中課長は前向きな反応を示した。","成果金額":0,"成果有無":false,"次回フォロー予定日":"2025-01-20T10:00:00+09:00","作成日時":"2024-11-15T15:45:00+09:00","更新日時":"2024-11-15T15:45:00+09:00","作成者":"usr-0847"},{"営業活動ID":"rec-20250115-7842","ユーザーID":"user-00156","活動日":"2025-01-15T14:30:00+09:00","活動種別":"訪問","顧客名":"株式会社ダイナミクス","案件名":"基幹システム刷新プロジェクト","活動内容":"契約前最終調整ミーティングを実施。システム導入スケジュール、保守サービス内容、支払い条件について協議。顧客側CFO、IT部長、調達部長が参加。契約書の最終版を確認し、1月22日の契約締結で合意。カスタマイズ要件3件について追加費用見積もりを提出予定。","成果金額":24500000,"成果有無":true,"次回フォロー予定日":"2025-01-22T10:00:00+09:00","作成日時":"2025-01-15T16:45:00+09:00","更新日時":"2025-01-15T16:45:00+09:00","作成者":"user-00156"},{"営業活動ID":"rec-20250115-001","ユーザーID":"usr-0847","活動日":"2025-01-15T14:30:00","活動種別":"電話","顧客名":"株式会社ハイテックソリューションズ","案件名":"クラウド基盤システム導入提案","活動内容":"前日送付したメール配信内容（クラウド基盤システムの機能説明資料）に関して、顧客のIT部長・鈴木課長から問い合わせを受けた。特にセキュリティ機能とコスト試算について詳しく説明。顧客の要件確認を行い、カスタマイズ対応の可能性について前向きな反応を得た。次回の詳細提案資料作成に向けて要件定義ドキュメントの提出を依頼。","成果金額":0,"成果有無":false,"次回フォロー予定日":"2025-01-22T10:00:00","作成日時":"2025-01-15T15:45:00","更新日時":"2025-01-15T15:45:00","作成者":"usr-0847"},{"営業活動ID":"rec-001","ユーザーID":"usr-0847","活動日":"2024-11-15T14:30:00+09:00","活動種別":"訪問","顧客名":"株式会社テクノソリューション","案件名":"クラウド基盤システム導入提案","活動内容":"先週の業界展示会（Japan IT Fair 2024）で名刺交換させていただいた株式会社テクノソリューションの情報システム部長・佐藤様を訪問。同社の現在のシステム課題（レガシーシステムの保守負担増加、クラウド移行の必要性）についてヒアリングを実施。当社のクラウド基盤ソリューションの概要説明と導入事例（同業他社での成功事例3件）を紹介。特にコスト削減効果（初期投資30%削減、運用コスト年間20%削減見込み）に高い関心を示していただいた。次段階として、詳細な提案資料と見積書の提示を要望。","成果金額":0,"成果有無":false,"次回フォロー予定日":"2024-12-06T10:00:00+09:00","作成日時":"2024-11-15T16:45:00+09:00","更新日時":"2024-11-15T16:45:00+09:00","作成者":"usr-0847"},{"営業活動ID":"rec-001","ユーザーID":"user-0847","活動日":"2024-11-15T14:30:00+09:00","活動種別":"打ち合わせ","顧客名":"株式会社サンテック工業","案件名":"追加発注_部品セット2024冬季","活動内容":"既存顧客のサンテック工業と追加発注に関する打ち合わせを実施。前回納品分の部品セットの追加注文について協議し、納期は12月中旬、数量は前回比150%での発注が決定。来年度の定期供給契約についても初期段階での検討を開始。","成果金額":2850000,"成果有無":true,"次回フォロー予定日":"2024-12-10T10:00:00+09:00","作成日時":"2024-11-15T16:45:00+09:00","更新日時":"2024-11-15T16:45:00+09:00","作成者":"user-0847"},{"営業活動ID":"rec-20250115-001","ユーザーID":"user-00847","活動日":"2025-01-15T14:30:00+09:00","活動種別":"提案","顧客名":"株式会社ハイテックソリューション","案件名":"基幹システム刷新プロジェクト","活動内容":"競合他社（A社）から奪取した基幹システム刷新案件について、最終的な提案内容の確認と受注契約書にサインをいただきました。当初、顧客はA社の提案を検討していましたが、当社の技術提案と導入後のサポート体制の充実性が評価され、受注に至りました。契約金額は税別3,500万円、実装期間は6ヶ月を予定しています。","成果金額":35000000,"成果有無":true,"次回フォロー予定日":"2025-02-01T10:00:00+09:00","作成日時":"2025-01-15T15:45:00+09:00","更新日時":"2025-01-15T15:45:00+09:00","作成者":"user-00847"},{"営業活動ID":"rec-001","ユーザーID":"usr-2024-0847","活動日":"2024-11-15T14:30:00+09:00","活動種別":"コンサルティング","顧客名":"株式会社ユーテック","案件名":"業務効率化システム導入相談","活動内容":"顧客の現在の業務フローをヒアリングし、DX推進における課題を整理。在庫管理と販売管理の統合システム導入による効率化シナリオを3パターン提示。導入後の運用体制構築についてもアドバイスを実施。","成果金額":0,"成果有無":false,"次回フォロー予定日":"2024-12-06T10:00:00+09:00","作成日時":"2024-11-15T15:45:00+09:00","更新日時":"2024-11-15T15:45:00+09:00","作成者":"usr-2024-0847"},{"営業活動ID":"rec-20250115-001","ユーザーID":"usr-00847","活動日":"2025-01-15T14:30:00+09:00","活動種別":"提案","顧客名":"株式会社ソリューションパートナーズ","案件名":"クラウドサービス利用契約更新","活動内容":"既存契約が2025年3月末で満期となるため、更新条件の確認と新機能を含むプランの提案を実施。顧客の利用状況を分析し、ストレージ容量の増加とセキュリティ機能の強化を推奨。次期契約での割引適用条件についても説明。顧客担当者（鈴木課長）から前向きな反応を得た。","成果金額":2400000,"成果有無":true,"次回フォロー予定日":"2025-02-10T10:00:00+09:00","作成日時":"2025-01-15T15:45:00+09:00","更新日時":"2025-01-15T15:45:00+09:00","作成者":"usr-00847"}],"顧客企業":[{"顧客企業ID":"rec-001","企業名":"株式会社トヨタ部品工業","業種":"自動車部品製造","所在地":"愛知県豊田市","代表者名":"鈴木隆一","電話番号":"0565-28-5000","メールアドレス":"info@toyota-buhin.co.jp","担当営業ユーザーID":"rec-u-042","ステータス":"既存顧客","作成日時":"2023-06-15T09:30:00+09:00","更新日時":"2025-01-20T14:45:30+09:00","作成者ユーザーID":"rec-u-015"},{"顧客企業ID":"rec-001","企業名":"株式会社グローバルロジスティクス","業種":"物流・運送業","所在地":"東京都港区芝浦3-1-1","代表者名":"山田太郎","電話番号":"03-XXXX-XXXX","メールアドレス":"info@global-logistics.jp","担当営業ユーザーID":"rec-usr-0042","ステータス":"見込み客","作成日時":"2024-11-15T10:30:00Z","更新日時":"2025-01-08T14:15:00Z","作成者ユーザーID":"rec-usr-0018"},{"顧客企業ID":"rec-001","企業名":"株式会社フレッシュマート関東","業種":"小売業（食品スーパーマーケット）","所在地":"東京都渋谷区道玄坂1-2-3","代表者名":"山田健一","電話番号":"03-XXXX-5678","メールアドレス":"yamada@freshmart-kanto.co.jp","担当営業ユーザーID":"rec-u-042","ステータス":"既存顧客","作成日時":"2024-03-15T10:30:00Z","更新日時":"2025-01-20T14:15:00Z","作成者ユーザーID":"rec-u-008"},{"顧客企業ID":"rec-001","企業名":"東京中央銀行株式会社","業種":"金融機関","所在地":"東京都千代田区丸の内1-2-3","代表者名":"山田次郎","電話番号":"03-1234-5678","メールアドレス":"info@tokyochuobank.co.jp","担当営業ユーザーID":"rec-u-042","ステータス":"見込み客","作成日時":"2024-11-15T09:30:00Z","更新日時":"2024-12-10T14:45:00Z","作成者ユーザーID":"rec-u-018"},{"顧客企業ID":"rec-001","企業名":"株式会社大西建設","業種":"建設業","所在地":"大阪府大阪市北区中之島3-2-4","代表者名":"大西健一","電話番号":"06-6123-4567","メールアドレス":"info@onishi-construction.co.jp","担当営業ユーザーID":"rec-101","ステータス":"休止中","作成日時":"2022-08-15T09:30:00+09:00","更新日時":"2024-12-20T14:45:00+09:00","作成者ユーザーID":"rec-201"},{"顧客企業ID":"rec-001","企業名":"医療法人社団 清和会 清和病院","業種":"医療・福祉","所在地":"東京都渋谷区神宮前3-15-8","代表者名":"山田健二","電話番号":"03-XXXX-5678","メールアドレス":"info@seiwa-hospital.jp","担当営業ユーザーID":"rec-101","ステータス":"見込み客","作成日時":"2024-11-15T10:30:00Z","更新日時":"2025-01-08T14:45:00Z","作成者ユーザーID":"rec-201"},{"顧客企業ID":"rec-001","企業名":"株式会社ロジスティクス関西","業種":"流通・物流","所在地":"大阪府大阪市北区中之島3-2-4","代表者名":"山田健一","電話番号":"06-6123-4567","メールアドレス":"info@logistics-kansai.co.jp","担当営業ユーザーID":"rec-u-0042","ステータス":"既存顧客","作成日時":"2024-03-15T09:30:00+09:00","更新日時":"2025-01-22T14:45:00+09:00","作成者ユーザーID":"rec-u-0018"},{"顧客企業ID":"rec-001","企業名":"株式会社NeXtVision","業種":"ソフトウェア開発・AI","所在地":"東京都渋谷区道玄坂2-1-1","代表者名":"山田健太","電話番号":"03-XXXX-5821","メールアドレス":"info@nextvision-inc.jp","担当営業ユーザーID":"rec-user-047","ステータス":"見込み客","作成日時":"2024-11-15T09:30:00Z","更新日時":"2025-01-08T14:22:00Z","作成者ユーザーID":"rec-user-023"},{"顧客企業ID":"rec-001","企業名":"株式会社フレッシュファーム日本","業種":"食品製造業","所在地":"兵庫県神戸市東灘区","代表者名":"山田健一","電話番号":"078-431-2800","メールアドレス":"info@freshfarm-jp.co.jp","担当営業ユーザーID":"rec-u-045","ステータス":"既存顧客","作成日時":"2022-03-15T09:30:00Z","更新日時":"2025-01-20T14:15:00Z","作成者ユーザーID":"rec-u-012"},{"顧客企業ID":"rec-001","企業名":"株式会社トヨタサプライヤーズパートナーシップ","業種":"自動車部品製造","所在地":"愛知県豊田市元町1-1","代表者名":"鈴木健一","電話番号":"0565-28-2121","メールアドレス":"info@toyota-suppliers.co.jp","担当営業ユーザーID":"rec-u-0042","ステータス":"見込み客","作成日時":"2024-11-15T09:30:00Z","更新日時":"2024-12-08T14:45:00Z","作成者ユーザーID":"rec-u-0028"}],"成約":[{"成約ID":"rec-20250115-001","営業活動ID":"rec-20241201-act-042","ユーザーID":"rec-user-0847","顧客企業ID":"rec-client-0156","成約金額":125000000,"成約日":"2025-01-15T14:30:00+09:00","商品サービス名":"生産管理システムクラウド統合パッケージ","契約期間開始日":"2025-04-01T00:00:00+09:00","契約期間終了日":"2028-03-31T23:59:59+09:00","備考":"3年間の包括ライセンス契約。導入支援費用2,500万円を含む。複数工場への展開を予定。保守サポート費用は別途年間契約。営業担当者：山田太郎、決裁者：取締役 鈴木花子","作成日時":"2025-01-15T15:45:00+09:00","更新日時":"2025-01-15T15:45:00+09:00","作成者":"rec-user-0847"},{"成約ID":"rec-001","営業活動ID":"rec-047","ユーザーID":"rec-012","顧客企業ID":"rec-089","成約金額":2400000,"成約日":"2024-11-15T14:30:00+09:00","商品サービス名":"クラウド勤怠管理システム ライセンス追加購入（50ユーザー分）","契約期間開始日":"2024-12-01T00:00:00+09:00","契約期間終了日":"2025-11-30T23:59:59+09:00","備考":"既存顧客の株式会社テクノロジーソリューションズからの追加ライセンス購入。従業員数の増加に伴い50ユーザー分の追加契約。既存の100ユーザーライセンスに加えて、合計150ユーザーでの運用となる。営業担当者の佐藤花子による継続営業活動の成果。","作成日時":"2024-11-15T15:45:00+09:00","更新日時":"2024-11-15T15:45:00+09:00","作成者":"rec-012"},{"成約ID":"rec-001","営業活動ID":"rec-002","ユーザーID":"rec-003","顧客企業ID":"rec-004","成約金額":480000,"成約日":"2024-11-15T14:30:00+09:00","商品サービス名":"クラウド勤怠管理システム Professional プラン","契約期間開始日":"2025-01-01T00:00:00+09:00","契約期間終了日":"2025-12-31T23:59:59+09:00","備考":"初回契約。従業員数50名規模の建設関連企業。月額40,000円×12ヶ月。導入支援費用20,000円別途。担当営業の田中太郎による提案。","作成日時":"2024-11-15T15:00:00+09:00","更新日時":"2024-11-15T15:00:00+09:00","作成者":"rec-003"},{"成約ID":"rec-001","営業活動ID":"rec-042","ユーザーID":"rec-u-015","顧客企業ID":"rec-c-008","成約金額":2500000,"成約日":"2025-01-15T14:30:00+09:00","商品サービス名":"クラウド型営業支援システム プレミアムプラン","契約期間開始日":"2025-02-01T00:00:00+09:00","契約期間終了日":"2026-01-31T23:59:59+09:00","備考":"初期導入サポート3ヶ月間無料。ユーザー数30名。月額契約から年間一括払いへの変更による割引適用。担当者は山田花子（顧客側IT部長）。","作成日時":"2025-01-15T15:45:22+09:00","更新日時":"2025-01-15T15:45:22+09:00","作成者":"rec-u-015"},{"成約ID":"rec-20250115-001","営業活動ID":"rec-act-20241201-015","ユーザーID":"rec-user-001","顧客企業ID":"rec-cust-20250115-042","成約金額":2400000,"成約日":"2025-01-15T14:30:00+09:00","商品サービス名":"クラウド型営業支援システム Professional Plan","契約期間開始日":"2025-02-01T00:00:00+09:00","契約期間終了日":"2026-01-31T23:59:59+09:00","備考":"従来利用していたA社システムからの乗り換え案件。導入支援費用50万円別途。初期設定・データ移行サポート込み。営業部門30名規模での利用を想定。2月中旬の本格運用開始予定。","作成日時":"2025-01-15T15:45:22+09:00","更新日時":"2025-01-15T15:45:22+09:00","作成者":"rec-user-001"},{"成約ID":"rec-20250115-001","営業活動ID":"rec-20250110-act-042","ユーザーID":"rec-user-0847","顧客企業ID":"rec-cust-1923","成約金額":2400000,"成約日":"2025-01-15T14:30:00+09:00","商品サービス名":"クラウド型顧客管理システム（CRM）年間ライセンス","契約期間開始日":"2025-02-01T00:00:00+09:00","契約期間終了日":"2026-01-31T23:59:59+09:00","備考":"前契約期間（2024年2月～2025年1月）の継続更新。ユーザー数を15名から20名に増加。割引率5%を適用。","作成日時":"2025-01-15T14:35:22+09:00","更新日時":"2025-01-15T14:35:22+09:00","作成者":"rec-user-0847"},{"成約ID":"rec-20250215-001","営業活動ID":"rec-20241120-act-001","ユーザーID":"rec-user-0847","顧客企業ID":"rec-cust-2156","成約金額":2500000,"成約日":"2025-02-15T14:30:00+09:00","商品サービス名":"クラウド型勤怠管理システム Professional プラン","契約期間開始日":"2025-03-01T00:00:00+09:00","契約期間終了日":"2026-02-28T23:59:59+09:00","備考":"東京ビジネスEXPO 2024年11月出展ブースでの初期接触。営業担当者：山田太郎。導入企業規模：従業員150名。既存システムからの移行対応が必要。初年度割引10%適用済み。","作成日時":"2025-02-15T15:45:22+09:00","更新日時":"2025-02-15T15:45:22+09:00","作成者":"rec-user-0847"},{"成約ID":"rec-20250115-001","営業活動ID":"rec-20250110-act-001","ユーザーID":"rec-user-tanaka-001","顧客企業ID":"rec-cust-yamada-corp-001","成約金額":2500000,"成約日":"2025-01-15T14:30:00+09:00","商品サービス名":"クラウド型経営管理システム年間ライセンス","契約期間開始日":"2025-02-01T00:00:00+09:00","契約期間終了日":"2026-01-31T23:59:59+09:00","備考":"既存顧客の山田物流株式会社からの紹介。代表取締役の紹介により営業活動開始。導入サポート費用50万円別途。","作成日時":"2025-01-15T15:45:00+09:00","更新日時":"2025-01-15T15:45:00+09:00","作成者":"rec-user-tanaka-001"},{"成約ID":"rec-001","営業活動ID":"rec-002","ユーザーID":"rec-003","顧客企業ID":"rec-004","成約金額":4800000,"成約日":"2024-11-15T14:30:00","商品サービス名":"クラウド型営業管理システム SalesCloud Pro","契約期間開始日":"2025-01-01T00:00:00","契約期間終了日":"2027-12-31T23:59:59","備考":"3年契約による大型案件。初年度月額40万円、2年目以降月額38万円での契約。導入サポートおよびカスタマイズ費用50万円を含む。顧客企業の営業部門50名が利用予定。","作成日時":"2024-11-15T15:45:00","更新日時":"2024-11-15T15:45:00","作成者":"rec-005"},{"成約ID":"rec-20250215-001","営業活動ID":"rec-20250110-042","ユーザーID":"rec-user-00847","顧客企業ID":"rec-cust-01523","成約金額":2850000,"成約日":"2025-02-14T16:30:00+09:00","商品サービス名":"クラウド型勤怠管理システム 年間ライセンス","契約期間開始日":"2025-03-01T00:00:00+09:00","契約期間終了日":"2026-02-28T23:59:59+09:00","備考":"前任営業の鈴木健一より引き継ぎ。既存顧客との信頼関係維持のため、契約金額より15%割引を適用。導入支援サービスは別途契約予定。","作成日時":"2025-02-14T17:45:22+09:00","更新日時":"2025-02-14T17:45:22+09:00","作成者":"rec-user-00847"}],"レポートテンプレート":[{"テンプレートID":"rec-001","テンプレート名":"月次全社営業成果サマリーレポート","説明":"営業部全体の月次売上実績、目標達成率、顧客獲得数、商品別売上内訳、地域別パフォーマンス、営業担当者別ランキングを集約したエグゼクティブ向けサマリーレポート","レポート種別":"月次","対象ユーザーID":"rec-u-0847","含める指標":"月次売上高,売上目標達成率,新規顧客数,既存顧客売上,商品カテゴリ別売上,地域別売上,営業担当者別売上ランキング,前月比増減率,顧客満足度スコア","フィルター条件":"部門=営業部,対象期間=当月1日から月末日,ステータス=完了案件のみ","配信先メールアドレス":"suzuki.hiroshi@example.com,yamamoto.keiko@example.com,tanaka.jiro@example.com","配信スケジュール":"毎月1日 09:00","有効フラグ":true,"作成日時":"2024-04-15T14:30:00+09:00","更新日時":"2024-12-10T11:45:00+09:00","作成者ID":"rec-u-0521"},{"テンプレートID":"rec-001","テンプレート名":"週次チーム別売上進捗レポート","説明":"営業チームの週単位での売上実績、目標達成率、チーム別パフォーマンスを可視化するレポート。各営業担当者の売上、新規案件数、受注率などの主要指標を含む。","レポート種別":"週次","対象ユーザーID":"rec-user-0042","含含める指標":"週間売上実績,売上目標,目標達成率,新規案件数,受注件数,受注率,顧客満足度スコア,チーム別売上ランキング","フィルター条件":"部門=営業部,対象期間=当該週,ステータス=確定済み","配信先メールアドレス":"suzuki.takeshi@company.jp,yamada.hanako@company.jp,kobayashi.jiro@company.jp","配信スケジュール":"毎週月曜日 09:00","有効フラグ":true,"作成日時":"2024-10-15 14:30:00","更新日時":"2025-01-08 11:22:45","作成者ID":"rec-user-0015"},{"テンプレートID":"rec-001","テンプレート名":"営業担当者向け日次個人営業活動レポート","説明":"営業担当者が毎日の営業活動を可視化し、目標達成状況を確認するための個人向けレポート。訪問件数、商談数、受注金額、進捗案件の状況を日次で集計します。","レポート種別":"日次","対象ユーザーID":"rec-u-0847","含める指標":"訪問件数,商談件数,新規案件数,受注金額,受注件数,パイプライン金額,成約率,平均商談時間","フィルター条件":"担当者ID=対象ユーザーID AND 日付=当日 AND ステータス!=キャンセル","配信先メールアドレス":"suzuki.hanako@company.co.jp","配信スケジュール":"毎日17:30","有効フラグ":true,"作成日時":"2024-04-15T09:30:00+09:00","更新日時":"2025-01-20T14:15:00+09:00","作成者ID":"rec-u-0102"},{"テンプレートID":"rec-001","テンプレート名":"経営層向け月次KPI達成状況と予実分析レポート","説明":"営業売上、利益率、顧客獲得数、カスタマーサクセス指標など主要KPIの月次達成状況を集計し、予算対比での実績分析を行うレポート。経営会議での意思決定支援を目的とする。","レポート種別":"月次","対象ユーザーID":"usr-2024001","含含める指標":"売上高,営業利益,営業利益率,新規顧客数,既存顧客売上,顧客維持率,プロジェクト完了率,スタッフ稼働率,売上予算比,利益予算比","フィルター条件":"対象月=当月,対象部門=全社,ステータス=完了","配信先メールアドレス":"ceo@example.co.jp,cfo@example.co.jp,営業本部長@example.co.jp","配信スケジュール":"毎月5日 09:00","有効フラグ":true,"作成日時":"2024-10-15 14:30:00","更新日時":"2025-01-08 11:45:00","作成者ID":"usr-2024002"},{"テンプレートID":"rec-001","テンプレート名":"月次商品別売上分析レポート","説明":"営業企画部向けの月次レポート。商品カテゴリ別の売上実績、前月比、目標達成率を集計し、地域別・営業担当者別の内訳を含む。","レポート種別":"月次","対象ユーザーID":"rec-002","含める指標":"売上高,売上前月比,売上目標達成率,商品別売上,地域別売上,新規顧客数,既存顧客売上,平均受注単価,受注件数","フィルター条件":"売上計上日が当月1日から末日、対象地域は全国、対象商品カテゴリはA～D","配信先メールアドレス":"eisei-kikaku@company.jp,yamada.hanako@company.jp,suzuki.jiro@company.jp","配信スケジュール":"毎月5日 09:00","有効フラグ":true,"作成日時":"2024-10-15 14:30:00","更新日時":"2025-01-20 11:45:00","作成者ID":"rec-003"},{"テンプレートID":"rec-001","テンプレート名":"営業支援チーム向け週次案件進捗・失注分析レポート","説明":"営業支援チームが毎週月曜日に前週の案件進捗状況と失注案件の分析結果を確認するためのレポート。パイプライン進捗、失注原因分析、リスク案件の抽出を含む。","レポート種別":"週次","対象ユーザーID":"rec-002","含含める指標":"新規案件数,進捗中案件数,受注案件数,失注案件数,平均案件金額,失注率,リスク案件数,営業ステージ別集計,失注原因別集計,顧客業種別分析","フィルター条件":"対象期間:前週月曜日～日曜日,営業部門:全営業チーム,案件ステータス:全て,失注案件は過去3ヶ月分を含む","配信先メールアドレス":"sales-support@company.jp,tanaka.jiro@company.jp,suzuki.hanako@company.jp,nakamura.takeshi@company.jp","配信スケジュール":"毎週月曜日 09:00","有効フラグ":true,"作成日時":"2024-10-15T14:30:00+09:00","更新日時":"2025-01-20T11:15:00+09:00","作成者ID":"rec-003"},{"テンプレートID":"rec-001","テンプレート名":"月次地域別売上実績レポート","説明":"全国7地域の売上実績、目標達成率、前月比を集計し、地域営業マネージャーが月次の営業成果を把握するためのレポート。地域別の詳細分析データと改善提案を含む。","レポート種別":"月次","対象ユーザーID":"rec-u-0042","含含める指標":"売上金額,売上目標,達成率,前月比増減,新規顧客数,既存顧客売上,商品カテゴリ別売上,地域別ランキング","フィルター条件":"売上計上日が当月1日から末日,ステータス=確定,地域コード IN ('01','02','03','04','05','06','07')","配信先メールアドレス":"regional-managers@company.jp,sales-director@company.jp,finance-dept@company.jp","配信スケジュール":"毎月1日 09:00","有効フラグ":true,"作成日時":"2024-04-15T14:30:00+09:00","更新日時":"2025-01-20T10:15:00+09:00","作成者ID":"rec-u-0001"},{"テンプレートID":"rec-001","テンプレート名":"新規営業チーム週次新規案件パイプラインレポート","説明":"新規営業チームが毎週月曜日に前週の新規案件獲得状況、パイプライン進捗、失注案件を確認するためのレポート。営業目標達成状況の把握と週間施策の立案に活用。","レポート種別":"週次","対象ユーザーID":"rec-0042","含含める指標":"新規案件数,新規案件金額,パイプライン件数,パイプライン金額,失注案件数,失注理由,成約率,平均案件規模,営業担当者別成績,業界別案件分布","フィルター条件":"案件作成日:前週月曜日～日曜日,案件ステータス:新規・進行中・失注,対象部門:新規営業チーム","配信先メールアドレス":"sales-new@company.jp,suzuki.yuki@company.jp,yamamoto.kenji@company.jp,nakamura.atsuko@company.jp","配信スケジュール":"毎週月曜日 08:00","有効フラグ":true,"作成日時":"2024-10-15T14:30:00+09:00","更新日時":"2025-01-20T10:15:00+09:00","作成者ID":"rec-0015"},{"テンプレートID":"rec-001","テンプレート名":"既存顧客向け月次満足度・リテンション指標レポート","説明":"既存顧客の満足度スコア、チャーンリスク、NPS、リピート購買率などの重要指標を月次で集計し、顧客担当者が顧客維持活動の効果測定と改善施策立案に活用するレポート","レポート種別":"月次","対象ユーザーID":"user-2024-001","含含める指標":"NPS(Net Promoter Score),顧客満足度スコア,チャーンリスク顧客数,リピート購買率,平均購買金額,サポートチケット対応率,解約予定顧客数","フィルター条件":"契約ステータス=有効,購買履歴期間=過去12ヶ月,顧客セグメント=既存顧客","配信先メールアドレス":"suzuki.hanako@company.jp,tanaka.jiro@company.jp,yamamoto.yuki@company.jp","配信スケジュール":"毎月1日 09:00","有効フラグ":true,"作成日時":"2024-10-15T14:30:00+09:00","更新日時":"2025-01-10T11:45:00+09:00","作成者ID":"user-2024-admin-001"},{"テンプレートID":"rec-001-2024-keiei-dashboard","テンプレート名":"経営会議用月次営業成果総合ダッシュボードレポート","説明":"営業部門の月次成果を経営層向けに総合的に可視化するレポート。売上実績、目標達成率、顧客獲得数、解約率、営業利益率などの主要指標を網羅し、経営会議での意思決定を支援する。","レポート種別":"月次","対象ユーザーID":"rec-user-0001","含含める指標":"月次売上実績,売上目標,達成率,新規顧客数,既存顧客売上,顧客解約数,解約率,営業利益,営業利益率,営業担当者別売上,部門別売上,顧客満足度スコア,受注件数,平均受注額","フィルター条件":"対象期間=当月,売上金額>=0,ステータス=確定,除外部門=なし","配信先メールアドレス":"keiei-kaigi@company.jp,sales-director@company.jp,cfo@company.jp","配信スケジュール":"毎月3日 09:00","有効フラグ":true,"作成日時":"2024-01-15T10:30:00+09:00","更新日時":"2024-12-10T14:45:00+09:00","作成者ID":"rec-user-admin-001"}],"生成済みレポート":[{"レポートID":"rec-001","テンプレートID":"rec-tmpl-002","ユーザーID":"rec-user-045","レポート期間開始日":"2024-01-01T00:00:00Z","レポート期間終了日":"2024-01-31T23:59:59Z","生成日時":"2024-02-01T09:15:30Z","レポートタイトル":"2024年1月営業活動レポート","レポート内容":"1月の営業活動を報告いたします。新規顧客開拓に注力し、既存顧客のフォローアップも継続いたしました。特に中旬の展示会での出展が功を奏し、複数の商談が進行中です。今後も目標達成に向けて邁進いたします。","配信ステータス":"配信済み","配信日時":"2024-02-01T10:45:00Z","配信先メールアドレス":"suzuki.hanako@company.jp","成約件数":3,"営業活動件数":28,"作成日時":"2024-02-01T09:15:30Z","更新日時":"2024-02-01T10:45:00Z","作成者ID":"rec-system-admin"},{"レポートID":"rec-20240201-001","テンプレートID":"rec-tpl-monthly-001","ユーザーID":"rec-usr-sales-002","レポート期間開始日":"2024-01-01T00:00:00Z","レポート期間終了日":"2024-01-31T23:59:59Z","生成日時":"2024-02-01T09:30:00Z","レポートタイトル":"2024年1月度営業活動レポート（営業担当者B）","レポート内容":"【1月度営業活動サマリー】\n営業担当者Bの1月度営業活動実績をご報告いたします。\n\n【重要指標】\n・成約件数：12件\n・営業活動件数：47件\n・成約率：25.5%\n・平均商談期間：8.3日\n\n【成約内訳】\n既存顧客フォロー：7件（売上高：850万円）\n新規開拓：5件（売上高：620万円）\n\n【営業活動内訳】\n訪問：28件、電話：12件、メール：7件\n\n【課題と改善策】\n大型案件の進捗が遅れ気味。2月は重点顧客への訪問頻度を増加予定。","配信ステータス":"配信失敗","配信日時":null,"配信先メールアドレス":"suzuki.hanako@example.co.jp","成約件数":12,"営業活動件数":47,"作成日時":"2024-02-01T09:30:00Z","更新日時":"2024-02-01T10:15:00Z","作成者ID":"rec-usr-admin-001"},{"レポートID":"rec-001","テンプレートID":"rec-template-q4","ユーザーID":"rec-user-0847","レポート期間開始日":"2024-10-01T00:00:00Z","レポート期間終了日":"2024-12-31T23:59:59Z","生成日時":"2025-01-06T09:30:00Z","レポートタイトル":"2024年第4四半期営業成績サマリーレポート","レポート内容":"【営業成績概要】\n2024年第4四半期における営業活動結果をご報告いたします。\n\n【主要成績】\n・成約件数：47件（前年同期比+12%）\n・営業活動件数：156件\n・平均成約率：30.1%\n・新規顧客獲得数：18社\n\n【月別実績】\n10月：成約14件、活動48件\n11月：成約16件、活動53件\n12月：成約17件、活動55件\n\n【営業活動内訳】\n・訪問活動：89件\n・電話営業：47件\n・オンライン商談：20件\n\n【課題と改善策】\n12月の成約件数は目標を達成しましたが、新規顧客開拓の効率化が課題です。次期は提案資料の改善と初回接触率向上に注力します。\n\n【次期目標】\n2025年第1四半期の成約目標：50件\n新規顧客開拓数目標：20社","配信ステータス":"配信済み","配信日時":"2025-01-06T10:15:00Z","配信先メールアドレス":"manager.suzuki@company.co.jp","成約件数":47,"営業活動件数":156,"作成日時":"2025-01-06T09:30:00Z","更新日時":"2025-01-06T10:15:00Z","作成者ID":"rec-admin-0001"},{"レポートID":"rec-001","テンプレートID":"rec-tpl-001","ユーザーID":"rec-usr-003","レポート期間開始日":"2024-12-01T00:00:00Z","レポート期間終了日":"2024-12-31T23:59:59Z","生成日時":"2025-01-02T10:30:00Z","レポートタイトル":"2024年12月度 営業活動レポート（新入社員C）","レポート内容":"12月の営業活動をご報告いたします。新規顧客訪問15件、既存顧客フォロー12件の営業活動を実施いたしました。その結果、成約件数は2件となり、契約金額は合計580万円です。特に中堅製造業A社との新規取引開始が実現し、来月以降の継続案件につながる見込みです。課題としては初回訪問での提案資料作成に時間を要した点があり、今後のテンプレート活用により改善予定です。","配信ステータス":"未配信","配信日時":null,"配信先メールアドレス":"suzuki.hanako@example.com","成約件数":2,"営業活動件数":27,"作成日時":"2025-01-02T10:30:00Z","更新日時":"2025-01-02T10:30:00Z","作成者ID":"rec-usr-admin-001"},{"レポートID":"rec-001","テンプレートID":"rec-tmpl-002","ユーザーID":"rec-user-045","レポート期間開始日":"2024-02-01T00:00:00Z","レポート期間終了日":"2024-02-29T23:59:59Z","生成日時":"2024-03-01T09:15:30Z","レポートタイトル":"2024年2月営業活動レポート - 営業担当者A","レポート内容":"2024年2月の営業活動について以下の通りご報告いたします。本月は新規顧客開拓に注力し、既存顧客との関係強化を図りました。特に製造業セクターでの案件化が進み、パイプライン構築に成功しております。来月も引き続き目標達成に向けて全力で取り組みます。","配信ステータス":"配信済み","配信日時":"2024-03-01T10:45:00Z","配信先メールアドレス":"manager-yamada@company.jp","成約件数":3,"営業活動件数":24,"作成日時":"2024-03-01T09:15:30Z","更新日時":"2024-03-01T10:45:00Z","作成者ID":"rec-system-admin"},{"レポートID":"rec-001","テンプレートID":"rec-tpl-002","ユーザーID":"rec-usr-015","レポート期間開始日":"2025-01-01T00:00:00Z","レポート期間終了日":"2025-01-31T23:59:59Z","生成日時":"2025-02-01T08:30:00Z","レポートタイトル":"2025年1月度 営業部全体月次ダッシュボード","レポート内容":"【営業部全体実績サマリー】\n\n【全体成約実績】\n成約件数：47件\n前月比：+12%\n\n【営業活動実績】\n営業活動件数：284件\n平均成約率：16.5%\n\n【トップパフォーマー】\n1位：田中太郎（成約件数：8件）\n2位：山田花子（成約件数：7件）\n3位：佐藤次郎（成約件数：6件）\n\n【課題と改善提案】\n・新規開拓活動が前月比-8%\n→営業研修の強化を検討\n・既存顧客フォロー件数は好調\n→このアプローチを継続推奨\n\n【来月の目標】\n成約件数：50件以上\n営業活動件数：300件以上","配信ステータス":"配信済み","配信日時":"2025-02-01T09:00:00Z","配信先メールアドレス":"sales-team@company.jp","成約件数":47,"営業活動件数":284,"作成日時":"2025-02-01T08:30:00Z","更新日時":"2025-02-01T09:00:00Z","作成者ID":"rec-usr-admin-001"},{"レポートID":"rec-001","テンプレートID":"rec-002","ユーザーID":"rec-003","レポート期間開始日":"2024-11-01T00:00:00Z","レポート期間終了日":"2024-11-30T23:59:59Z","生成日時":"2024-12-01T09:30:00Z","レポートタイトル":"11月特別キャンペーン期間営業活動レポート","レポート内容":"営業担当者D（山田花子）の11月特別キャンペーン期間における営業活動実績を報告いたします。本期間は新規顧客開拓キャンペーンを実施し、積極的な営業活動を展開いたしました。成約件数は前月比125%の達成となり、特にIT業界向けソリューション提案での成功率が向上いたしました。営業活動件数も目標を上回る実績を達成し、チーム内でも上位の成績となっております。今後も引き続き、顧客満足度の向上と売上拡大に向けて注力してまいります。","配信ステータス":"配信済み","配信日時":"2024-12-01T10:15:00Z","配信先メールアドレス":"yamada.hanako@company.jp","成約件数":18,"営業活動件数":67,"作成日時":"2024-12-01T09:30:00Z","更新日時":"2024-12-01T10:15:00Z","作成者ID":"rec-004"},{"レポートID":"rec-20240315-001","テンプレートID":"rec-tmpl-monthly-001","ユーザーID":"rec-user-営業B-002","レポート期間開始日":"2024-02-01T00:00:00+09:00","レポート期間終了日":"2024-02-29T23:59:59+09:00","生成日時":"2024-03-15T10:30:00+09:00","レポートタイトル":"2024年2月度営業活動レポート（営業担当者B：佐藤花子）","レポート内容":"2024年2月度の営業活動成果をご報告いたします。本月は新規顧客開拓に注力し、既存顧客のフォローアップと併せて営業活動を展開いたしました。成約件数は12件、営業活動件数は67件となっており、前月比で成約件数は15%の増加を達成いたしました。特に製造業向けの大型案件2件が成約に至り、売上目標に対して102%の達成率となっております。今後も顧客満足度の向上を図りながら、安定した営業成績の維持に努めます。","配信ステータス":"配信済み","配信日時":"2024-03-15T14:45:00+09:00","配信先メールアドレス":"satoh.hanako@company.jp","成約件数":12,"営業活動件数":67,"作成日時":"2024-03-15T10:30:00+09:00","更新日時":"2024-03-15T14:45:00+09:00","作成者ID":"rec-user-system-admin"},{"レポートID":"rec-001","テンプレートID":"tpl-045","ユーザーID":"usr-0823","レポート期間開始日":"2025-01-01T00:00:00Z","レポート期間終了日":"2025-01-31T23:59:59Z","生成日時":"2025-02-03T09:15:00Z","レポートタイトル":"2025年1月度 営業担当者別成績比較分析レポート","レポート内容":"【対象期間】2025年1月1日～1月31日\n\n【営業担当者別成績比較】\n\n1. 田中太郎\n   - 成約件数: 12件\n   - 営業活動件数: 48件\n   - 成約率: 25.0%\n   - 前月比: +2件（+20%）\n\n2. 鈴木花子\n   - 成約件数: 9件\n   - 営業活動件数: 42件\n   - 成約率: 21.4%\n   - 前月比: -1件（-10%）\n\n3. 佐藤健一\n   - 成約件数: 8件\n   - 営業活動件数: 38件\n   - 成約率: 21.1%\n   - 前月比: +1件（+14%）\n\n【チーム全体】\n- 総成約件数: 29件\n- 総営業活動件数: 128件\n- 平均成約率: 22.7%\n\n【分析】\n田中太郎が前月比で最も成長しており、成約率も高い水準を維持しています。鈴木花子については若干の低下が見られるため、営業手法の改善支援が推奨されます。","配信ステータス":"配信済み","配信日時":"2025-02-03T10:30:00Z","配信先メールアドレス":"manager-yamada@company.jp","成約件数":29,"営業活動件数":128,"作成日時":"2025-02-03T09:15:00Z","更新日時":"2025-02-03T10:30:00Z","作成者ID":"usr-admin-001"}],"レポート配信履歴":[{"配信履歴ID":"rec-001","生成済みレポートID":"rep-2024-11-001","配信先ユーザーID":"usr-0847","配信先メールアドレス":"tanaka.taro@company.jp","配信日時":"2024-11-30T09:15:00+09:00","配信ステータス":"成功","配信方法":"メール","エラーメッセージ":null,"開封日時":"2024-11-30T10:42:00+09:00","開封フラグ":true,"再配信フラグ":false,"再配信回数":0,"作成日時":"2024-11-30T09:15:00+09:00","更新日時":"2024-11-30T10:42:00+09:00","作成者ID":"sys-auto-001"},{"配信履歴ID":"rec-20250115-0847","生成済みレポートID":"rep-20250113-weekly-sales","配信先ユーザーID":"usr-tanaka-taro-001","配信先ユーザー":"田中太郎","配信先メールアドレス":"tanaka.taro.new@salesforce-company.jp","配信日時":"2025-01-15 09:30:00","配信ステータス":"成功","配信方法":"メール","エラーメッセージ":null,"開封日時":"2025-01-15 10:45:00","開封フラグ":true,"再配信フラグ":true,"再配信回数":1,"作成日時":"2025-01-13 18:00:00","更新日時":"2025-01-15 09:31:00","作成者ID":"sys-auto-batch-001"},{"配信履歴ID":"rec-001-20250115-001","生成済みレポートID":"rep-2024-Q4-001","配信先ユーザーID":"usr-exec-001","配信先ユーザー":"佐藤次郎","配信先メールアドレス":"satoh.jiro@company.co.jp","配信日時":"2025-01-15 09:30:00","配信ステータス":"成功","配信方法":"メール","エラーメッセージ":null,"開封日時":"2025-01-15 10:45:00","開封フラグ":true,"再配信フラグ":false,"再配信回数":2,"作成日時":"2025-01-15 09:30:00","更新日時":"2025-01-15 10:45:00","作成者ID":"sys-auto-001"},{"配信履歴ID":"rec-20250115-001","生成済みレポートID":"rep-20250115-daily","配信先ユーザーID":"usr-sales-team-001","配信先メールアドレス":"tanaka.taro@company.jp","配信日時":"2025-01-15T08:30:00+09:00","配信ステータス":"成功","配信方法":"システム内通知","エラーメッセージ":null,"開封日時":"2025-01-15T09:15:30+09:00","開封フラグ":true,"再配信フラグ":false,"再配信回数":0,"作成日時":"2025-01-15T08:29:45+09:00","更新日時":"2025-01-15T09:15:30+09:00","作成者ID":"sys-auto-delivery"},{"配信履歴ID":"rec-20250215-001","生成済みレポートID":"rep-2025-q1-sales","配信先ユーザーID":"usr-20240401-yamada","配信先メールアドレス":"yamada.hanako@company.jp","配信日時":"2025-02-14 09:30:00","配信ステータス":"失敗","配信方法":"メール","エラーメッセージ":"ユーザーアカウントが無効化されています。配信対象ユーザーは2025年1月31日に退職し、アカウントは無効化されました。メール配信サーバーより550エラー（ユーザー不在）を受信しました。","開封日時":null,"開封フラグ":false,"再配信フラグ":false,"再配信回数":0,"作成日時":"2025-02-14 09:30:15","更新日時":"2025-02-14 09:35:42","作成者ID":"sys-automated-distribution"},{"配信履歴ID":"rec-20250115-0847","生成済みレポートID":"rep-2025Q1-sales-001","配信先ユーザーID":"usr-client-yamada-0521","配信先メールアドレス":"yamada.taro@clientcorp.co.jp","配信日時":"2025-01-15 09:30:00","配信ステータス":"成功","配信方法":"メール","エラーメッセージ":null,"開封日時":null,"開封フラグ":false,"再配信フラグ":false,"再配信回数":0,"作成日時":"2025-01-15 09:30:00","更新日時":"2025-01-15 09:30:00","作成者ID":"sys-automated-delivery"},{"配信履歴ID":"rec-001","生成済みレポートID":"rep-047","配信先ユーザーID":"usr-128","配信先メールアドレス":"yamada.hanako@example.com","配信日時":"2025-01-15T14:32:00+09:00","配信ステータス":"保留中","配信方法":"メール","エラーメッセージ":"SMTPサーバー接続タイムアウト: メールサーバーが応答しません。システム管理者による対応予定。","開封日時":null,"開封フラグ":false,"再配信フラグ":true,"再配信回数":0,"作成日時":"2025-01-15T14:32:00+09:00","更新日時":"2025-01-15T16:45:30+09:00","作成者ID":"sys-auto"},{"配信履歴ID":"rec-001","生成済みレポートID":"rep-2024-001","配信先ユーザーID":"usr-0847","配信先ユーザー":"営業所長","配信先メールアドレス":"tanaka.taro@company.co.jp","配信日時":"2024-11-15 09:30:00","配信ステータス":"成功","配信方法":"メール","エラーメッセージ":null,"開封日時":"2024-11-15 10:45:00","開封フラグ":true,"再配信フラグ":false,"再配信回数":0,"作成日時":"2024-11-15 09:30:00","更新日時":"2024-11-15 10:45:00","作成者ID":"sys-admin"},{"配信履歴ID":"rec-20250115-0847","生成済みレポートID":"rpt-2025-01-sales-monthly","配信先ユーザーID":"usr-yamada-hanako","配信先ユーザー":"営業事務スタッフ","配信先メールアドレス":"yamada.hanako@company.jp","配信日時":"2025-01-15 09:30:00","配信ステータス":"成功","配信方法":"システム内通知","エラーメッセージ":null,"開封日時":"2025-01-15 09:35:12","開封フラグ":true,"再配信フラグ":false,"再配信回数":0,"作成日時":"2025-01-15 09:30:00","更新日時":"2025-01-15 09:35:12","作成者ID":"sys-auto-report"},{"配信履歴ID":"rec-001","生成済みレポートID":"rep-2024-0847","配信先ユーザーID":"usr-5432","配信先メールアドレス":"tanaka.taro.old@example.com","配信日時":"2024-11-15 09:30:00","配信ステータス":"失敗","配信方法":"メール","エラーメッセージ":"メールアドレスが無効です。メールボックスが存在しません。（550 5.1.1 The email account that you tried to reach does not exist）","開封日時":null,"開封フラグ":false,"再配信フラグ":true,"再配信回数":0,"作成日時":"2024-11-15 09:30:00","更新日時":"2024-11-15 10:15:00","作成者ID":"sys-auto"}],"成果指標":[{"成果指標ID":"rec-001","指標名":"月次売上高","指標コード":"SALES_REVENUE_MONTHLY","説明":"毎月の営業活動による売上高の合計。企業の経営目標達成状況を測定する最重要KPI。","単位":"円","計算方法":"当月1日から末日までの全売上取引の合計金額。返品・キャンセルは差し引き後の純売上を集計。","目標値":50000000,"警告閾値":40000000,"表示順序":1,"有効フラグ":true,"作成日時":"2024-01-15T09:30:00Z","更新日時":"2025-01-10T14:22:30Z","作成者":"rec-user-0042"},{"成果指標ID":"rec-001","指標名":"月次受注件数","指標コード":"ORDER_COUNT_MONTHLY","説明":"営業チームが毎月獲得する新規受注の件数を測定する指標。顧客開拓活動の成果を定量的に評価し、営業目標の達成状況を把握するために使用される。","単位":"件","計算方法":"当月1日から末日までに確定した新規受注の総件数。キャンセルや保留中の案件は除外し、契約締結済みの案件のみを計上する。","目標値":45,"警告閾値":36,"表示順序":1,"有効フラグ":true,"作成日時":"2024-01-15T09:30:00+09:00","更新日時":"2024-12-10T14:20:00+09:00","作成者":"rec-user-0042"},{"成果指標ID":"rec-001","指標名":"新規顧客獲得数","指標コード":"NEW_CUSTOMER_ACQUISITION","説明":"営業期間内に新たに契約を締結した顧客の総数。顧客との関係構築度合いを定量化し、事業成長の基盤となる指標。","単位":"件","計算方法":"当期間内に初回契約日を迎えた顧客の件数をカウント。既存顧客からの追加注文は除外。","目標値":150,"警告閾値":120,"表示順序":1,"有効フラグ":true,"作成日時":"2024-04-01T09:30:00+09:00","更新日時":"2025-01-15T14:45:00+09:00","作成者":"rec-u-0087"},{"成果指標ID":"rec-001","指標名":"平均受注単価","指標コード":"AVG_ORDER_VALUE","説明":"営業効率性を示す指標。一件あたりの受注金額の平均値を測定し、営業チームの提案品質と顧客ニーズへの対応度を評価する。","単位":"万円","計算方法":"当月の受注総額 ÷ 受注件数 = 平均受注単価。前年同月比での達成率も併せて管理。","目標値":85,"警告閾値":72,"表示順序":2,"有効フラグ":true,"作成日時":"2024-04-01T09:30:00+09:00","更新日時":"2025-01-15T14:20:00+09:00","作成者":"rec-user-0047"},{"成果指標ID":"rec-001","指標名":"提案から受注への成約率","指標コード":"PROPOSAL_CONVERSION_RATE","説明":"営業プロセスの質を評価するため、営業担当者が顧客に提案した案件のうち、実際に受注に至った割合を測定する指標。営業活動の効率性と提案品質の向上を促進する。","単位":"％","計算方法":"（当月受注件数 ÷ 当月提案件数） × 100。ただし提案から受注までの期間が90日以内のものを対象とする。","目標値":35,"警告閾値":28,"表示順序":2,"有効フラグ":true,"作成日時":"2024-04-01T09:30:00+09:00","更新日時":"2025-01-15T14:20:00+09:00","作成者":"rec-user-0047"},{"成果指標ID":"rec-001","指標名":"継続取引率","指標コード":"CUSTOMER_RETENTION_RATE","説明":"顧客満足度を反映した指標として、前年度から継続して取引を行っている顧客の割合を測定します。顧客サービス品質、製品品質、価格競争力などの総合的な満足度を数値化した重要な経営指標です。","単位":"％","計算方法":"（当期末時点での継続顧客数 ÷ 前期末時点での顧客総数）× 100で算出。継続顧客とは前年度に1件以上の取引実績がある顧客を指します。","目標値":85,"警告閾値":78,"表示順序":3,"有効フラグ":true,"作成日時":"2024-04-01T09:30:00+09:00","更新日時":"2025-01-15T14:20:00+09:00","作成者":"rec-user-0042"},{"成果指標ID":"rec-001","指標名":"月次営業訪問件数","指標コード":"SALES_VISIT_COUNT","説明":"営業担当者が顧客及び見込み客を訪問した件数を月単位で集計し、営業活動の量的指標として管理する。営業生産性向上と顧客接触機会の拡大を目的とする。","単位":"件","計算方法":"営業支援システム(SFA)に記録された訪問実績の月間合計値。営業担当者ごとの訪問件数を集計し、部門別・個人別に集計する。","目標値":40,"警告閾値":30,"表示順序":1,"有効フラグ":true,"作成日時":"2024-01-15T09:30:00+09:00","更新日時":"2025-01-10T14:20:00+09:00","作成者":"rec-user-0042"},{"成果指標ID":"rec-001","指標名":"既存顧客売上構成比","指標コード":"EXISTING_CUSTOMER_SALES_RATIO","説明":"全売上に占める既存顧客からの追加売上の割合を測定する指標。顧客ロイヤルティの向上と既存顧客との関係強化の成果を定量的に評価する。","単位":"％","計算方法":"既存顧客からの売上 ÷ 全売上 × 100。既存顧客は契約開始から12ヶ月以上経過した顧客を対象とする。","目標値":65,"警告閾値":55,"表示順序":3,"有効フラグ":true,"作成日時":"2024-04-01T09:30:00Z","更新日時":"2025-01-15T14:45:00Z","作成者":"rec-u-0847"},{"成果指標ID":"rec-001","指標名":"営業一人当たり売上","指標コード":"SALES_PER_PERSON","説明":"営業チーム全体の生産性を測定するための指標。月間の総売上を営業人数で除算し、一人当たりの平均売上を算出する。営業効率性と個別営業の貢献度を可視化する。","単位":"万円","計算方法":"当月の営業部門総売上 ÷ 営業チーム人数 = 営業一人当たり売上。営業人数の増減がある場合は月末時点の人数を使用。","目標値":450,"警告閾値":360,"表示順序":1,"有効フラグ":true,"作成日時":"2024-04-01T09:30:00+09:00","更新日時":"2025-01-15T14:22:00+09:00","作成者":"rec-user-0042"},{"成果指標ID":"rec-001","指標名":"営業活動コスト対売上比率","指標コード":"SALES_COST_RATIO","説明":"営業活動に要した総コスト（給与、交通費、通信費、営業支援ツール費用など）を売上高で除した比率。営業活動の効率性を測定し、低いほど効率的な営業活動を示す。","単位":"％","計算方法":"（営業部門の総コスト ÷ 当期売上高）× 100。営業部門総コストには、営業スタッフ給与、営業手当、交通費、通信費、営業支援システム利用料、営業研修費を含める。","目標値":15,"警告閾値":20,"表示順序":3,"有効フラグ":true,"作成日時":"2024-04-01T09:30:00Z","更新日時":"2025-01-15T14:20:00Z","作成者":"rec-u-0847"}]};
+window.AIVIC_PAGE_SCREEN_ID = "scr-1782111929733";
+window.AIVIC_PAGE_INIT_JS = "function(container, apiUrl, tables) {\n  const reportTbody = container.querySelector('#report-tbody');\n  const detailPanel = container.querySelector('#detail-panel');\n  const detailHeader = container.querySelector('#detail-header');\n  const statusFilter = container.querySelector('[data-testid=\"status-filter\"]');\n  const templateFilter = container.querySelector('[data-testid=\"template-filter\"]');\n  const exportBtn = container.querySelector('[data-testid=\"export-csv-btn\"]');\n  const resendBtn = container.querySelector('[data-testid=\"resend-btn\"]');\n  const previewBtn = container.querySelector('[data-testid=\"preview-btn\"]');\n  const previewModal = container.querySelector('#preview-modal');\n  const closePreviewBtn = container.querySelector('#close-preview');\n\n  let allReports = [];\n  let selectedReport = null;\n\n  // テーブルインデックス（生成済みレポート = 0）\n  const REPORT_TABLE_IDX = 0;\n  const USER_TABLE_IDX = 0;\n  const DELIVERY_HISTORY_IDX = 1;\n\n  // レポート一覧を取得・表示\n  async function loadReports() {\n    const reports = await window.aivicApi.list(REPORT_TABLE_IDX);\n    if (!reports) return;\n    \n    allReports = reports;\n    renderReportList(allReports);\n  }\n\n  // レポート一覧をレンダリング\n  function renderReportList(reports) {\n    reportTbody.innerHTML = '';\n    reports.forEach(report => {\n      const row = document.createElement('tr');\n      row.style.cssText = 'background: rgba(255,255,255,0.02); cursor: pointer; transition: background 0.2s;';\n      row.dataset.id = report.id;\n      \n      const statusColor = {\n        '配信済み': '#22c55e',\n        '未配信': '#f59e0b',\n        '配信失敗': '#ef4444'\n      }[report.配信ステータス] || '#9ca3af';\n      \n      row.innerHTML = `\n        <td style=\"padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.08); color: var(--text);\">\n          <div style=\"font-weight: 500;\">${report.レポートタイトル || '無題'}</div>\n          <div style=\"font-size: 11px; color: var(--text-muted); margin-top: 2px;\">${new Date(report.生成日時).toLocaleDateString('ja-JP')}</div>\n        </td>\n        <td style=\"padding: 8px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.08);\">\n          <span style=\"display: inline-block; padding: 2px 6px; background: ${statusColor}; color: #fff; border-radius: 3px; font-size: 10px; font-weight: 600;\">${report.配信ステータス || '未配信'}</span>\n        </td>\n      `;\n      \n      row.addEventListener('click', () => selectReport(report));\n      row.addEventListener('mouseenter', () => row.style.background = 'rgba(255,255,255,0.08)');\n      row.addEventListener('mouseleave', () => row.style.background = 'rgba(255,255,255,0.02)');\n      \n      reportTbody.appendChild(row);\n    });\n  }\n\n  // レポート選択時の詳細表示\n  async function selectReport(report) {\n    selectedReport = report;\n    \n    // ヘッダー更新\n    container.querySelector('#detail-title').textContent = report.レポートタイトル || '無題';\n    const startDate = new Date(report.レポート期間開始日).toLocaleDateString('ja-JP');\n    const endDate = new Date(report.レポート期間終了日).toLocaleDateString('ja-JP');\n    container.querySelector('#detail-period').textContent = `${startDate} ～ ${endDate}`;\n    container.querySelector('#detail-template').textContent = report.テンプレート名 || '—';\n    container.querySelector('#detail-generated').textContent = new Date(report.生成日時).toLocaleString('ja-JP');\n    \n    // KPI表示\n    container.querySelector('#kpi-contracts').textContent = report.成約件数 || 0;\n    container.querySelector('#kpi-revenue').textContent = `¥${(report.売上金額 || 0).toLocaleString()}`;\n    container.querySelector('#kpi-achievement').textContent = report.達成率 ? `${report.達成率}%` : '—';\n    \n    // コンテンツプレビュー\n    container.querySelector('#content-preview').textContent = report.レポート内容 || '内容なし';\n    \n    // ユーザー情報取得\n    const users = await window.aivicApi.list(USER_TABLE_IDX);\n    const user = users?.find(u => u.id === report.ユーザーID);\n    container.querySelector('#user-name').textContent = user?.氏名 || '—';\n    container.querySelector('#user-email').textContent = user?.メールアドレス || '—';\n    \n    // 配信履歴取得\n    const deliveryHistory = await window.aivicApi.list(DELIVERY_HISTORY_IDX);\n    const history = deliveryHistory?.filter(h => h.生成済みレポートID === report.id) || [];\n    renderDeliveryTimeline(history);\n    \n    // ボタン有効化\n    resendBtn.disabled = false;\n    previewBtn.disabled = false;\n    \n    // 行のハイライト\n    container.querySelectorAll('#report-tbody tr').forEach(tr => {\n      tr.style.background = tr.dataset.id === report.id ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.02)';\n    });\n  }\n\n  // 配信履歴タイムラインをレンダリング\n  function renderDeliveryTimeline(history) {\n    const timeline = container.querySelector('#delivery-timeline');\n    if (!history || history.length === 0) {\n      timeline.innerHTML = '<div style=\"color: var(--text-muted); text-align: center; padding: 16px 0;\">配信履歴なし</div>';\n      return;\n    }\n    \n    timeline.innerHTML = history.map(h => {\n      const statusColor = {\n        '成功': '#22c55e',\n        '失敗': '#ef4444',\n        '保留中': '#f59e0b'\n      }[h.配信ステータス] || '#9ca3af';\n      \n      return `\n        <div style=\"padding: 8px; border-left: 2px solid ${statusColor}; margin-bottom: 8px; background: rgba(0,0,0,0.2); border-radius: 4px;\">\n          <div style=\"display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;\">\n            <span style=\"font-weight: 500; color: var(--text);\">${h.配信先メールアドレス}</span>\n            <span style=\"display: inline-block; padding: 2px 6px; background: ${statusColor}; color: #fff; border-radius: 2px; font-size: 9px; font-weight: 600;\">${h.配信ステータス}</span>\n          </div>\n          <div style=\"font-size: 10px; color: var(--text-muted);\">${new Date(h.配信日時).toLocaleString('ja-JP')}</div>\n          ${h.開封フラグ ? `<div style=\"font-size: 10px; color: #22c55e; margin-top: 2px;\">✓ 開封済み (${new Date(h.開封日時).toLocaleString('ja-JP')})</div>` : ''}\n          ${h.エラーメッセージ ? `<div style=\"font-size: 10px; color: #ef4444; margin-top: 2px;\">エラー: ${h.エラーメッセージ}</div>` : ''}\n        </div>\n      `;\n    }).join('');\n  }\n\n  // フィルタ適用\n  function applyFilters() {\n    const status = statusFilter.value;\n    const template = templateFilter.value;\n    \n    const filtered = allReports.filter(r => {\n      const matchStatus = !status || r.配信ステータス === status;\n      const matchTemplate = !template || r.テンプレート名 === template;\n      return matchStatus && matchTemplate;\n    });\n    \n    renderReportList(filtered);\n  }\n\n  // CSVエクスポート\n  exportBtn.addEventListener('click', async () => {\n    const reports = await window.aivicApi.list(REPORT_TABLE_IDX);\n    if (!reports || reports.length === 0) return;\n    \n    const headers = ['レポートID', 'レポートタイトル', '生成日時', 'テンプレート名', '配信ステータス', '成約件数', '売上金額', '達成率'];\n    const rows = reports.map(r => [\n      r.id,\n      r.レポートタイトル || '',\n      new Date(r.生成日時).toLocaleString('ja-JP'),\n      r.テンプレート名 || '',\n      r.配信ステータス || '',\n      r.成約件数 || 0,\n      r.売上金額 || 0,\n      r.達成率 || ''\n    ]);\n    \n    const csv = '\\uFEFF' + [headers, ...rows].map(row => \n      row.map(cell => `\"${String(cell).replace(/\"/g, '\"\"')}\"`).join(',')\n    ).join('\\n');\n    \n    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });\n    const link = document.createElement('a');\n    link.href = URL.createObjectURL(blob);\n    link.download = `reports_${new Date().toISOString().slice(0,10)}.csv`;\n    link.click();\n  });\n\n  // 再配信\n  resendBtn.addEventListener('click', async () => {\n    if (!selectedReport) return;\n    \n    const updated = await window.aivicApi.update(REPORT_TABLE_IDX, selectedReport.id, {\n      配信ステータス: '未配信',\n      更新日時: new Date().toISOString()\n    });\n    \n    if (updated) {\n      selectedReport = updated;\n      loadReports();\n      alert('再配信キューに追加されました');\n    }\n  });\n\n  // プレビュー\n  previewBtn.addEventListener('click', () => {\n    if (!selectedReport) return;\n    container.querySelector('#modal-content').textContent = selectedReport.レポート内容 || '内容なし';\n    previewModal.style.display = 'flex';\n  });\n\n  closePreviewBtn.addEventListener('click', () => {\n    previewModal.style.display = 'none';\n  });\n\n  previewModal.addEventListener('click', (e) => {\n    if (e.target === previewModal) previewModal.style.display = 'none';\n  });\n\n  // フィルタイベント\n  statusFilter.addEventListener('change', applyFilters);\n  templateFilter.addEventListener('change', applyFilters);\n\n  // 初期ロード\n  loadReports();\n}";
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<nav style="display:flex;align-items:center;overflow-x:auto;background:var(--top-bar-bg,var(--bg-sidebar,#0e1a31));border-bottom:1px solid var(--top-bar-border,var(--border,#2a3a5d));padding:0 12px;height:40px;flex-shrink:0;"><a href="./scr-1782111868648.html" data-aivic-nav-system="itg-2" style="padding:6px 14px;text-decoration:none;font-size:13px;white-space:nowrap;color:var(--text,#e8eefc);opacity:1;border-bottom:2px solid var(--primary,#2b66ff);font-weight:600;">営業成果レポート自動生成・配信システム</a><a href="./scr-1782112376817.html" data-aivic-nav-system="itg-3" style="padding:6px 14px;text-decoration:none;font-size:13px;white-space:nowrap;color:var(--text,#e8eefc);opacity:0.6;border-bottom:2px solid transparent;font-weight:400;">契約・提案資料管理システム</a><a href="./scr-1782112883813-1f2f.html" data-aivic-nav-system="itg-4" style="padding:6px 14px;text-decoration:none;font-size:13px;white-space:nowrap;color:var(--text,#e8eefc);opacity:0.6;border-bottom:2px solid transparent;font-weight:400;">顧客企業向け契約・成果管理ポータル</a><a href="./scr-1782113354430.html" data-aivic-nav-system="itg-5" style="padding:6px 14px;text-decoration:none;font-size:13px;white-space:nowrap;color:var(--text,#e8eefc);opacity:0.6;border-bottom:2px solid transparent;font-weight:400;">契約変更・請求検証管理システム</a><a href="./scr-1782111017612.html" data-aivic-nav-system="itg-1" style="padding:6px 14px;text-decoration:none;font-size:13px;white-space:nowrap;color:var(--text,#e8eefc);opacity:0.6;border-bottom:2px solid transparent;font-weight:400;">営業データ品質管理・請求自動化システム</a></nav>
+  <div class="shell-container">
+    <div class="top-bar">
+      <div class="top-bar-left">
+        <div class="logo">📊 Sales Report</div>
+      </div>
+      <div class="top-bar-right">
+        <div class="user-menu" onclick="window.location.href='./login.html'">
+          <span style="font-size:12px;">ログアウト</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-wrapper">
+      <div class="sidebar">
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">ダッシュボード</div>
+          <div class="nav-item aivic-active" data-aivic-nav="scr-1782111949772" onclick="window.showScreen('scr-1782111949772')">📈 成果指標</div>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">レポート管理</div>
+          <div class="nav-item" data-aivic-nav="scr-1782111868648" onclick="window.showScreen('scr-1782111868648')">📋 テンプレート管理</div>
+          <div class="nav-item" data-aivic-nav="scr-1782111910177" onclick="window.showScreen('scr-1782111910177')">⚙️ 自動生成・配信</div>
+          <div class="nav-item" data-aivic-nav="scr-1782111929733" onclick="window.showScreen('scr-1782111929733')">✓ 生成済みレポート</div>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">データ管理</div>
+          <div class="nav-item" data-aivic-nav="scr-1782111888280" onclick="window.showScreen('scr-1782111888280')">🔍 営業データ検索</div>
+        </div>
+      </div>
+
+      <div class="content-area">
+        <div data-aivic-panel="scr-1782111949772" class="panel-container" style="display:none"></p>
+          </div>
+
+          <div class="dashboard-grid">
+            <div class="kpi-card">
+              <div class="kpi-label">月間成約数</div>
+              <div class="kpi-value">24</div>
+              <div class="kpi-meta">先月比 <span class="kpi-trend up">+8%</span></div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">成約金額</div>
+              <div class="kpi-value">¥2.4M</div>
+              <div class="kpi-meta">先月比 <span class="kpi-trend up">+12%</span></div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">営業活動数</div>
+              <div class="kpi-value">156</div>
+              <div class="kpi-meta">先月比 <span class="kpi-trend down">-3%</span></div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">成約率</div>
+              <div class="kpi-value">15.4%</div>
+              <div class="kpi-meta">目標達成率 102%</div>
+            </div>
+          </div>
+
+          <div style="margin-top:32px;">
+            <h2 class="section-title">営業担当者別成績</h2>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>担当者</th>
+                    <th>成約数</th>
+                    <th>成約金額</th>
+                    <th>成約率</th>
+                    <th>ステータス</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>山田太郎</td>
+                    <td>8</td>
+                    <td>¥800K</td>
+                    <td>18.2%</td>
+                    <td><span class="status-badge status-active">達成</span></td>
+                  </tr>
+                  <tr>
+                    <td>佐藤花子</td>
+                    <td>6</td>
+                    <td>¥720K</td>
+                    <td>14.6%</td>
+                    <td><span class="status-badge status-active">達成</span></td>
+                  </tr>
+                  <tr>
+                    <td>鈴木次郎</td>
+                    <td>5</td>
+                    <td>¥580K</td>
+                    <td>12.1%</td>
+                    <td><span class="status-badge status-pending">進行中</span></td>
+                  </tr>
+                  <tr>
+                    <td>田中美咲</td>
+                    <td>5</td>
+                    <td>¥600K</td>
+                    <td>13.5%</td>
+                    <td><span class="status-badge status-pending">進行中</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111868648" class="panel-container" style="display:none"></p>
+          </div>
+
+          <div class="action-bar">
+            <button class="btn btn-primary">+ 新規テンプレート</button>
+            <button class="btn btn-secondary">インポート</button>
+          </div>
+
+          <div class="table-wrapper">
+            <div class="table-header">
+              <div class="table-header-search">
+                <input type="text" class="search-input" placeholder="テンプレート名で検索...">
+              </div>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>テンプレート名</th>
+                  <th>形式</th>
+                  <th>配信先</th>
+                  <th>作成日</th>
+                  <th>アクション</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>月次営業成果レポート</strong></td>
+                  <td><span class="badge">PDF</span></td>
+                  <td>営業部全員</td>
+                  <td>2024-01-15</td>
+                  <td><button class="btn btn-sm btn-secondary">編集</button></td>
+                </tr>
+                <tr>
+                  <td><strong>週次成績サマリー</strong></td>
+                  <td><span class="badge">Excel</span></td>
+                  <td>営業管理者</td>
+                  <td>2024-01-10</td>
+                  <td><button class="btn btn-sm btn-secondary">編集</button></td>
+                </tr>
+                <tr>
+                  <td><strong>顧客別成約実績</strong></td>
+                  <td><span class="badge">PDF</span></td>
+                  <td>営業部全員</td>
+                  <td>2024-01-08</td>
+                  <td><button class="btn btn-sm btn-secondary">編集</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111910177" class="panel-container" style="display:none"></p>
+          </div>
+
+          <div class="stepper">
+            <div class="step completed">
+              <div class="step-number">✓</div>
+              <div class="step-label">テンプレート選択</div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step active">
+              <div class="step-number">2</div>
+              <div class="step-label">配信設定</div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step">
+              <div class="step-number">3</div>
+              <div class="step-label">確認・実行</div>
+            </div>
+          </div>
+
+          <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+            <h2 style="font-size:14px;font-weight:700;margin-bottom:16px;">配信スケジュール設定</h2>
+
+            <div class="form-group">
+              <label class="form-label">テンプレート</label>
+              <select class="form-select">
+                <option>月次営業成果レポート</option>
+                <option>週次成績サマリー</option>
+                <option>顧客別成約実績</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">配信頻度</label>
+              <select class="form-select">
+                <option>毎月末日</option>
+                <option>毎週金曜日</option>
+                <option>毎日</option>
+                <option>カスタム</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">配信先メールアドレス</label>
+              <textarea class="form-textarea" placeholder="複数の場合は改行で区切ってください">sales-team@company.com
+manager@company.com</textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">配信形式</label>
+              <div style="display:flex;gap:12px;">
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+                  <input type="checkbox" checked> PDF
+                </label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+                  <input type="checkbox"> Excel
+                </label>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:8px;margin-top:20px;">
+              <button class="btn btn-primary">次へ</button>
+              <button class="btn btn-secondary">キャンセル</button>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111929733" class="panel-container" style="display:block"><div style="display: grid; grid-template-columns: 1fr 1.4fr; gap: 16px; height: 100%; padding: 12px;">
+  
+  <!-- 左パネル: レポート一覧 -->
+  <div style="display: flex; flex-direction: column; gap: 8px; overflow: hidden;">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 4px;">
+      <h2 style="font-size: 14px; font-weight: 600; color: var(--text); margin: 0;">生成済みレポート</h2>
+      <button data-testid="export-csv-btn" style="padding: 4px 8px; font-size: 12px; background: var(--primary); color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 500;">CSV</button>
+    </div>
+    
+    <!-- フィルタバー -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 4px;">
+      <div>
+        <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 2px;">配信ステータス</label>
+        <select data-testid="status-filter" style="width: 100%; padding: 6px 8px; font-size: 12px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.25); color: var(--text); border-radius: 4px;">
+          <option value="">すべて</option>
+          <option value="未配信">未配信</option>
+          <option value="配信済み">配信済み</option>
+          <option value="配信失敗">配信失敗</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 2px;">テンプレート</label>
+        <select data-testid="template-filter" style="width: 100%; padding: 6px 8px; font-size: 12px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.25); color: var(--text); border-radius: 4px;">
+          <option value="">すべて</option>
+          <option value="月次営業成果レポート">月次営業成果レポート</option>
+          <option value="週次営業成果レポート">週次営業成果レポート</option>
+          <option value="カスタムレポート">カスタムレポート</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- レポート一覧テーブル -->
+    <div style="flex: 1; overflow-y: auto; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; background: var(--bg-card);">
+      <table data-testid="report-list" style="width: 100%; border-collapse: collapse; font-size: 12px;">
+        <thead style="position: sticky; top: 0; background: rgba(0,0,0,0.2);">
+          <tr>
+            <th style="padding: 8px; text-align: left; color: var(--text); font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.12);">レポート</th>
+            <th style="padding: 8px; text-align: center; color: var(--text); font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.12); width: 60px;">ステータス</th>
+          </tr>
+        </thead>
+        <tbody id="report-tbody">
+          <tr style="background: rgba(255,255,255,0.02); cursor: pointer;" data-id="sample-1">
+            <td style="padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.08); color: var(--text);">
+              <div style="font-weight: 500;">2024年1月営業成果</div>
+              <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">2024-02-01</div>
+            </td>
+            <td style="padding: 8px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.08);">
+              <span style="display: inline-block; padding: 2px 6px; background: #22c55e; color: #fff; border-radius: 3px; font-size: 10px; font-weight: 600;">配信済み</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 右パネル: レポート詳細 -->
+  <div id="detail-panel" style="display: flex; flex-direction: column; gap: 12px; overflow-y: auto; padding: 4px;">
+    
+    <!-- 詳細ヘッダー -->
+    <div id="detail-header" style="padding: 12px; background: var(--bg-card); border-radius: 6px; border-left: 3px solid var(--primary);">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+        <div>
+          <h3 id="detail-title" style="font-size: 14px; font-weight: 600; color: var(--text); margin: 0;">レポートを選択してください</h3>
+          <div id="detail-period" style="font-size: 11px; color: var(--text-muted); margin-top: 4px;"></div>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <button data-testid="resend-btn" style="padding: 6px 12px; font-size: 11px; background: var(--primary); color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 500;" disabled>再配信</button>
+          <button data-testid="preview-btn" style="padding: 6px 12px; font-size: 11px; background: transparent; color: var(--text); border: 1px solid rgba(255,255,255,0.18); border-radius: 4px; cursor: pointer; font-weight: 500;" disabled>プレビュー</button>
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 11px;">
+        <div>
+          <span style="color: var(--text-muted);">テンプレート:</span>
+          <span id="detail-template" style="color: var(--text); font-weight: 500;">—</span>
+        </div>
+        <div>
+          <span style="color: var(--text-muted);">生成日時:</span>
+          <span id="detail-generated" style="color: var(--text); font-weight: 500;">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 営業成果サマリー -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+      <div style="padding: 12px; background: var(--bg-card); border-radius: 6px; border-top: 2px solid #fbbf24;">
+        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">成約件数</div>
+        <div id="kpi-contracts" style="font-size: 18px; font-weight: 700; color: var(--text);">—</div>
+      </div>
+      <div style="padding: 12px; background: var(--bg-card); border-radius: 6px; border-top: 2px solid #f87171;">
+        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">売上金額</div>
+        <div id="kpi-revenue" style="font-size: 18px; font-weight: 700; color: var(--text);">—</div>
+      </div>
+      <div style="padding: 12px; background: var(--bg-card); border-radius: 6px; border-top: 2px solid #60a5fa;">
+        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">達成率</div>
+        <div id="kpi-achievement" style="font-size: 18px; font-weight: 700; color: var(--text);">—</div>
+      </div>
+    </div>
+
+    <!-- レポート内容プレビュー -->
+    <div style="padding: 12px; background: var(--bg-card); border-radius: 6px;">
+      <div style="font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 8px;">レポート内容</div>
+      <div id="content-preview" style="font-size: 12px; color: var(--text); line-height: 1.5; max-height: 120px; overflow-y: auto; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 4px; border-left: 2px solid var(--primary);">
+        <div style="color: var(--text-muted);">内容を選択して表示</div>
+      </div>
+    </div>
+
+    <!-- 配信履歴タイムライン -->
+    <div style="padding: 12px; background: var(--bg-card); border-radius: 6px;">
+      <div style="font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 8px;">配信履歴</div>
+      <div id="delivery-timeline" style="font-size: 11px; max-height: 140px; overflow-y: auto;">
+        <div style="color: var(--text-muted); text-align: center; padding: 16px 0;">履歴なし</div>
+      </div>
+    </div>
+
+    <!-- 対象ユーザー情報 -->
+    <div style="padding: 12px; background: var(--bg-card); border-radius: 6px;">
+      <div style="font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 8px;">対象ユーザー</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 11px;">
+        <div>
+          <span style="color: var(--text-muted);">ユーザー名:</span>
+          <div id="user-name" style="color: var(--text); font-weight: 500;">—</div>
+        </div>
+        <div>
+          <span style="color: var(--text-muted);">メール:</span>
+          <div id="user-email" style="color: var(--text); font-weight: 500; word-break: break-all;">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- プレビューモーダル -->
+<div id="preview-modal" style="display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0, 0, 0, 0.55); display: flex; align-items: center; justify-content: center;">
+  <div style="background: var(--bg-card); color: var(--text); padding: 24px; border-radius: 8px; max-width: 90vw; max-height: 90vh; overflow: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <h3 style="font-size: 16px; font-weight: 600; margin: 0;">レポートプレビュー</h3>
+      <button id="close-preview" style="background: transparent; border: none; color: var(--text); font-size: 20px; cursor: pointer; padding: 0; width: 24px; height: 24px;">×</button>
+    </div>
+    <div id="modal-content" style="font-size: 13px; line-height: 1.6; color: var(--text); max-height: 70vh; overflow-y: auto;"></div>
+  </div>
+</div></p>
+          </div>
+
+          <div class="action-bar">
+            <input type="text" class="search-input" placeholder="レポート名で検索..." style="max-width:300px;">
+            <button class="btn btn-secondary">フィルタ</button>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>レポート名</th>
+                  <th>生成日時</th>
+                  <th>テンプレート</th>
+                  <th>配信状況</th>
+                  <th>アクション</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>2024年1月月次営業成果</strong></td>
+                  <td>2024-02-01 09:00</td>
+                  <td>月次営業成果レポート</td>
+                  <td><span class="status-badge status-active">配信完了</span></td>
+                  <td><button class="btn btn-sm btn-secondary">詳細</button></td>
+                </tr>
+                <tr>
+                  <td><strong>2024年1月第4週成績</strong></td>
+                  <td>2024-01-26 17:00</td>
+                  <td>週次成績サマリー</td>
+                  <td><span class="status-badge status-active">配信完了</span></td>
+                  <td><button class="btn btn-sm btn-secondary">詳細</button></td>
+                </tr>
+                <tr>
+                  <td><strong>2024年1月第3週成績</strong></td>
+                  <td>2024-01-19 17:00</td>
+                  <td>週次成績サマリー</td>
+                  <td><span class="status-badge status-pending">配信中</span></td>
+                  <td><button class="btn btn-sm btn-secondary">詳細</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111888280" class="panel-container" style="display:none"></p>
+          </div>
+
+          <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:20px;">
+            <h2 style="font-size:13px;font-weight:700;margin-bottom:12px;">検索条件</h2>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">期間</label>
+                <input type="date" class="form-input">
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">営業担当者</label>
+                <select class="form-select">
+                  <option>全員</option>
+                  <option>山田太郎</option>
+                  <option>佐藤花子</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">ステータス</label>
+                <select class="form-select">
+                  <option>全て</option>
+                  <option>成約</option>
+                  <option>進行中</option>
+                </select>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:12px;">
+              <button class="btn btn-primary">検索</button>
+              <button class="btn btn-secondary">リセット</button>
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>日付</th>
+                  <th>担当者</th>
+                  <th>顧客企業</th>
+                  <th>活動内容</th>
+                  <th>金額</th>
+                  <th>ステータス</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>2024-01-25</td>
+                  <td>山田太郎</td>
+                  <td>ABC株式会社</td>
+                  <td>初回訪問</td>
+                  <td>¥100K</td>
+                  <td><span class="status-badge status-active">成約</span></td>
+                </tr>
+                <tr>
+                  <td>2024-01-24</td>
+                  <td>佐藤花子</td>
+                  <td>XYZ商事</td>
+                  <td>提案資料送付</td>
+                  <td>¥250K</td>
+                  <td><span class="status-badge status-pending">進行中</span></td>
+                </tr>
+                <tr>
+                  <td>2024-01-23</td>
+                  <td>鈴木次郎</td>
+                  <td>DEF工業</td>
+                  <td>見積提示</td>
+                  <td>¥180K</td>
+                  <td><span class="status-badge status-pending">進行中</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111967271" class="panel-container" style="display:none"></div>
+            <div class="empty-state-title">営業成果レポート自動生成処理</div>
+            <div class="empty-state-text">この画面は自動処理用です。手動実行はダッシュボードから行ってください。</div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111987930" class="panel-container" style="display:none"></div>
+            <div class="empty-state-title">月次成果レポート自動生成処理</div>
+            <div class="empty-state-text">この画面は自動処理用です。スケジュール設定はテンプレート管理から行ってください。</div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782112008898" class="panel-container" style="display:none"></div>
+            <div class="empty-state-title">レポート配信処理</div>
+            <div class="empty-state-text">この画面は配信処理用です。配信設定は自動生成・配信画面から行ってください。</div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782112030309" class="panel-container" style="display:none"></div>
+            <div class="empty-state-title">営業成果レポート自動生成</div>
+            <div class="empty-state-text">この画面は自動生成用です。手動実行はダッシュボードから行ってください。</div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782112072414" class="panel-container" style="display:none"></div>
+            <div class="empty-state-title">成果指標集計処理</div>
+            <div class="empty-state-text">この画面は集計処理用です。指標はダッシュボードでリアルタイム表示されます。</div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782112092776" class="panel-container" style="display:none"></div>
+            <div class="empty-state-title">レポート生成・フォーマット変換処理</div>
+            <div class="empty-state-text">この画面は変換処理用です。形式設定は自動生成・配信画面から行ってください。</div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782112113969" class="panel-container" style="display:none"></p>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>レポート名</th>
+                  <th>生成日時</th>
+                  <th>配信状況</th>
+                  <th>確認</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>2024年1月月次営業成果</strong></td>
+                  <td>2024-02-01 09:00</td>
+                  <td><span class="status-badge status-active">配信完了</span></td>
+                  <td><button class="btn btn-sm btn-accent">表示</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782112135603" class="panel-container" style="display:none"></div>
+            <div class="empty-state-title">レポート自動配信処理</div>
+            <div class="empty-state-text">この画面は配信スケジュール管理用です。配信履歴は生成済みレポート画面で確認できます。</div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782112157461" class="panel-container" style="display:none"></div>
+            <div class="empty-state-title">レポート自動生成・配信処理</div>
+            <div class="empty-state-text">この画面は統合処理用です。スケジュール管理は自動生成・配信画面から行ってください。</div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782112178006" class="panel-container" style="display:none"></div>
+            <div class="empty-state-title">営業成果レポート生成処理</div>
+            <div class="empty-state-text">この画面は生成処理用です。手動実行はダッシュボードから行ってください。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+(function() {
+  var TABLE_DEFS = window.AIVIC_TABLES || [];
+  var PRESET_SEED = window.AIVIC_PRESET_SEED || {};
+  var SYSTEM_NAME = window.AIVIC_SYSTEM_NAME || "";
+  var APP_ID = window.AIVIC_APP_ID || "";
+  var API_URL = (window.AIVIC_API_URL && window.AIVIC_API_URL !== "REPLACE_WITH_API_URL")
+    ? window.AIVIC_API_URL : window.location.origin;
+
+  // 通知 helper ( SPA 版と同じ )
+  window.aivicNotify = (function() {
+    function ensureContainer() {
+      var c = document.getElementById("aivic-toast-container");
+      if (c) return c;
+      c = document.createElement("div");
+      c.id = "aivic-toast-container";
+      c.style.cssText = "position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;max-width:360px;";
+      document.body.appendChild(c);
+      return c;
+    }
+    function show(msg, type) {
+      var c = ensureContainer();
+      var el = document.createElement("div");
+      el.textContent = msg;
+      el.style.cssText = "padding:10px 16px;border-radius:8px;font-size:13px;line-height:1.4;pointer-events:auto;color:#fff;background:" + (type === "error" ? "#dc2626" : "#d97706");
+      c.appendChild(el);
+      setTimeout(function() {
+        el.style.transition = "opacity .3s";
+        el.style.opacity = "0";
+        setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 320);
+      }, type === "error" ? 6000 : 4500);
+    }
+    return {
+      error: function(msg) { show("❌ " + msg, "error"); },
+      warn:  function(msg) { show("⚠️ " + msg, "warn"); },
+    };
+  })();
+
+  // CRUD API ( SPA 版と同じ )
+  window.aivicApi = (function() {
+    function dbErr(op) { window.aivicNotify.error("データベースエラー ( " + op + " ): APIサーバーに接続できません。"); }
+    function newId() { return typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : "id-" + Date.now() + "-" + Math.random().toString(36).slice(2); }
+    function q(i) {
+      var t = TABLE_DEFS[i];
+      var dbP = (window.AIVIC_DB_TYPE && window.AIVIC_DB_TYPE !== "dynamodb") ? "&db=" + encodeURIComponent(window.AIVIC_DB_TYPE) : "";
+      return "?app=" + encodeURIComponent(APP_ID) + "&system=" + encodeURIComponent(SYSTEM_NAME) + "&table=" + encodeURIComponent(t ? t.tableName : "table" + i) + dbP;
+    }
+    return {
+      list: async function(tableIndex) {
+        if (!API_URL) return [];
+        try { var r = await fetch(API_URL + "/api/" + tableIndex + q(tableIndex)); var d = await r.json(); return Array.isArray(d) ? d : (d.items || []); }
+        catch(e) { dbErr("データ取得"); return []; }
+      },
+      save: async function(tableIndex, item) {
+        if (!API_URL) { dbErr("保存"); return null; }
+        var now = new Date().toISOString();
+        var rec = Object.assign({}, item, { id: item.id || newId(), createdAt: item.createdAt || now, updatedAt: now });
+        try { var r = await fetch(API_URL + "/api/" + tableIndex + q(tableIndex), { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(rec) }); return await r.json(); }
+        catch(e) { dbErr("保存"); return null; }
+      },
+      update: async function(tableIndex, id, changes) {
+        if (!API_URL) { dbErr("更新"); return null; }
+        try { var r = await fetch(API_URL + "/api/" + tableIndex + "/" + id + q(tableIndex), { method:"PUT", headers:{"Content-Type":"application/json"}, body:JSON.stringify(Object.assign({}, changes, {updatedAt: new Date().toISOString()})) }); return await r.json(); }
+        catch(e) { dbErr("更新"); return null; }
+      },
+      delete: async function(tableIndex, id) {
+        if (!API_URL) { dbErr("削除"); return {deleted:false}; }
+        try { await fetch(API_URL + "/api/" + tableIndex + "/" + id + q(tableIndex), {method:"DELETE"}); return {deleted:true}; }
+        catch(e) { dbErr("削除"); return {deleted:false}; }
+      },
+    };
+  })();
+
+  // showScreen はマルチページ構成ではページ遷移として動く。
+  var _aivicNavLastTime = 0;
+  var _aivicNavLastTarget = "";
+  var _aivicReady = false;
+  window.showScreen = function(screenId) {
+    if (!screenId) return;
+    if (screenId === window.AIVIC_PAGE_SCREEN_ID) return;
+    var targetPath = './' + encodeURIComponent(screenId) + '.html';
+    var currentName = (window.location.pathname.split('/').pop() || '');
+    if (currentName === (encodeURIComponent(screenId) + '.html') ||
+        currentName === (screenId + '.html')) {
+      return;
+    }
+    var now = Date.now();
+    if (_aivicNavLastTarget === targetPath && (now - _aivicNavLastTime) < 100) {
+      console.warn('[aivic] showScreen 連続呼び出し検知。 無限ループ防止のため抑制:', screenId);
+      return;
+    }
+    if (!_aivicReady) {
+      console.warn('[aivic] DOMContentLoaded 前の showScreen 呼び出し。 抑制:', screenId);
+      return;
+    }
+    _aivicNavLastTime = now;
+    _aivicNavLastTarget = targetPath;
+    window.location.href = targetPath;
+  };
+
+  function seedAllIfEmpty() {
+    if (!API_URL) return Promise.resolve();
+    return Promise.all(TABLE_DEFS.map(function(t, i) {
+      var preset = PRESET_SEED[t.tableName];
+      if (!Array.isArray(preset) || preset.length === 0) return Promise.resolve();
+      return window.aivicApi.list(i).then(function(existing) {
+        if (existing && existing.length > 0) return;
+        return Promise.all(preset.map(function(row) { return window.aivicApi.save(i, row); }));
+      }).catch(function() {});
+    }));
+  }
+
+  // ── 初期表示: このページ専用の panel に initFn を実行 ──
+  document.addEventListener("DOMContentLoaded", function() {
+    setTimeout(function() { _aivicReady = true; }, 1500);
+    var pageScreenId = window.AIVIC_PAGE_SCREEN_ID;
+    if (!pageScreenId) return;
+
+    document.querySelectorAll('[data-aivic-nav]').forEach(function(btn) {
+      var isActive = btn.getAttribute("data-aivic-nav") === pageScreenId;
+      btn.classList.toggle("aivic-active", isActive);
+      btn.setAttribute("aria-current", isActive ? "page" : "false");
+    });
+
+    var container = document.querySelector('[data-aivic-panel="' + pageScreenId + '"]');
+    if (!container) return;
+
+    // content 要素の hidden 強制除去 ( 2026-05-24 Playwright 大量 fail 対応 )
+    var isModalLike = function(el) {
+      if (!el || !el.classList) return false;
+      var cn = String(el.className || "");
+      if (/\bmodal\b|\bdialog\b|\boverlay\b|\bpopup\b|\bdropdown\b|\btooltip\b/i.test(cn)) return true;
+      var role = el.getAttribute && el.getAttribute("role");
+      if (role === "dialog" || role === "alertdialog" || role === "tooltip" || role === "menu") return true;
+      if (el.hasAttribute && (el.hasAttribute("data-modal") || el.hasAttribute("data-dropdown") || el.hasAttribute("data-popup"))) return true;
+      return false;
+    };
+    var unhideContentElements = function(root) {
+      var all = root.querySelectorAll('.hidden, [hidden], [style*="display:none"], [style*="display: none"]');
+      for (var k = 0; k < all.length; k++) {
+        var el = all[k];
+        if (isModalLike(el)) continue;
+        var p = el.parentElement;
+        var insideModal = false;
+        while (p && p !== root) {
+          if (isModalLike(p)) { insideModal = true; break; }
+          p = p.parentElement;
+        }
+        if (insideModal) continue;
+        el.classList.remove('hidden');
+        el.removeAttribute('hidden');
+        if (el.style && el.style.display === 'none') el.style.display = '';
+      }
+    };
+    try { unhideContentElements(container); } catch (e) { console.warn('[aivic] unhideContent failed:', e); }
+
+    var initJsSource = window.AIVIC_PAGE_INIT_JS;
+    if (!initJsSource) {
+      seedAllIfEmpty();
+      return;
+    }
+    var initFn = null;
+    try {
+      initFn = (new Function("return (" + initJsSource + ")"))();
+    } catch (e) {
+      console.error("[aivic] initJs compile error:", pageScreenId, e);
+      return;
+    }
+    if (typeof initFn !== "function") return;
+
+    seedAllIfEmpty().then(function() {
+      return Promise.all(TABLE_DEFS.map(function(t, i) {
+        return window.aivicApi.list(i)
+          .then(function(records) { return Object.assign({}, t, { records: records }); })
+          .catch(function() { return Object.assign({}, t, { records: [] }); });
+      }));
+    }).then(function(tables) {
+      try { initFn(container, API_URL, tables); } catch (e) { console.error("[aivic] initFn error:", pageScreenId, e); }
+      _aivicReady = true;
+    });
+  });
+})();
+
+</script>
+</body>
+</html>

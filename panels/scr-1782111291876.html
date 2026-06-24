@@ -1,0 +1,3058 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>金と赤 - 営業データ品質管理・請求自動化システム</title>
+  <style>
+:root {
+  --primary: #c92a2a;
+  --primary-hover: #a61e1e;
+  --accent-gold: #c9a23e;
+  --accent-gold-hover: #b8860b;
+  --bg-main: #1a0a0a;
+  --bg-card: #2a1515;
+  --bg-sidebar: #251010;
+  --bg-hover: #3a2020;
+  --border: #4a2a2a;
+  --border-light: #6a3a3a;
+  --text: #f5f5f5;
+  --text-muted: #b0b0b0;
+  --text-disabled: #707070;
+  --top-bar-bg: #2a1515;
+  --top-bar-border: #4a2a2a;
+  --success: #51cf66;
+  --warning: #ffa94d;
+  --error: #ff6b6b;
+  --info: #74c0fc;
+  --focus-ring: #c92a2a;
+  --focus-ring-opacity: 0.3;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.7);
+  --opacity-disabled: 0.5;
+  --opacity-hover: 0.85;
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  font-family: var(--font-family);
+  background: var(--bg-main);
+  color: var(--text);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+}
+
+.shell-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.5rem;
+  background: var(--top-bar-bg);
+  border-bottom: 1px solid var(--top-bar-border);
+  flex-shrink: 0;
+  gap: 1rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: var(--font-size-lg);
+  color: var(--accent-gold);
+}
+
+.brand-icon {
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, var(--accent-gold), var(--primary));
+  border-radius: 2px;
+}
+
+.top-bar-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  justify-content: center;
+}
+
+.top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.user-menu:hover {
+  background: var(--bg-hover);
+}
+
+.user-avatar {
+  width: 28px;
+  height: 28px;
+  background: var(--accent-gold);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--bg-main);
+}
+
+.main-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 240px;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.sidebar-section {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-section:first-child {
+  padding-top: 0.5rem;
+}
+
+.sidebar-label {
+  padding: 0.5rem 1rem;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sidebar-item {
+  padding: 0.625rem 1rem;
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  border-left: 2px solid transparent;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-item:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.sidebar-item.aivic-active {
+  background: var(--bg-hover);
+  color: var(--accent-gold);
+  border-left-color: var(--accent-gold);
+}
+
+.panel-area {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+[data-aivic-panel] {
+  padding: 1.5rem;
+  min-height: 100%;
+}
+
+.panel-header {
+  margin-bottom: 1.5rem;
+}
+
+.panel-title {
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+}
+
+.panel-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.kpi-label {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+}
+
+.kpi-value {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--accent-gold);
+  margin-bottom: 0.25rem;
+}
+
+.kpi-change {
+  font-size: var(--font-size-xs);
+  color: var(--success);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  font-size: var(--font-size-sm);
+}
+
+.data-table thead {
+  background: var(--bg-hover);
+  border-bottom: 1px solid var(--border);
+}
+
+.data-table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.data-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+.data-table tbody tr:hover {
+  background: var(--bg-hover);
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 3px;
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+}
+
+.status-success {
+  background: rgba(81, 207, 102, 0.15);
+  color: var(--success);
+}
+
+.status-warning {
+  background: rgba(255, 169, 77, 0.15);
+  color: var(--warning);
+}
+
+.status-error {
+  background: rgba(255, 107, 107, 0.15);
+  color: var(--error);
+}
+
+.status-info {
+  background: rgba(116, 192, 252, 0.15);
+  color: var(--info);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+}
+
+.btn-secondary {
+  background: var(--bg-hover);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: var(--border);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--accent-gold);
+  border: 1px solid var(--border);
+}
+
+.btn-ghost:hover {
+  background: var(--bg-hover);
+}
+
+.btn-sm {
+  padding: 0.375rem 0.75rem;
+  font-size: var(--font-size-xs);
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 0.375rem;
+}
+
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  transition: border-color 0.2s;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  outline: none;
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 0 3px rgba(201, 162, 62, 0.1);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.filter-bar {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.filter-input {
+  flex: 1;
+  min-width: 200px;
+}
+
+.alert {
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  font-size: var(--font-size-sm);
+  border-left: 3px solid;
+}
+
+.alert-success {
+  background: rgba(81, 207, 102, 0.1);
+  border-left-color: var(--success);
+  color: var(--success);
+}
+
+.alert-warning {
+  background: rgba(255, 169, 77, 0.1);
+  border-left-color: var(--warning);
+  color: var(--warning);
+}
+
+.alert-error {
+  background: rgba(255, 107, 107, 0.1);
+  border-left-color: var(--error);
+  color: var(--error);
+}
+
+.alert-info {
+  background: rgba(116, 192, 252, 0.1);
+  border-left-color: var(--info);
+  color: var(--info);
+}
+
+.stepper {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  align-items: center;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.step-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-hover);
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.step.active .step-circle {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.step.completed .step-circle {
+  background: var(--success);
+  border-color: var(--success);
+  color: white;
+}
+
+.step-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+.step.active .step-label {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.step-line {
+  flex: 1;
+  height: 2px;
+  background: var(--border);
+  margin: 0 0.5rem;
+}
+
+.step.completed .step-line {
+  background: var(--success);
+}
+
+.split-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.split-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.25rem;
+}
+
+.split-panel-title {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.list-item {
+  padding: 0.75rem;
+  background: var(--bg-main);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.list-item:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-light);
+}
+
+.list-item.selected {
+  background: var(--bg-hover);
+  border-color: var(--accent-gold);
+}
+
+.list-item-title {
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+}
+
+.list-item-meta {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab {
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  margin-bottom: -1px;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tab.active {
+  color: var(--accent-gold);
+  border-bottom-color: var(--accent-gold);
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.section-divider {
+  margin: 1.5rem 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-muted);
+}
+
+.empty-state-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.empty-state-title {
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.empty-state-text {
+  font-size: var(--font-size-sm);
+  margin-bottom: 1rem;
+}
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  padding: 1.25rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: var(--font-size-lg);
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close:hover {
+  color: var(--text);
+}
+
+.modal-body {
+  padding: 1.25rem;
+}
+
+.modal-footer {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.625rem;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+.badge-primary {
+  background: rgba(201, 42, 42, 0.15);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.badge-gold {
+  background: rgba(201, 162, 62, 0.15);
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+}
+
+.action-bar {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.stat-row {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.stat-item {
+  flex: 1;
+}
+
+.stat-label {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.25rem;
+}
+
+.stat-value {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--bg-hover);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--accent-gold);
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: help;
+  border-bottom: 1px dotted var(--text-muted);
+}
+
+.tooltip-text {
+  visibility: hidden;
+  background: var(--bg-hover);
+  color: var(--text);
+  text-align: center;
+  padding: 0.5rem 0.75rem;
+  border-radius: 3px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: var(--font-size-xs);
+  border: 1px solid var(--border);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+.scrollable-table {
+  overflow-x: auto;
+}
+
+.tag {
+  display: inline-block;
+  padding: 0.375rem 0.75rem;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  font-size: var(--font-size-xs);
+  color: var(--text);
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.tag-removable {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tag-remove {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+  font-size: var(--font-size-xs);
+}
+
+.tag-remove:hover {
+  color: var(--error);
+}
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 1rem 0;
+}
+
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-muted { color: var(--text-muted); }
+.text-error { color: var(--error); }
+.text-success { color: var(--success); }
+.text-warning { color: var(--warning); }
+.text-gold { color: var(--accent-gold); }
+
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mt-3 { margin-top: 1.5rem; }
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+.mb-3 { margin-bottom: 1.5rem; }
+
+.font-bold { font-weight: 600; }
+.font-sm { font-size: var(--font-size-sm); }
+.font-xs { font-size: var(--font-size-xs); }
+
+.opacity-50 { opacity: 0.5; }
+.opacity-75 { opacity: 0.75; }
+
+@media (max-width: 1024px) {
+  .split-layout { grid-template-columns: 1fr; }
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+  .sidebar { width: 200px; }
+}
+
+@media (max-width: 768px) {
+  .top-bar { flex-direction: column; }
+  .top-bar-center { flex-direction: column; gap: 0.5rem; }
+  .main-content { flex-direction: column; }
+  .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .kpi-grid { grid-template-columns: 1fr; }
+}
+  </style>
+
+  <script>
+window.AIVIC_API_URL = "https://mkwmoife37uqyv4zhy4yhweozq0oddxn.lambda-url.us-east-1.on.aws/";
+window.AIVIC_APP_ID = "session-1781935010162";
+window.AIVIC_SYSTEM_NAME = "営業データ品質管理・請求自動化システム";
+window.AIVIC_TABLES = [{"tableName":"営業データ","purpose":"営業取引の記録、請求自動化、データ品質管理を支援するトランザクションテーブル","columns":[{"name":"営業データID","type":"uuid","required":true,"description":"営業データの一意識別子"},{"name":"顧客ID","type":"varchar(100)","required":true,"description":"顧客マスタへの外部キー"},{"name":"取引日","type":"timestamp","required":true,"description":"営業取引が発生した日時"},{"name":"取引金額","type":"integer","required":true,"description":"取引の金額（単位：円）"},{"name":"取引種別","type":"varchar(100)","required":true,"description":"取引の種類（例：販売、返品、調整）"},{"name":"商品ID","type":"varchar(100)","required":true,"description":"商品マスタへの外部キー"},{"name":"数量","type":"integer","required":true,"description":"取引の数量"},{"name":"単価","type":"integer","required":true,"description":"商品の単価（単位：円）"},{"name":"請求対象フラグ","type":"boolean","required":true,"description":"請求自動化の対象かどうか"},{"name":"請求済みフラグ","type":"boolean","required":true,"description":"請求処理が完了したかどうか"},{"name":"請求ID","type":"varchar(100)","required":false,"description":"請求マスタへの外部キー（請求済みの場合）"},{"name":"データ品質ステータス","type":"varchar(100)","required":true,"description":"データ品質の状態（例：正常、警告、エラー）"},{"name":"品質エラー内容","type":"text","required":false,"description":"データ品質上の問題の詳細"},{"name":"摘要","type":"text","required":false,"description":"取引に関する備考"},{"name":"作成日時","type":"timestamp","required":true,"description":"レコード作成日時"},{"name":"作成者","type":"varchar(100)","required":true,"description":"レコード作成者のユーザーID"},{"name":"更新日時","type":"timestamp","required":true,"description":"レコード最終更新日時"},{"name":"更新者","type":"varchar(100)","required":true,"description":"レコード最終更新者のユーザーID"}]},{"tableName":"営業データ検証ルール","purpose":"営業データの品質を確保するための検証ルールを管理し、請求自動化システムで使用される営業データの妥当性を定義・運用する","columns":[{"name":"ルールID","type":"uuid","required":true,"description":"検証ルールの一意識別子"},{"name":"ルール名","type":"varchar(100)","required":true,"description":"検証ルールの名称"},{"name":"対象フィールド","type":"varchar(100)","required":true,"description":"検証対象となる営業データのフィールド名"},{"name":"検証タイプ","type":"varchar(100)","required":true,"description":"検証方式（必須チェック/形式チェック/範囲チェック/重複チェック等）"},{"name":"検証条件","type":"text","required":true,"description":"検証ルールの詳細条件・パラメータ"},{"name":"エラーメッセージ","type":"varchar(100)","required":true,"description":"検証失敗時に表示するエラーメッセージ"},{"name":"重要度","type":"varchar(100)","required":true,"description":"ルールの重要度（エラー/警告/情報）"},{"name":"有効フラグ","type":"boolean","required":true,"description":"ルールが有効かどうか"},{"name":"作成日時","type":"timestamp","required":true,"description":"ルール作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"ルール最終更新日時"},{"name":"作成者","type":"varchar(100)","required":true,"description":"ルール作成者"},{"name":"更新者","type":"varchar(100)","required":true,"description":"ルール最終更新者"}]},{"tableName":"営業データ異常検出ログ","purpose":"営業データの品質異常を検出・記録し、請求自動化システムの信頼性を確保するための監査ログ","columns":[{"name":"異常検出ログID","type":"uuid","required":true,"description":"異常検出ログの一意識別子"},{"name":"営業データID","type":"uuid","required":true,"description":"異常が検出された営業データの参照ID"},{"name":"検証ルールID","type":"uuid","required":true,"description":"適用された営業データ検証ルールの参照ID"},{"name":"異常タイプ","type":"varchar(100)","required":true,"description":"異常の分類（例：データ型不正、範囲外、必須項目欠落、重複）"},{"name":"異常フィールド名","type":"varchar(100)","required":true,"description":"異常が検出されたフィールド名"},{"name":"検出値","type":"text","required":false,"description":"異常が検出された実際の値"},{"name":"期待値","type":"text","required":false,"description":"検証ルールで期待される値または条件"},{"name":"重要度","type":"varchar(100)","required":true,"description":"異常の重要度レベル（例：高、中、低）"},{"name":"検出日時","type":"timestamp","required":true,"description":"異常が検出された日時"},{"name":"対応状況","type":"varchar(100)","required":true,"description":"異常への対応状況（例：未対応、対応中、解決済み、無視）"},{"name":"対応者","type":"varchar(100)","required":false,"description":"異常に対応したユーザー"},{"name":"対応日時","type":"timestamp","required":false,"description":"異常が対応された日時"},{"name":"対応コメント","type":"text","required":false,"description":"対応内容の詳細説明"},{"name":"請求処理への影響","type":"boolean","required":true,"description":"この異常が請求自動化処理に影響を与えるかどうか"},{"name":"作成日時","type":"timestamp","required":true,"description":"ログレコード作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"ログレコード最終更新日時"}]},{"tableName":"請求対象項目定義","purpose":"営業データから請求対象となる項目を定義・管理し、請求自動化システムが正確に請求対象データを抽出・検証するためのマスタテーブル","columns":[{"name":"項目定義ID","type":"uuid","required":true,"description":"請求対象項目定義の一意識別子"},{"name":"項目コード","type":"varchar(100)","required":true,"description":"請求対象項目の業務コード（例：SALES_AMOUNT、SERVICE_FEE）"},{"name":"項目名","type":"varchar(100)","required":true,"description":"請求対象項目の日本語名称"},{"name":"説明","type":"text","required":false,"description":"項目の詳細説明・定義"},{"name":"営業データテーブル名","type":"varchar(100)","required":true,"description":"営業データテーブル内のソーステーブル名"},{"name":"営業データカラム名","type":"varchar(100)","required":true,"description":"営業データテーブル内のソースカラム名"},{"name":"データ型","type":"varchar(50)","required":true,"description":"項目のデータ型（integer/varchar/timestamp等）"},{"name":"請求計算方法","type":"varchar(100)","required":true,"description":"請求額計算方法（SUM/AVG/COUNT/DIRECT等）"},{"name":"検証ルールID","type":"uuid","required":false,"description":"適用する営業データ検証ルールの参照ID"},{"name":"必須フラグ","type":"boolean","required":true,"description":"請求対象として必須かどうか"},{"name":"有効フラグ","type":"boolean","required":true,"description":"項目定義が有効かどうか"},{"name":"開始日","type":"timestamp","required":true,"description":"項目定義の適用開始日時"},{"name":"終了日","type":"timestamp","required":false,"description":"項目定義の適用終了日時（NULL=継続中）"},{"name":"作成日時","type":"timestamp","required":true,"description":"レコード作成日時"},{"name":"作成者","type":"varchar(100)","required":true,"description":"レコード作成者"},{"name":"更新日時","type":"timestamp","required":true,"description":"レコード最終更新日時"},{"name":"更新者","type":"varchar(100)","required":true,"description":"レコード最終更新者"}]},{"tableName":"顧客請求集計","purpose":"営業データから検証・集計した請求対象データを管理し、請求自動化の入力源となる顧客別・期間別の請求集計情報を保持する","columns":[{"name":"請求集計ID","type":"uuid","required":true,"description":"請求集計レコードの一意識別子"},{"name":"顧客ID","type":"varchar(100)","required":true,"description":"請求対象の顧客ID（営業データから参照）"},{"name":"請求年月","type":"varchar(100)","required":true,"description":"請求対象期間（YYYY-MM形式）"},{"name":"請求金額","type":"integer","required":true,"description":"集計された請求対象金額（税抜き）"},{"name":"税額","type":"integer","required":true,"description":"請求金額に対する消費税額"},{"name":"請求金額合計","type":"integer","required":true,"description":"請求金額と税額の合計（税込み）"},{"name":"対象営業データ件数","type":"integer","required":true,"description":"この請求集計に含まれる営業データレコード数"},{"name":"検証ステータス","type":"varchar(100)","required":true,"description":"検証状態（未検証/検証済み/異常検出/承認待ち）"},{"name":"異常フラグ","type":"boolean","required":true,"description":"異常検出ログに該当する異常が存在するか"},{"name":"請求ステータス","type":"varchar(100)","required":true,"description":"請求処理状態（未処理/請求済み/入金確認/キャンセル）"},{"name":"摘要","type":"text","required":false,"description":"請求集計に関する備考・特記事項"},{"name":"作成日時","type":"timestamp","required":true,"description":"請求集計レコード作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"請求集計レコード最終更新日時"},{"name":"作成者","type":"varchar(100)","required":true,"description":"請求集計を作成したユーザーID"},{"name":"更新者","type":"varchar(100)","required":false,"description":"請求集計を最後に更新したユーザーID"}]},{"tableName":"サービス請求集計","purpose":"営業データから検証・集計した請求対象データを管理し、顧客別・サービス別の請求額を確定する集計テーブル","columns":[{"name":"請求集計ID","type":"uuid","required":true,"description":"請求集計レコードの一意識別子"},{"name":"顧客ID","type":"varchar(100)","required":true,"description":"請求対象の顧客ID（顧客マスタへの外部キー）"},{"name":"請求年月","type":"varchar(100)","required":true,"description":"請求対象の年月（YYYY-MM形式）"},{"name":"サービスID","type":"varchar(100)","required":true,"description":"請求対象のサービスID"},{"name":"集計対象件数","type":"integer","required":true,"description":"この集計に含まれる営業データレコード数"},{"name":"請求金額","type":"integer","required":true,"description":"確定した請求金額（税抜き）"},{"name":"税額","type":"integer","required":true,"description":"計算された消費税額"},{"name":"請求金額合計","type":"integer","required":true,"description":"請求金額 + 税額"},{"name":"集計ステータス","type":"varchar(100)","required":true,"description":"集計状態（下書き/確定/請求済み/キャンセル）"},{"name":"データ品質スコア","type":"integer","required":false,"description":"この集計に含まれるデータの品質スコア（0-100）"},{"name":"異常検出フラグ","type":"boolean","required":true,"description":"異常検出ログで検出された異常が存在するか"},{"name":"検証ルール適用状況","type":"text","required":false,"description":"適用された検証ルールの結果サマリー"},{"name":"請求確定日時","type":"timestamp","required":false,"description":"請求金額が確定した日時"},{"name":"作成日時","type":"timestamp","required":true,"description":"集計レコード作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"集計レコード最終更新日時"},{"name":"作成者","type":"varchar(100)","required":true,"description":"集計レコード作成者のユーザーID"},{"name":"更新者","type":"varchar(100)","required":false,"description":"集計レコード最終更新者のユーザーID"},{"name":"備考","type":"text","required":false,"description":"集計に関する備考・摘要"}]},{"tableName":"営業データメタデータ","purpose":"営業データの構造・品質基準・検証ルール・請求対象項目の定義を一元管理し、データ品質管理と請求自動化の基準となるマスタ情報を提供する","columns":[{"name":"メタデータID","type":"uuid","required":true,"description":"メタデータレコードの一意識別子"},{"name":"データ項目名","type":"varchar(100)","required":true,"description":"営業データ内の項目名（例：受注金額、顧客ID、請求日等）"},{"name":"データ項目説明","type":"text","required":false,"description":"データ項目の詳細説明・ビジネス定義"},{"name":"データ型","type":"varchar(100)","required":true,"description":"データ型（integer、varchar、timestamp等）"},{"name":"必須フラグ","type":"boolean","required":true,"description":"当該項目が必須かどうか"},{"name":"最大文字数","type":"integer","required":false,"description":"varchar型の場合の最大文字数"},{"name":"品質検証ルール適用","type":"boolean","required":true,"description":"営業データ検証ルールを適用するかどうか"},{"name":"異常検出対象フラグ","type":"boolean","required":true,"description":"異常検出ロジックの対象項目かどうか"},{"name":"請求対象フラグ","type":"boolean","required":true,"description":"請求集計に使用する項目かどうか"},{"name":"請求項目カテゴリ","type":"varchar(100)","required":false,"description":"請求対象の場合のカテゴリ（例：サービス料金、手数料、税金等）"},{"name":"集計方法","type":"varchar(100)","required":false,"description":"請求集計時の集計方法（SUM、COUNT、AVG等）"},{"name":"データソース","type":"varchar(100)","required":true,"description":"データの取得元システム・テーブル名"},{"name":"更新頻度","type":"varchar(100)","required":false,"description":"データ更新の頻度（日次、月次等）"},{"name":"有効開始日","type":"timestamp","required":true,"description":"このメタデータ定義の有効開始日時"},{"name":"有効終了日","type":"timestamp","required":false,"description":"このメタデータ定義の有効終了日時（NULL=現在有効）"},{"name":"作成日時","type":"timestamp","required":true,"description":"レコード作成日時"},{"name":"作成者","type":"varchar(100)","required":true,"description":"レコード作成者のユーザーID"},{"name":"更新日時","type":"timestamp","required":true,"description":"レコード最終更新日時"},{"name":"更新者","type":"varchar(100)","required":true,"description":"レコード最終更新者のユーザーID"},{"name":"備考","type":"text","required":false,"description":"その他の注記・運用上の注意事項"}]},{"tableName":"月次サマリーテンプレート","purpose":"営業データと請求データの月次集計結果を標準化されたテンプレート形式で管理し、レポーティングと異常検出の基準となる月次サマリーを保持する","columns":[{"name":"月次サマリーテンプレートID","type":"uuid","required":true,"description":"月次サマリーテンプレートの一意識別子"},{"name":"対象年月","type":"varchar(7)","required":true,"description":"集計対象の年月（YYYY-MM形式）"},{"name":"営業データ集計件数","type":"integer","required":true,"description":"当月の営業データ総件数"},{"name":"営業データ検証成功件数","type":"integer","required":true,"description":"検証ルール合格の営業データ件数"},{"name":"営業データ検証失敗件数","type":"integer","required":true,"description":"検証ルール不合格の営業データ件数"},{"name":"異常検出件数","type":"integer","required":true,"description":"異常検出ログで検出された異常件数"},{"name":"請求対象件数","type":"integer","required":true,"description":"請求対象項目定義に該当する件数"},{"name":"請求集計金額","type":"integer","required":true,"description":"顧客請求集計とサービス請求集計の合計金額（円）"},{"name":"顧客別請求件数","type":"integer","required":true,"description":"顧客請求集計の集計対象顧客数"},{"name":"サービス別請求件数","type":"integer","required":true,"description":"サービス請求集計の集計対象サービス数"},{"name":"データ品質スコア","type":"integer","required":true,"description":"当月のデータ品質スコア（0-100）"},{"name":"テンプレートステータス","type":"varchar(20)","required":true,"description":"テンプレートの状態（下書き/確定/承認済み/アーカイブ）"},{"name":"備考","type":"text","required":false,"description":"月次サマリーに関する備考やコメント"},{"name":"作成日時","type":"timestamp","required":true,"description":"レコード作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"レコード最終更新日時"},{"name":"作成者","type":"varchar(100)","required":true,"description":"レコード作成者のユーザーID"},{"name":"更新者","type":"varchar(100)","required":true,"description":"レコード最終更新者のユーザーID"}]},{"tableName":"データ品質検証結果","purpose":"営業データの品質検証実行結果を記録し、検証ルール適用状況、エラー内容、是正状況を追跡管理するトランザクションテーブル","columns":[{"name":"検証結果ID","type":"uuid","required":true,"description":"検証結果の一意識別子"},{"name":"営業データID","type":"uuid","required":true,"description":"検証対象の営業データを特定するID"},{"name":"検証ルールID","type":"uuid","required":true,"description":"適用された検証ルールを特定するID"},{"name":"検証実行日時","type":"timestamp","required":true,"description":"検証が実行された日時"},{"name":"検証ステータス","type":"varchar(100)","required":true,"description":"検証結果ステータス（合格/不合格/警告）"},{"name":"エラー内容","type":"text","required":false,"description":"検証失敗時の詳細エラーメッセージ"},{"name":"エラー重大度","type":"varchar(100)","required":false,"description":"エラーの重大度レベル（致命的/高/中/低）"},{"name":"検証対象フィールド","type":"varchar(100)","required":false,"description":"検証対象となったデータフィールド名"},{"name":"検証対象値","type":"text","required":false,"description":"検証対象となったデータの値"},{"name":"是正状況","type":"varchar(100)","required":true,"description":"是正状況（未対応/対応中/完了/対応不要）"},{"name":"是正完了日時","type":"timestamp","required":false,"description":"データ是正が完了した日時"},{"name":"請求対象フラグ","type":"boolean","required":true,"description":"当該データが請求処理に影響するかどうか"},{"name":"作成日時","type":"timestamp","required":true,"description":"検証結果レコード作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"検証結果レコード最終更新日時"},{"name":"作成者","type":"varchar(100)","required":true,"description":"検証を実行したシステムまたはユーザー"}]},{"tableName":"不足データ通知ログ","purpose":"営業データの不足項目を検出し、通知履歴を記録・追跡するトランザクションログテーブル。データ品質管理と請求自動化の前提条件となる不足データの可視化と対応状況管理を実現する。","columns":[{"name":"不足データ通知ログID","type":"uuid","required":true,"description":"通知ログの一意識別子"},{"name":"営業データID","type":"uuid","required":true,"description":"不足が検出された営業データレコードへの外部キー"},{"name":"不足項目名","type":"varchar(100)","required":true,"description":"不足している営業データ項目の名称"},{"name":"検証ルールID","type":"uuid","required":true,"description":"不足を検出した営業データ検証ルールへの外部キー"},{"name":"通知ステータス","type":"varchar(100)","required":true,"description":"通知状態（未対応/対応中/解決/無視）"},{"name":"通知対象者","type":"varchar(100)","required":true,"description":"通知を受け取る担当者またはグループ"},{"name":"通知日時","type":"timestamp","required":true,"description":"不足データが検出され通知が発行された日時"},{"name":"対応予定日","type":"timestamp","required":false,"description":"不足データの補正予定日"},{"name":"対応完了日時","type":"timestamp","required":false,"description":"不足データが補正され対応が完了した日時"},{"name":"補正内容","type":"text","required":false,"description":"実施された補正内容の詳細説明"},{"name":"請求影響フラグ","type":"boolean","required":true,"description":"この不足データが請求処理に影響を与えるかどうか"},{"name":"重要度レベル","type":"varchar(100)","required":true,"description":"不足データの重要度（高/中/低）"},{"name":"作成日時","type":"timestamp","required":true,"description":"ログレコード作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"ログレコード最終更新日時"},{"name":"作成者","type":"varchar(100)","required":true,"description":"ログレコード作成者ユーザーID"}]},{"tableName":"操作履歴","purpose":"ユーザーによるシステム操作の記録と監査証跡を管理し、データ品質管理・請求自動化システムにおけるすべての重要な操作を追跡する","columns":[{"name":"操作履歴ID","type":"uuid","required":true,"description":"操作履歴の一意識別子"},{"name":"ユーザーID","type":"uuid","required":true,"description":"操作を実行したユーザーの識別子（ユーザーテーブルへの外部キー）"},{"name":"操作種別","type":"varchar(100)","required":true,"description":"操作の種類（例：CREATE、UPDATE、DELETE、VALIDATE、EXPORT、APPROVE）"},{"name":"対象テーブル名","type":"varchar(100)","required":true,"description":"操作対象のテーブル名（例：営業データ、請求対象項目定義）"},{"name":"対象レコードID","type":"uuid","required":false,"description":"操作対象のレコード識別子"},{"name":"操作内容","type":"text","required":false,"description":"操作の詳細説明または変更内容"},{"name":"変更前値","type":"text","required":false,"description":"更新操作の場合の変更前の値"},{"name":"変更後値","type":"text","required":false,"description":"更新操作の場合の変更後の値"},{"name":"操作ステータス","type":"varchar(100)","required":true,"description":"操作の実行結果（例：SUCCESS、FAILURE、PENDING）"},{"name":"エラーメッセージ","type":"text","required":false,"description":"操作失敗時のエラーメッセージ"},{"name":"IPアドレス","type":"varchar(100)","required":false,"description":"操作を実行したクライアントのIPアドレス"},{"name":"セッションID","type":"varchar(100)","required":false,"description":"ユーザーセッションの識別子"},{"name":"作成日時","type":"timestamp","required":true,"description":"操作が実行された日時"}]}];
+window.AIVIC_PRESET_SEED = {"営業データ":[{"営業データID":"rec-20250115-0847","顧客ID":"cust-0524","取引日":"2025-01-15T10:30:00+09:00","取引金額":450000,"取引種別":"販売","商品ID":"prod-1203","数量":15,"単価":30000,"請求対象フラグ":true,"請求済みフラグ":false,"請求ID":null,"データ品質ステータス":"正常","品質エラー内容":null,"摘要":"定期発注分、納期2025年1月20日予定","作成日時":"2025-01-15T10:35:22+09:00","作成者":"yamada-hanako","更新日時":"2025-01-15T10:35:22+09:00","更新者":"yamada-hanako"},{"営業データID":"rec-20250247","顧客ID":"cust-08521","取引日":"2025-01-15T14:30:00","取引金額":-45000,"取引種別":"返品","商品ID":"prod-12847","数量":-15,"単価":3000,"請求対象フラグ":false,"請求済みフラグ":false,"請求ID":null,"データ品質ステータス":"警告","品質エラー内容":"返品理由が記載されていません。摘要欄への記入を推奨します。","摘要":"顧客からの返品受け付け。納期遅延による対応。","作成日時":"2025-01-15T15:05:22","作成者":"suzuki-hanako","更新日時":"2025-01-16T09:20:15","更新者":"tanaka-taro"},{"営業データID":"rec-20250115-0847","顧客ID":"cust-00234","取引日":"2025-01-15T10:30:00+09:00","取引金額":450000,"取引種別":"販売","商品ID":"prod-05821","数量":30,"単価":15000,"請求対象フラグ":true,"請求済みフラグ":true,"請求ID":"inv-20250120-1543","データ品質ステータス":"正常","品質エラー内容":null,"摘要":"定期発注による納入。納期厳守。","作成日時":"2025-01-15T10:32:15+09:00","作成者":"山田花子","更新日時":"2025-01-20T14:18:22+09:00","更新者":"鈴木健一"},{"営業データID":"rec-20250147","顧客ID":"cust-00892","取引日":"2025-01-15T10:30:00","取引金額":145000,"取引種別":"販売","商品ID":"prod-05634","数量":50,"単価":2900,"請求対象フラグ":false,"請求済みフラグ":false,"請求ID":null,"データ品質ステータス":"エラー","品質エラー内容":"単価不一致エラー：マスタ単価3000円に対し、入力単価2900円。取引金額145000円は入力単価で計算されており、正規単価での計算額150000円と乖離しています。","摘要":"OEM製品A型の大口注文。納入先からの値引き要望に応じて単価を調整したが、商品マスタ更新手続きが未完了のため単価不一致が発生。","作成日時":"2025-01-15T11:45:00","作成者":"山田花子","更新日時":"2025-01-16T09:20:00","更新者":"佐藤次郎"},{"営業データID":"rec-20250156","顧客ID":"cust-00847","取引日":"2025-01-15T14:30:00","取引金額":0,"取引種別":"調整","商品ID":"prod-02341","数量":0,"単価":8500,"請求対象フラグ":false,"請求済みフラグ":false,"請求ID":null,"データ品質ステータス":"エラー","品質エラー内容":"調整取引であり数量がゼロのため、取引の妥当性確認が必要です。負債調整または取消処理の確認待ち。","摘要":"前月請求分の過剰計上を修正するための調整取引。顧客からの指摘により数量ゼロで調整記録。","作成日時":"2025-01-15T15:45:00","作成者":"佐藤花子","更新日時":"2025-01-15T15:45:00","更新者":"佐藤花子"},{"営業データID":"rec-20250147","顧客ID":"cust-99999","取引日":"2025-01-15T10:30:00","取引金額":125000,"取引種別":"販売","商品ID":"prod-00456","数量":50,"単価":2500,"請求対象フラグ":true,"請求済みフラグ":false,"請求ID":null,"データ品質ステータス":"エラー","品質エラー内容":"顧客マスタに該当する顧客ID(cust-99999)が存在しません。顧客マスタとの連携確認が必要です。","摘要":"新規顧客からの注文。顧客情報登録待ちのため請求処理は一時保留中。","作成日時":"2025-01-15T11:00:00","作成者":"佐藤花子","更新日時":"2025-01-15T14:30:00","更新者":"鈴木次郎"},{"営業データID":"rec-20250156","顧客ID":"cust-00847","取引日":"2025-01-15T10:30:00","取引金額":450000,"取引種別":"販売","商品ID":"prod-12304","数量":15,"単価":30000,"請求対象フラグ":true,"請求済みフラグ":true,"請求ID":"inv-202501-0542","データ品質ステータス":"警告","品質エラー内容":"同一顧客・同一商品・同一金額の取引が2024-12-28に存在。重複請求の可能性あり。請求ID inv-202412-0389 との突合確認が必要。","摘要":"1月の定期発注分。前月末の取引との差分確認待ち","作成日時":"2025-01-15T11:05:00","作成者":"suzuki-hanako","更新日時":"2025-01-16T09:20:00","更新者":"yamamoto-jiro"},{"営業データID":"rec-20250147","顧客ID":"cust-00856","取引日":"2025-03-15T14:30:00","取引金額":125000,"取引種別":"販売","商品ID":"prod-04521","数量":50,"単価":2500,"請求対象フラグ":true,"請求済みフラグ":false,"請求ID":null,"データ品質ステータス":"警告","品質エラー内容":"取引日が本日より60日以上先の未来日付です。入力ミスの可能性があります。営業担当者に確認が必要です。","摘要":"予約受注分。納期2025年3月15日予定。確認待ち。","作成日時":"2025-01-08T09:15:00","作成者":"佐藤花子","更新日時":"2025-01-08T09:15:00","更新者":"佐藤花子"},{"営業データID":"rec-20250145","顧客ID":"cust-00847","取引日":"2025-01-15T14:30:00","取引金額":2850000,"取引種別":"販売","商品ID":"prod-05623","数量":50,"単価":57000,"請求対象フラグ":null,"請求済みフラグ":false,"請求ID":null,"データ品質ステータス":"正常","品質エラー内容":null,"摘要":"大型機械装置一括購入。高額取引のため承認待ち中。顧客より納期厳守の要望あり。","作成日時":"2025-01-15T15:45:00","作成者":"鈴木健一","更新日時":"2025-01-15T15:45:00","更新者":"鈴木健一"},{"営業データID":"rec-001","顧客ID":"cust-00245","取引日":"2025-01-15T14:30:00Z","取引金額":-125000,"取引種別":"返品","商品ID":"prod-08932","数量":-50,"単価":2500,"請求対象フラグ":true,"請求済みフラグ":true,"請求ID":"inv-00892","データ品質ステータス":"正常","品質エラー内容":null,"摘要":"2025年1月10日の販売取引（rec-000）に対する返品相殺処理。顧客からの品質クレームに基づき全量返品。請求ID inv-00891の販売分と相殺処理済み。","作成日時":"2025-01-15T15:45:22Z","作成者":"鈴木花子","更新日時":"2025-01-16T09:20:15Z","更新者":"佐藤次郎"}],"営業データ検証ルール":[{"ルールID":"rec-001","ルール名":"契約金額の負数チェック","対象フィールド":"契約金額","検証タイプ":"必須チェック","検証条件":"契約金額 >= 0","エラーメッセージ":"契約金額は0以上の値を入力してください","重要度":"エラー","有効フラグ":true,"作成日時":"2024-04-15T09:30:00+09:00","更新日時":"2025-01-20T14:45:00+09:00","作成者":"田中太郎","更新者":"鈴木花子"},{"ルールID":"rec-001","ルール名":"顧客ID参照整合性チェック","対象フィールド":"顧客ID","検証タイプ":"参照整合性チェック","検証条件":"顧客マスタテーブルのcustomer_idカラムに存在することを確認","エラーメッセージ":"指定された顧客IDは顧客マスタに存在しません","重要度":"エラー","有効フラグ":true,"作成日時":"2024-04-15T09:30:00+09:00","更新日時":"2025-01-20T14:45:00+09:00","作成者":"田中太郎","更新者":"鈴木花子"},{"ルールID":"rec-001","ルール名":"請求日が契約開始日以降であることの確認","対象フィールド":"請求日","検証タイプ":"日付順序チェック","検証条件":"請求日 >= 契約開始日","エラーメッセージ":"請求日は契約開始日以降である必要があります","重要度":"エラー","有効フラグ":true,"作成日時":"2024-01-15T09:30:00+09:00","更新日時":"2024-11-20T14:45:00+09:00","作成者":"田中太郎","更新者":"鈴木花子"},{"ルールID":"rec-001","ルール名":"商品コード存在チェック","対象フィールド":"商品コード","検証タイプ":"存在チェック","検証条件":"商品マスタテーブルのコードカラムとの一致確認","エラーメッセージ":"指定された商品コードは商品マスタに登録されていません","重要度":"エラー","有効フラグ":true,"作成日時":"2024-04-15 09:30:00","更新日時":"2025-01-20 14:15:00","作成者":"佐藤花子","更新者":"鈴木健一"},{"ルールID":"rec-001","ルール名":"請求金額の契約金額範囲チェック","対象フィールド":"請求金額","検証タイプ":"範囲チェック","検証条件":"請求金額 >= 契約金額 * 0.9 AND 請求金額 <= 契約金額 * 1.1","エラーメッセージ":"請求金額が契約金額の±10%範囲外です","重要度":"エラー","有効フラグ":true,"作成日時":"2024-04-15 09:30:00","更新日時":"2024-12-10 14:45:00","作成者":"山田太郎","更新者":"佐藤花子"},{"ルールID":"rec-001","ルール名":"同一顧客同一期間重複請求検出ルール","対象フィールド":"顧客ID,請求期間開始日,請求期間終了日,請求金額","検証タイプ":"重複チェック","検証条件":"同一の顧客IDに対して、請求期間開始日と請求期間終了日が完全に一致する複数の請求レコードが存在しないこと。許容される重複は同一請求番号による同期エラーのみ","エラーメッセージ":"同一顧客の同一期間における重複請求が検出されました。請求内容を確認してください","重要度":"エラー","有効フラグ":true,"作成日時":"2024-04-15T09:30:00+09:00","更新日時":"2025-01-20T14:45:00+09:00","作成者":"山田花子","更新者":"佐藤次郎"},{"ルールID":"rec-001","ルール名":"消費税率妥当性チェック","対象フィールド":"消費税率","検証タイプ":"値妥当性チェック","検証条件":"値が10%または8%のいずれかであること。軽減税率対象商品の場合は8%、その他は10%","エラーメッセージ":"消費税率が現行税率定義に合致していません。10%または8%を入力してください","重要度":"エラー","有効フラグ":true,"作成日時":"2024-04-01T09:30:00+09:00","更新日時":"2025-01-15T14:22:00+09:00","作成者":"山田花子","更新者":"佐藤次郎"},{"ルールID":"rec-001","ルール名":"請求先メールアドレス形式チェック","対象フィールド":"billing_email","検証タイプ":"形式チェック","検証条件":"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$","エラーメッセージ":"請求先メールアドレスが正しい形式ではありません","重要度":"エラー","有効フラグ":true,"作成日時":"2024-01-15T09:30:00","更新日時":"2024-11-20T14:45:00","作成者":"山田太郎","更新者":"鈴木花子"},{"ルールID":"rec-001","ルール名":"売上計上日会計期間チェック","対象フィールド":"売上計上日","検証タイプ":"範囲チェック","検証条件":"売上計上日が当該会計期間の開始日(2024年4月1日)から終了日(2025年3月31日)の範囲内であること","エラーメッセージ":"売上計上日が会計期間外です。2024年4月1日～2025年3月31日の範囲で入力してください。","重要度":"エラー","有効フラグ":true,"作成日時":"2024-03-15T09:30:00","更新日時":"2024-11-20T14:45:00","作成者":"佐藤花子","更新者":"鈴木太郎"},{"ルールID":"rec-001","ルール名":"割引率の範囲チェック","対象フィールド":"割引率","検証タイプ":"範囲チェック","検証条件":"0 <= 割引率 <= 100","エラーメッセージ":"割引率は0～100%の範囲で入力してください","重要度":"エラー","有効フラグ":true,"作成日時":"2024-04-15 09:30:00","更新日時":"2024-11-20 14:45:00","作成者":"田中太郎","更新者":"鈴木花子"}],"営業データ異常検出ログ":[{"異常検出ログID":"rec-001","営業データID":"rec-002","検証ルールID":"rec-003","異常タイプ":"範囲外","異常フィールド名":"売上金額","検出値":"15500000","期待値":"契約上限: 15000000以下","重要度":"高","検出日時":"2024-11-15T14:32:45+09:00","対応状況":"解決済み","対応者":"山田花子","対応日時":"2024-11-15T16:20:10+09:00","対応コメント":"顧客との契約変更を確認。新契約では上限が16000000に引き上げられており、営業システムの契約マスタが未更新だったため。マスタを修正し、請求処理を承認した。","請求処理への影響":true,"作成日時":"2024-11-15T14:32:45+09:00","更新日時":"2024-11-15T16:20:10+09:00"},{"異常検出ログID":"rec-20250115-0847","営業データID":"rec-sales-202501-5234","検証ルールID":"rec-rule-mandatory-001","異常タイプ":"必須項目欠落","異常フィールド名":"顧客ID","検出値":"null","期待値":"顧客ID（8文字以上の英数字コード）","重要度":"高","検出日時":"2025-01-15T08:47:23+09:00","対応状況":"対応中","対応者":"山田花子","対応日時":"2025-01-15T10:12:45+09:00","対応コメント":"営業担当者の入力漏れが原因。該当レコードの営業担当者（佐藤健一）に確認中。顧客マスタから推定される顧客ID「CUST0089」と思われるが、本人確認待ち。","請求処理への影響":true,"作成日時":"2025-01-15T08:47:23+09:00","更新日時":"2025-01-15T10:12:45+09:00"},{"異常検出ログID":"rec-001","営業データID":"rec-002","検証ルールID":"rec-003","異常タイプ":"範囲外","異常フィールド名":"商品単価","検出値":"45800","期待値":"8500～12000（過去90日平均: 9850円、標準偏差: 1200円、許容範囲: 平均±3σ以内）","重要度":"高","検出日時":"2024-11-15T09:32:47Z","対応状況":"解決済み","対応者":"鈴木花子","対応日時":"2024-11-15T14:28:15Z","対応コメント":"営業担当者の入力ミスが原因。商品コード「SKU-2024-001」の単価を誤入力（正規単価9,800円を45,800円と記入）。営業システムの入力値を修正し、当該営業データを再検証済み。入力者に対し単価確認プロセスの徹底を指導。","請求処理への影響":true,"作成日時":"2024-11-15T09:33:22Z","更新日時":"2024-11-15T14:29:05Z"},{"異常検出ログID":"rec-20250115-0847","営業データID":"rec-20250114-5623","検証ルールID":"rec-rule-billing-date-001","異常タイプ":"範囲外","異常フィールド名":"請求日付","検出値":"2025-01-12","期待値":"営業日（月〜金）かつ月末から5営業日以内","重要度":"高","検出日時":"2025-01-15T08:47:32+09:00","対応状況":"対応中","対応者":"佐藤花子","対応日時":"2025-01-15T09:15:00+09:00","対応コメント":"請求日付が日曜日（営業日外）に設定されていました。営業担当者に確認したところ、システム入力時に曜日を誤認識したとのこと。正しい請求日付2025-01-15に修正予定です。","請求処理への影響":true,"作成日時":"2025-01-15T08:47:32+09:00","更新日時":"2025-01-15T09:15:00+09:00"},{"異常検出ログID":"rec-001","営業データID":"rec-002","検証ルールID":"rec-003","異常タイプ":"重複","異常フィールド名":"受注番号","検出値":"SO-2024-0015847","期待値":"同一営業担当者からの同一期間内での重複なし","重要度":"高","検出日時":"2024-11-15 09:32:45","対応状況":"対応中","対応者":"鈴木花子","対応日時":"2024-11-15 10:15:20","対応コメント":"営業担当者の山田太郎に確認したところ、システムの二重送信によるものと判明。顧客への重複請求を防ぐため、先に登録された2024-11-14 14:22:33のレコードを有効とし、本レコードは無効化処理を実施予定。","請求処理への影響":true,"作成日時":"2024-11-15 09:32:45","更新日時":"2024-11-15 10:15:20"},{"異常検出ログID":"rec-001","営業データID":"rec-2847","検証ルールID":"rec-rule-0523","異常タイプ":"計算ロジック誤り","異常フィールド名":"消費税額","検出値":"15840","期待値":"16500","重要度":"高","検出日時":"2024-11-15 09:32:47","対応状況":"解決済み","対応者":"田中太郎","対応日時":"2024-11-15 14:28:15","対応コメント":"消費税計算ロジックで軽減税率（8%）と標準税率（10%）の判定条件が逆転していたため修正。対象請求書番号INV-202411-0847の消費税を15840円から16500円に訂正し、請求金額を合算で修正した。","請求処理への影響":true,"作成日時":"2024-11-15 09:32:47","更新日時":"2024-11-15 14:28:15"},{"異常検出ログID":"rec-20250215-001","営業データID":"rec-20250214-sales-789","検証ルールID":"rec-validation-rule-045","異常タイプ":"参照整合性エラー","異常フィールド名":"取引先コード","検出値":"CUS-999888","期待値":"顧客マスタに存在する有効な取引先コード","重要度":"高","検出日時":"2025-02-14T14:32:18+09:00","対応状況":"解決済み","対応者":"山田花子","対応日時":"2025-02-14T15:47:52+09:00","対応コメント":"営業担当者に確認したところ、入力誤りでした。正しい取引先コードはCUS-456123です。営業データを修正し、再度検証を実施しました。","請求処理への影響":true,"作成日時":"2025-02-14T14:32:18+09:00","更新日時":"2025-02-14T15:47:52+09:00"},{"異常検出ログID":"rec-001","営業データID":"rec-002","検証ルールID":"rec-003","異常タイプ":"範囲外","異常フィールド名":"販売数量","検出値":"-15","期待値":"0以上の整数","重要度":"高","検出日時":"2024-11-15 09:32:47","対応状況":"解決済み","対応者":"佐藤花子","対応日時":"2024-11-15 10:18:22","対応コメント":"営業担当者の入力ミスにより負の値が入力されていました。正しい数量15に修正し、営業担当者に入力方法の再教育を実施しました。","請求処理への影響":true,"作成日時":"2024-11-15 09:32:47","更新日時":"2024-11-15 10:18:22"},{"異常検出ログID":"rec-001","営業データID":"rec-002","検証ルールID":"rec-003","異常タイプ":"請求済みデータの事後修正","異常フィールド名":"請求金額","検出値":"1,250,000","期待値":"1,500,000","重要度":"高","検出日時":"2024-11-15T14:32:00+09:00","対応状況":"解決済み","対応者":"山田花子","対応日時":"2024-11-16T09:15:00+09:00","対応コメント":"顧客との契約変更により単価が変更されたため、請求金額を1,500,000円から1,250,000円に修正。修正差額250,000円について顧客に返金手続きを実施。既発行の請求書は取消し、修正版を再発行した。","請求処理への影響":true,"作成日時":"2024-11-15T14:32:00+09:00","更新日時":"2024-11-16T09:15:00+09:00"},{"異常検出ログID":"rec-001","営業データID":"rec-002","検証ルールID":"rec-003","異常タイプ":"権限超過","異常フィールド名":"契約金額","検出値":"15000000","期待値":"契約金額 <= 10000000（営業担当者権限上限）","重要度":"高","検出日時":"2024-11-15T14:32:45+09:00","対応状況":"対応中","対応者":"佐藤花子","対応日時":"2024-11-15T15:20:00+09:00","対応コメント":"営業担当者・鈴木健一が権限上限1,000万円を超える1,500万円の取引を申請。営業部長に確認したところ、顧客の信用度向上に伴う特例承認の予定。承認書類提出待ちのため対応中。","請求処理への影響":true,"作成日時":"2024-11-15T14:32:45+09:00","更新日時":"2024-11-15T15:20:00+09:00"}],"請求対象項目定義":[{"項目定義ID":"rec-001","項目コード":"SALES_AMOUNT","項目名":"基本売上金額","説明":"営業部門が計上した月次の基本売上金額。商品販売およびサービス提供に伴う主要な売上を集計対象とする。","営業データテーブル名":"sales_transactions","営業データカラム名":"transaction_amount","データ型":"integer","請求計算方法":"SUM","検証ルールID":"rec-v-001","必須フラグ":true,"有効フラグ":true,"開始日":"2024-04-01T00:00:00Z","終了日":null,"作成日時":"2024-03-15T09:30:00Z","作成者":"山田花子","更新日時":"2024-12-20T14:15:00Z","更新者":"佐藤次郎"},{"項目定義ID":"rec-001","項目コード":"SERVICE_FEE","項目名":"サービス手数料","説明":"顧客との契約に基づき月次で発生するサービス提供に対する手数料。売上高の3%を基準として計算し、最低手数料5,000円を適用する。","営業データテーブル名":"sales_transactions","営業データカラム名":"monthly_sales_amount","データ型":"integer","請求計算方法":"SUM","検証ルールID":"rule-042","必須フラグ":true,"有効フラグ":true,"開始日":"2024-04-01T00:00:00Z","終了日":null,"作成日時":"2024-03-15T10:30:45Z","作成者":"山田花子","更新日時":"2024-12-20T14:22:18Z","更新者":"佐藤次郎"},{"項目定義ID":"rec-001","項目コード":"RETURN_DEDUCTION","項目名":"返品・キャンセル売上控除","説明":"顧客からの返品またはキャンセル申請に基づき、当月の売上から控除する金額。返品理由コードと承認ステータスにより自動計算される。","営業データテーブル名":"sales_returns","営業データカラム名":"deduction_amount","データ型":"integer","請求計算方法":"SUM","検証ルールID":"rec-v-001","必須フラグ":true,"有効フラグ":true,"開始日":"2024-04-01T00:00:00Z","終了日":null,"作成日時":"2024-03-15T09:30:00Z","作成者":"鈴木花子","更新日時":"2024-12-10T14:20:00Z","更新者":"佐藤次郎"},{"項目定義ID":"rec-001","項目コード":"MONTHLY_CONTRACT_CHARGE","項目名":"契約金月割請求額","説明":"複数月にわたる契約金を契約開始日から終了日までの月数で均等割りした月額請求額。契約期間中の毎月、同額を請求対象とする。","営業データテーブル名":"契約マスタ","営業データカラム名":"契約金総額","データ型":"integer","請求計算方法":"MONTHLY_DIVISION","検証ルールID":"rec-v-012","必須フラグ":true,"有効フラグ":true,"開始日":"2024-04-01T00:00:00Z","終了日":null,"作成日時":"2024-03-15T09:30:00Z","作成者":"佐藤花子","更新日時":"2024-12-20T14:15:00Z","更新者":"鈴木健一"},{"項目定義ID":"rec-001","項目コード":"CONSUMPTION_TAX","項目名":"消費税額","説明":"売上金額に対して適用される消費税10%相当額。営業取引における消費税額を自動集計し、請求対象として計上する。","営業データテーブル名":"sales_transactions","営業データカラム名":"tax_amount","データ型":"integer","請求計算方法":"SUM","検証ルールID":"rec-v-012","必須フラグ":true,"有効フラグ":true,"開始日":"2024-01-01T00:00:00Z","終了日":null,"作成日時":"2024-01-15T09:30:00Z","作成者":"山田花子","更新日時":"2024-11-20T14:45:00Z","更新者":"佐藤次郎"},{"項目定義ID":"rec-001","項目コード":"DELIVERY_CHARGE_EXCLUSION","項目名":"配送料金請求対象外除外","説明":"特定の条件下で配送料金を請求対象から除外する項目。同一日配送、キャンセル配送、返品配送等の場合に適用され、請求額計算時に減額対象となる。","営業データテーブル名":"delivery_transactions","営業データカラム名":"exclusion_charge_amount","データ型":"integer","請求計算方法":"SUM","検証ルールID":"rec-042","必須フラグ":false,"有効フラグ":true,"開始日":"2024-04-01T00:00:00Z","終了日":null,"作成日時":"2024-03-15T10:30:00Z","作成者":"佐藤花子","更新日時":"2025-01-20T14:15:00Z","更新者":"鈴木健一"},{"項目定義ID":"rec-001","項目コード":"DISCOUNT_AMOUNT","項目名":"割引額","説明":"顧客への販売時に適用した割引額。売上から控除される金額。キャンペーン割引、数量割引、顧客別割引が対象。","営業データテーブル名":"sales_transactions","営業データカラム名":"discount_amount","データ型":"integer","請求計算方法":"SUM","検証ルールID":"rec-v-001","必須フラグ":true,"有効フラグ":true,"開始日":"2024-01-01T00:00:00Z","終了日":null,"作成日時":"2024-01-15T09:30:00Z","作成者":"佐藤花子","更新日時":"2024-11-20T14:15:00Z","更新者":"鈴木次郎"},{"項目定義ID":"rec-001","項目コード":"PARTNER_COMMISSION_RATE","項目名":"取引先別手数料率","説明":"取引先との契約に基づき適用される手数料率。売上高に対して取引先ごとに異なる手数料率を乗算して手数料額を算出する。","営業データテーブル名":"sales_transactions","営業データカラム名":"commission_rate","データ型":"decimal","請求計算方法":"DIRECT","検証ルールID":"rule-047","必須フラグ":true,"有効フラグ":true,"開始日":"2024-04-01T00:00:00Z","終了日":null,"作成日時":"2024-03-15T09:30:00Z","作成者":"山田花子","更新日時":"2024-12-20T14:15:00Z","更新者":"佐藤次郎"},{"項目定義ID":"rec-001","項目コード":"CARRYOVER_AMOUNT","項目名":"前月繰越金","説明":"前月度の未請求残高を当月の請求対象に加算する項目。月次決算時に前月繰越金を確認し、当月売上と合算して請求額を算出する。","営業データテーブル名":"営業取引記録","営業データカラム名":"繰越金額","データ型":"integer","請求計算方法":"DIRECT","検証ルールID":"rec-042","必須フラグ":true,"有効フラグ":true,"開始日":"2024-04-01T00:00:00Z","終了日":null,"作成日時":"2024-03-15T10:30:00Z","作成者":"山田花子","更新日時":"2024-12-20T14:15:00Z","更新者":"佐藤次郎"},{"項目定義ID":"rec-001","項目コード":"CATEGORY_SALES_ELECTRONICS","項目名":"電子機器カテゴリー売上","説明":"販売管理システムから抽出した電子機器カテゴリーに属する商品の月次売上合計。消費税を含まない税抜金額を集計対象とする。","営業データテーブル名":"sales_transactions","営業データカラム名":"sales_amount","データ型":"integer","請求計算方法":"SUM","検証ルールID":"rec-042","必須フラグ":true,"有効フラグ":true,"開始日":"2024-04-01T00:00:00Z","終了日":null,"作成日時":"2024-03-15T10:30:45Z","作成者":"山田花子","更新日時":"2024-12-20T14:22:18Z","更新者":"佐藤次郎"}],"顧客請求集計":[{"請求集計ID":"rec-20250201-001","顧客ID":"cust-0847","請求年月":"2025-01","請求金額":2850000,"税額":285000,"請求金額合計":3135000,"対象営業データ件数":47,"検証ステータス":"検証済み","異常フラグ":false,"請求ステータス":"請求済み","摘要":"大口顧客・通常月次請求。前月比3.2%増。全営業データ検証完了。請求書発行済み（2025-02-03）。","作成日時":"2025-02-01T09:15:00+09:00","更新日時":"2025-02-03T14:30:00+09:00","作成者":"山田花子","更新者":"佐藤次郎"},{"請求集計ID":"rec-20250115-0847","顧客ID":"CUST-00542","請求年月":"2025-01","請求金額":2850000,"税額":285000,"請求金額合計":3135000,"対象営業データ件数":47,"検証ステータス":"検証済み","異常フラグ":true,"請求ステータス":"承認待ち","摘要":"1月分請求集計。営業データ件数が前月比で+15件と増加。単価変動の軽微な異常を検出したが、顧客との新規契約追加による正当な変動として確認済み。承認者による最終確認待ち。","作成日時":"2025-01-15T09:30:00","更新日時":"2025-01-16T14:22:00","作成者":"山田花子","更新者":"佐藤次郎"},{"請求集計ID":"rec-20250115-001","顧客ID":"CUST-2025-0001","請求年月":"2025-01","請求金額":850000,"税額":85000,"請求金額合計":935000,"対象営業データ件数":12,"検証ステータス":"未検証","異常フラグ":false,"請求ステータス":"未処理","摘要":"新規取引先（株式会社サンテック）の初回請求。2024年12月の営業活動分を集計。請求内容は営業支援サービス提供料金。","作成日時":"2025-01-15T09:30:00+09:00","更新日時":"2025-01-15T09:30:00+09:00","作成者":"山田花子","更新者":"山田花子"},{"請求集計ID":"rec-20250215-0847","顧客ID":"cust-A2024-1156","請求年月":"2025-01","請求金額":2850000,"税額":285000,"請求金額合計":3135000,"対象営業データ件数":47,"検証ステータス":"検証済み","異常フラグ":false,"請求ステータス":"請求済み","摘要":"前月12月繰越案件15件を含む。システム保守サービス一式（12月分18件、1月分29件）の統合請求。請求書発行済み。","作成日時":"2025-02-10T09:30:45","更新日時":"2025-02-15T14:22:18","作成者":"yamada-taro","更新者":"suzuki-hanako"},{"請求集計ID":"rec-20250156","顧客ID":"cust-00847","請求年月":"2025-01","請求金額":2850000,"税額":285000,"請求金額合計":3135000,"対象営業データ件数":47,"検証ステータス":"異常検出","異常フラグ":true,"請求ステータス":"未処理","摘要":"予算上限2,500,000円に対し請求金額が2,850,000円となり350,000円の超過。大型案件の追加発注による増額。営業部門への確認が必要。","作成日時":"2025-02-03T09:15:30+09:00","更新日時":"2025-02-03T14:42:15+09:00","作成者":"鈴木花子","更新者":"佐藤次郎"},{"請求集計ID":"rec-20250115-001","顧客ID":"cust-2024-0847","請求年月":"2025-01","請求金額":45800000,"税額":4580000,"請求金額合計":50380000,"対象営業データ件数":2847,"検証ステータス":"異常検出","異常フラグ":true,"請求ステータス":"承認待ち","摘要":"大型システム開発プロジェクト（2024年10月〜2025年1月）の統合請求。営業データ件数が通常の3倍以上となっており、複数部門による並行作業が反映されている。金額検証完了、顧客承認待ち。","作成日時":"2025-01-15 09:30:00","更新日時":"2025-01-15 14:45:00","作成者":"佐藤花子","更新者":"鈴木健太"},{"請求集計ID":"rec-20250087","顧客ID":"cust-00456","請求年月":"2025-01","請求金額":-45000,"税額":-4500,"請求金額合計":-49500,"対象営業データ件数":3,"検証ステータス":"検証済み","異常フラグ":false,"請求ステータス":"キャンセル","摘要":"2024年12月納品分の返品に伴う返金処理。顧客より不良品の報告を受け、2025年1月15日に全量返品確認。請求集計ID rec-20241245を相殺するための負の請求を計上。返金予定日2025年2月10日。","作成日時":"2025-01-20T09:30:00","更新日時":"2025-01-20T14:15:00","作成者":"山田花子","更新者":"佐藤次郎"},{"請求集計ID":"rec-20250147","顧客ID":"cust-00892","請求年月":"2024-11","請求金額":385000,"税額":38500,"請求金額合計":423500,"対象営業データ件数":47,"検証ステータス":"検証済み","異常フラグ":false,"請求ステータス":"入金確認","摘要":"2024年11月分の請求。営業データ検証完了。入金予定日は2025年1月15日。","作成日時":"2024-12-05T09:30:00+09:00","更新日時":"2025-01-08T14:22:00+09:00","作成者":"田中太郎","更新者":"佐藤花子"},{"請求集計ID":"rec-20250115-0847","顧客ID":"cust-JP-00284","請求年月":"2024-04","請求金額":850000,"税額":68000,"請求金額合計":918000,"対象営業データ件数":23,"検証ステータス":"検証済み","異常フラグ":false,"請求ステータス":"請求済み","摘要":"2024年4月1日の消費税率変更対応。3月31日までは8%、4月1日以降は10%で計算。3月分(税抜き420,000円、税額33,600円)と4月分(税抜き430,000円、税額43,000円)を合算。特殊計算により経理部で事前承認済み。","作成日時":"2024-05-08T09:30:00+09:00","更新日時":"2024-05-15T14:22:00+09:00","作成者":"佐藤花子","更新者":"鈴木一郎"},{"請求集計ID":"rec-20250215-001","顧客ID":"cust-A0847","請求年月":"2025-01","請求金額":2850000,"税額":285000,"請求金額合計":3135000,"対象営業データ件数":47,"検証ステータス":"承認待ち","異常フラグ":true,"請求ステータス":"未処理","摘要":"営業データの重複検出により差戻し。2024-12-15の営業活動3件が重複計上されていたため、請求金額を450,000円減額し再集計。対象営業データ件数は50件から47件に修正。","作成日時":"2025-02-01T09:30:00+09:00","更新日時":"2025-02-15T14:45:00+09:00","作成者":"佐藤花子","更新者":"鈴木次郎"}],"サービス請求集計":[{"請求集計ID":"rec-20250115-a7f3","顧客ID":"cust-00847","請求年月":"2025-01","サービスID":"svc-premium-cloud","集計対象件数":1847,"請求金額":2850000,"税額":285000,"請求金額合計":3135000,"集計ステータス":"確定","データ品質スコア":98,"異常検出フラグ":false,"検証ルール適用状況":"全23項目のルール適用完了。金額範囲チェック（OK）、顧客マスタ照合（OK）、重複排除（OK）、サービス利用期間検証（OK）","請求確定日時":"2025-01-15T09:30:00+09:00","作成日時":"2025-01-10T14:22:15+09:00","更新日時":"2025-01-15T09:30:00+09:00","作成者":"山田花子","更新者":"佐藤次郎","備考":"大口顧客A社との1月度月次請求。前月比105%。全データ品質良好。予定通り1月20日に請求書発行予定。"},{"請求集計ID":"rec-20250115-0847","顧客ID":"cust-0024567","請求年月":"2025-01","サービスID":"svc-cloud-001","集計対象件数":1247,"請求金額":850000,"税額":85000,"請求金額合計":935000,"集計ステータス":"下書き","データ品質スコア":87,"異常検出フラグ":true,"検証ルール適用状況":"基本検証:合格 | 金額範囲検証:合格 | データ完全性:警告(0.8%の件数に時刻情報欠落) | 重複検証:合格","請求確定日時":null,"作成日時":"2025-01-15T09:23:45+09:00","更新日時":"2025-01-15T14:12:30+09:00","作成者":"山田太郎","更新者":"佐藤花子","備考":"クラウドストレージサービス1月度集計。前月比+12%。軽微なデータ欠落を確認したため、営業チームに確認依頼済み。確認後に確定予定。"},{"請求集計ID":"rec-20250115-001","顧客ID":"cust-NEW-20250101-0847","請求年月":"2025-01","サービスID":"svc-cloud-basic","集計対象件数":42,"請求金額":125000,"税額":12500,"請求金額合計":137500,"集計ステータス":"確定","データ品質スコア":68,"異常検出フラグ":true,"検証ルール適用状況":"【適用ルール】①初回請求チェック:OK ②金額範囲検証:警告(下限以下) ③データ欠落検証:4件の不完全レコード検出 ④重複チェック:重複なし ⑤顧客情報整合性:部分一致 【結論】条件付き確定","請求確定日時":"2025-01-15T10:32:00+09:00","作成日時":"2025-01-10T14:22:00+09:00","更新日時":"2025-01-15T10:32:00+09:00","作成者":"suzuki_hanako","更新者":"yamamoto_taro","備考":"新規顧客初回請求。契約開始2025年1月1日。サービス利用開始直後のため集計対象件数が少なく、データ品質スコアが低めとなっている。顧客側のAPI連携遅延により4件のデータ欠落あり。営業担当者(佐藤次郎)確認済み。請求金額は確定。次月より正常な集計を見込む。"},{"請求集計ID":"rec-20250215-0847","顧客ID":"cust-00156","請求年月":"2025-01","サービスID":"svc-cloud-001","集計対象件数":1247,"請求金額":3850000,"税額":385000,"請求金額合計":4235000,"集計ステータス":"確定","データ品質スコア":94,"異常検出フラグ":false,"検証ルール適用状況":"金額妥当性チェック:OK、データ完全性チェック:OK、重複排除チェック:OK、日付範囲チェック:OK","請求確定日時":"2025-02-15 09:30:45","作成日時":"2025-02-15 08:47:12","更新日時":"2025-02-15 09:30:45","作成者":"山田花子","更新者":"佐藤次郎","備考":"2025-01月分の前回集計（rec-20250210-0521）をキャンセルし、営業データの修正反映に伴い再集計。前回比+85,000円の差分は1月中旬の追加利用分による。顧客確認済み。"},{"請求集計ID":"rec-20250115-001","顧客ID":"cust-00847","請求年月":"2025-01","サービスID":"svc-basic-support","集計対象件数":12,"請求金額":180000,"税額":18000,"請求金額合計":198000,"集計ステータス":"請求済み","データ品質スコア":98,"異常検出フラグ":false,"検証ルール適用状況":"全検証ルール適用完了。金額範囲チェック：OK、重複チェック：OK、必須項目チェック：OK","請求確定日時":"2025-01-15T09:30:00+09:00","作成日時":"2025-01-10T14:22:15+09:00","更新日時":"2025-01-15T09:30:45+09:00","作成者":"田中太郎","更新者":"佐藤花子","備考":"小規模案件向け基本サポートサービス。2024年12月分営業データ12件を集計。顧客からの承認済み。2025年1月15日に請求書発行完了。"},{"請求集計ID":"rec-20250115-0847","顧客ID":"cust-00012450","請求年月":"2025-01","サービスID":"svc-multi-001","集計対象件数":247,"請求金額":2850000,"税額":285000,"請求金額合計":3135000,"集計ステータス":"確定","データ品質スコア":72,"異常検出フラグ":true,"検証ルール適用状況":"部門A(営業部)：1,200,000円/124件✓ | 部門B(カスタマー部)：980,000円/89件✓ | 部門C(システム部)：670,000円/34件⚠ 同一顧客への複数部門請求統合、部門C件数が前月比-45%で異常検出","請求確定日時":"2025-01-15T09:30:00+09:00","作成日時":"2025-01-10T14:22:15+09:00","更新日時":"2025-01-15T09:30:00+09:00","作成者":"user-佐藤花子","更新者":"user-鈴木一郎","備考":"複数部門(営業・カスタマー・システム)からの同一顧客(株式会社ヤマダ)への請求を統合。部門C(システム部)の件数減少について営業部に確認済み。新規プロジェクト終了に伴う減少のため異常ではなく、請求確定時に営業部長・山田太郎の承認を得た。"},{"請求集計ID":"rec-20250115-7842","顧客ID":"cust-00156","請求年月":"2025-01","サービスID":"svc-cloud-basic","集計対象件数":8,"請求金額":45000,"税額":4500,"請求金額合計":49500,"集計ステータス":"確定","データ品質スコア":92,"異常検出フラグ":false,"検証ルール適用状況":"全検証ルール適用済み。部分月請求（1月1日～1月15日）のため日割り計算を実施。営業データ件数8件、全件正常。","請求確定日時":"2025-01-16 14:32:15","作成日時":"2025-01-15 09:18:42","更新日時":"2025-01-16 14:32:15","作成者":"user-yamada-hanako","更新者":"user-suzuki-jiro","備考":"新規顧客の初月利用。契約開始日2025年1月1日、月途中での部分月請求。利用期間は1月1日～1月15日（15日間）。日割り計算により基本料60,000円から45,000円に減額。請求予定日は2025年2月5日。"},{"請求集計ID":"rec-20250215-0847","顧客ID":"cust-00156","請求年月":"2025-01","サービスID":"svc-cloud-premium","集計対象件数":1247,"請求金額":2850000,"税額":285000,"請求金額合計":3135000,"集計ステータス":"確定","データ品質スコア":68,"異常検出フラグ":true,"検証ルール適用状況":"前月比変動率+156%で異常検出。データ欠損率8.2%。単価整合性OK。ユーザー数増加（450→1150名）が主要因と判定。","請求確定日時":"2025-02-14T16:45:23+09:00","作成日時":"2025-02-01T09:12:00+09:00","更新日時":"2025-02-14T16:45:23+09:00","作成者":"山田花子","更新者":"佐藤次郎","備考":"顧客の大規模キャンペーン実施に伴う利用者急増。前月1,100万円→2,850万円。営業確認済み。異常ではなく正常な変動。2025年1月中旬より新規部門50名が追加利用開始。"},{"請求集計ID":"rec-20250215-0847","顧客ID":"cust-C0012847","請求年月":"2025-02","サービスID":"svc-premium-monthly","集計対象件数":0,"請求金額":-145000,"税額":-14500,"請求金額合計":-159500,"集計ステータス":"キャンセル","データ品質スコア":95,"異常検出フラグ":false,"検証ルール適用状況":"負額請求承認ルール適用済み。キャンセル理由コード: REFUND_REQUEST_APPROVED。返金対象請求集計ID: rec-20250131-0612参照。","請求確定日時":"2025-02-15T14:32:18+09:00","作成日時":"2025-02-14T09:45:22+09:00","更新日時":"2025-02-15T14:32:18+09:00","作成者":"yamada-hanako","更新者":"suzuki-taro","備考":"2025年1月31日請求分（請求金額145,000円）について、顧客からのキャンセル申し立てに基づき2025年2月10日に返金承認。サービス利用期間中の機能不具合（2025年1月20日〜25日）に伴う部分返金対応。返金方法：クレジットカード逆請求。対応者：営業部・田中太郎。"},{"請求集計ID":"rec-20250131-0847","顧客ID":"CUST-00015234","請求年月":"2025-01","サービスID":"SVC-CLOUD-BASIC","集計対象件数":1247,"請求金額":385000,"税額":38500,"請求金額合計":423500,"集計ステータス":"下書き","データ品質スコア":78,"異常検出フラグ":true,"検証ルール適用状況":"単価異常検出:警告(前月比+12%),件数異常検出:正常,金額範囲検証:正常,重複チェック:警告(3件の重複使用ログ検出)","請求確定日時":null,"作成日時":"2025-01-31 17:43:22","更新日時":"2025-01-31 18:56:15","作成者":"山田花子","更新者":"佐藤次郎","備考":"月末締め切り駆け込み集計。前月比で利用件数が増加傾向。重複ログ3件は顧客側のシステム連携エラーと判明。確定前に顧客確認予定。"}],"営業データメタデータ":[{"メタデータID":"rec-001-20250115-001","データ項目名":"受注金額","データ項目説明":"顧客との契約成立時点での受注額。税抜き金額で記録。返品・キャンセルは別途調整。月次請求集計の基礎となる重要項目。","データ型":"integer","必須フラグ":true,"最大文字数":null,"品質検証ルール適用":true,"異常検出対象フラグ":true,"請求対象フラグ":true,"請求項目カテゴリ":"サービス料金","集計方法":"SUM","データソース":"営業管理システム.受注テーブル","更新頻度":"日次","有効開始日":"2024-04-01T00:00:00Z","有効終了日":null,"作成日時":"2024-03-15T10:30:45Z","作成者":"山田花子","更新日時":"2025-01-10T14:22:30Z","更新者":"佐藤次郎","備考":"月次請求書作成時に当月受注分を集計対象とする。キャンセル案件は受注金額から除外し、キャンセル理由コードで追跡管理。異常値判定基準：単一受注が500万円を超える場合は営業部長確認必須。"},{"メタデータID":"rec-001","データ項目名":"顧客ID","データ項目説明":"営業システムで顧客を一意に識別するための識別子。顧客マスタテーブルの主キーとして機能し、受注・請求・入金などの営業トランザクションと顧客情報を関連付けるために使用される。","データ型":"varchar","必須フラグ":true,"最大文字数":20,"品質検証ルール適用":true,"異常検出対象フラグ":true,"請求対象フラグ":false,"請求項目カテゴリ":null,"集計方法":null,"データソース":"顧客マスタ","更新頻度":"日次","有効開始日":"2024-01-01T00:00:00Z","有効終了日":null,"作成日時":"2024-01-15T09:30:00Z","作成者":"田中太郎","更新日時":"2024-11-20T14:45:00Z","更新者":"鈴木花子","備考":"顧客IDの形式はCUST-で始まる8桁の数字（例：CUST-00001234）。受注データに含まれる顧客IDが顧客マスタに存在しない場合は異常として検出される。月次の顧客マスタ更新に伴い、新規顧客IDが追加される。"},{"メタデータID":"rec-001-billing-date-validation","データ項目名":"請求日","データ項目説明":"顧客に対する請求が確定した日付。営業月の翌月末までに請求日が設定される必要があり、過去日付および未来日付の妥当性検証対象となる。請求システムへの登録基準日として機能する。","データ型":"timestamp","必須フラグ":true,"最大文字数":null,"品質検証ルール適用":true,"異常検出対象フラグ":true,"請求対象フラグ":true,"請求項目カテゴリ":"請求基準日","集計方法":"COUNT","データソース":"sales_transactions","更新頻度":"日次","有効開始日":"2024-01-01T00:00:00Z","有効終了日":null,"作成日時":"2024-01-15T09:30:00Z","作成者":"山田太郎","更新日時":"2025-01-10T14:22:30Z","更新者":"鈴木花子","備考":"検証ルール：請求日は取引日から30日以内であること、システム日付を超過しないこと、月末日を超える場合は翌月1日に自動補正。異常値（1900年代、2099年以降）は検出対象。請求実績集計では請求日ベースで月次集計を実施。"},{"メタデータID":"rec-001-svc-period-basis","データ項目名":"サービス利用期間計算基準","データ項目説明":"顧客がサービスを利用した期間を特定するための基準項目。サービス開始日と終了日から請求対象期間を算出し、月次または年次の請求集計に使用される。部分月の料金按分計算にも適用される。","データ型":"varchar","必須フラグ":true,"最大文字数":50,"品質検証ルール適用":true,"異常検出対象フラグ":true,"請求対象フラグ":true,"請求項目カテゴリ":"サービス料金","集計方法":"SUM","データソース":"sales_contract_master","更新頻度":"日次","有効開始日":"2024-01-01T00:00:00Z","有効終了日":null,"作成日時":"2024-01-15T10:30:00Z","作成者":"山田花子","更新日時":"2025-01-20T14:45:00Z","更新者":"佐藤次郎","備考":"サービス開始日が月中の場合は日割り計算を適用。終了日がNULLの場合は継続中として扱う。請求月の最終営業日を期間終了日とする運用ルールを適用。四半期契約・年間契約の場合は契約開始月から計算。"},{"メタデータID":"rec-20250115-0047","データ項目名":"割引金額","データ項目説明":"営業取引において顧客に対して適用された割引・値引き金額。キャンペーン割引、数量割引、継続取引割引等が含まれる。請求額から控除される項目。","データ型":"numeric","必須フラグ":false,"最大文字数":null,"品質検証ルール適用":true,"異常検出対象フラグ":true,"請求対象フラグ":true,"請求項目カテゴリ":"割引・値引き","集計方法":"SUM","データソース":"sales_transaction","更新頻度":"日次","有効開始日":"2024-04-01T00:00:00Z","有効終了日":null,"作成日時":"2024-04-01T09:30:00Z","作成者":"山田花子","更新日時":"2025-01-15T14:20:00Z","更新者":"佐藤次郎","備考":"割引金額は0以上の値のみ許可。受注金額の30%を超える割引は異常値として検出対象。月次請求集計時に割引・値引きカテゴリとして合算し、売上から控除。営業部門の割引権限に基づき適用される。"},{"メタデータID":"rec-001","データ項目名":"消費税額","データ項目説明":"課税対象売上金額に対して適用税率（10%または8%）を乗算して自動計算される消費税額。軽減税率対象商品は8%、その他は10%を適用。","データ型":"decimal","必須フラグ":true,"最大文字数":null,"品質検証ルール適用":true,"異常検出対象フラグ":true,"請求対象フラグ":true,"請求項目カテゴリ":"税金","集計方法":"計算式","データソース":"sales_transaction","更新頻度":"日次","有効開始日":"2024-04-01T00:00:00Z","有効終了日":null,"作成日時":"2024-03-15T10:30:00Z","作成者":"山田太郎","更新日時":"2024-12-20T14:45:00Z","更新者":"鈴木花子","備考":"計算式：課税対象売上額×税率。税率は商品マスタの軽減税率フラグにより自動判定。消費税の端数処理は四捨五入。月次請求書作成時に検証ルールで消費税額の妥当性チェックを実施。"},{"メタデータID":"rec-20250115-fee-001","データ項目名":"決済手数料","データ項目説明":"クレジットカード決済時に発生する決済代行業者への手数料。受注金額に対して2.5%～3.5%の範囲で計算される。異常な手数料率や金額が計上された場合は即座に検出・通知する必要がある。","データ型":"decimal","必須フラグ":true,"最大文字数":null,"品質検証ルール適用":true,"異常検出対象フラグ":true,"請求対象フラグ":true,"請求項目カテゴリ":"手数料","集計方法":"SUM","データソース":"payment_transactions","更新頻度":"日次","有効開始日":"2024-04-01T00:00:00Z","有効終了日":null,"作成日時":"2024-03-15T10:30:45Z","作成者":"佐藤花子","更新日時":"2025-01-10T14:22:18Z","更新者":"山田次郎","備考":"異常検出ルール：手数料額が受注金額の5%を超える場合または0円の場合はアラート発火。月次決済レポートに含める。2024年度より監視対象に追加。"},{"メタデータID":"rec-001-return-deduction-202501","データ項目名":"返品・キャンセル金額","データ項目説明":"顧客からの返品またはキャンセルに伴う金額。負数値で記録され、請求額から控除される。返品理由コードと紐付けられ、月次請求集計時に累計控除額として計上される。","データ型":"decimal","必須フラグ":true,"最大文字数":null,"品質検証ルール適用":true,"異常検出対象フラグ":true,"請求対象フラグ":true,"請求項目カテゴリ":"請求控除","集計方法":"SUM","データソース":"sales_return_management.return_transactions","更新頻度":"日次","有効開始日":"2024-01-01T00:00:00Z","有効終了日":null,"作成日時":"2024-01-15T09:30:00Z","作成者":"鈴木花子","更新日時":"2025-01-20T14:15:00Z","更新者":"佐藤次郎","備考":"返品・キャンセルは常に負数値（-）で記録される。月次請求集計では同一顧客・同一期間の返品金額を合算し、請求額から控除。異常検出では単一トランザクションで50万円を超える返品は要確認フラグが立つ。返品理由コード（101:初期不良、102:納期遅延対応、103:顧客都合キャンセル等）と併せて管理する。"},{"メタデータID":"rec-001","データ項目名":"商品コード","データ項目説明":"営業取引に含まれる商品を一意に識別するコード。商品マスタと照合し、実在する商品であることを検証する必須項目。形式は英数字4桁（例：A001、B234）。","データ型":"varchar","必須フラグ":true,"最大文字数":10,"品質検証ルール適用":true,"異常検出対象フラグ":true,"請求対象フラグ":true,"請求項目カテゴリ":"サービス料金","集計方法":"COUNT","データソース":"商品マスタ","更新頻度":"日次","有効開始日":"2024-01-01T00:00:00Z","有効終了日":null,"作成日時":"2024-04-15T09:30:00Z","作成者":"田中太郎","更新日時":"2025-01-20T14:45:00Z","更新者":"鈴木花子","備考":"商品マスタとの照合ルール：商品コードが商品マスタに存在しない場合はエラー。廃止商品（有効終了日が過去）も不可。月次決算前の品質検証時に重点確認項目。"},{"メタデータID":"rec-20250115-001","データ項目名":"内部取引フラグ","データ項目説明":"営業取引が社内グループ企業間の内部取引であるかどうかを示すフラグ。内部取引は請求対象外となり、連結決算時の相殺処理対象となる。値は0（外部取引）または1（内部取引）。","データ型":"integer","必須フラグ":true,"最大文字数":null,"品質検証ルール適用":true,"異常検出対象フラグ":false,"請求対象フラグ":false,"請求項目カテゴリ":null,"集計方法":null,"データソース":"営業管理システム(SalesForce)_取引マスタテーブル","更新頻度":"日次","有効開始日":"2024-04-01T00:00:00Z","有効終了日":null,"作成日時":"2024-03-15T10:30:45Z","作成者":"山田花子","更新日時":"2025-01-10T14:22:18Z","更新者":"佐藤次郎","備考":"内部取引フラグが1の場合は請求データから自動的に除外される。品質検証ルールとして、当該フラグが立っている取引は必ず関連会社コードが入力されていることを確認する。月次決算時に内部取引の相殺額を経理部に報告。"}],"月次サマリーテンプレート":[{"月次サマリーテンプレートID":"rec-001","対象年月":"2024-11","営業データ集計件数":1247,"営業データ検証成功件数":1198,"営業データ検証失敗件数":49,"異常検出件数":12,"請求対象件数":1186,"請求集計金額":4856000,"顧客別請求件数":43,"サービス別請求件数":8,"データ品質スコア":92,"テンプレートステータス":"承認済み","備考":"11月度の集計完了。検証失敗件数の大半は顧客マスタ不一致によるもの。異常検出12件は全て既知の一時的エラーで対応済み。請求金額は前月比3.2%増。","作成日時":"2024-12-01 09:15:00","更新日時":"2024-12-05 14:42:00","作成者":"山田花子","更新者":"佐藤次郎"},{"月次サマリーテンプレートID":"rec-001","対象年月":"2024-11","営業データ集計件数":2847,"営業データ検証成功件数":1923,"営業データ検証失敗件数":924,"異常検出件数":87,"請求対象件数":1856,"請求集計金額":18750000,"顧客別請求件数":142,"サービス別請求件数":28,"データ品質スコア":52,"テンプレートステータス":"下書き","備考":"11月は営業データ検証失敗件数が例年比で約3倍に増加。主な原因は営業担当者の入力誤りと顧客マスタ更新の遅延。12月の改善施策として入力フォームのバリデーション強化とマスタ同期スケジュール見直しを実施予定。","作成日時":"2024-12-01 09:15:00","更新日時":"2024-12-02 14:30:00","作成者":"山田花子","更新者":"鈴木一郎"},{"月次サマリーテンプレートID":"rec-20250215-001","対象年月":"2025-01","営業データ集計件数":1250,"営業データ検証成功件数":1180,"営業データ検証失敗件数":70,"異常検出件数":23,"請求対象件数":1205,"請求集計金額":4850000,"顧客別請求件数":87,"サービス別請求件数":34,"データ品質スコア":62,"テンプレートステータス":"確定","備考":"1月度の異常検出により23件の不正請求が検出されました。うち15件は過剰請求、8件は重複請求です。対象顧客：大手流通グループ、中堅製造業2社。検証失敗件数の増加とデータ品質スコア低下が顕著。経理部門と協議の上、該当請求は一旦保留し、顧客への説明資料を準備中です。","作成日時":"2025-02-01 09:30:00","更新日時":"2025-02-15 14:45:00","作成者":"佐藤花子","更新者":"鈴木健一"},{"月次サマリーテンプレートID":"rec-20250331-001","対象年月":"2025-03","営業データ集計件数":8547,"営業データ検証成功件数":8312,"営業データ検証失敗件数":235,"異常検出件数":18,"請求対象件数":7856,"請求集計金額":487650000,"顧客別請求件数":143,"サービス別請求件数":28,"データ品質スコア":87,"テンプレートステータス":"承認済み","備考":"期末決算月による決済集中。前月比+42%の売上増。請求金額大幅増加に伴い検証失敗件数も増加傾向。異常検出ログで重複請求3件、金額誤差5件を検出し対応済み。","作成日時":"2025-04-01T09:15:32+09:00","更新日時":"2025-04-02T16:45:18+09:00","作成者":"佐藤花子","更新者":"山田次郎"},{"月次サマリーテンプレートID":"rec-001","対象年月":"2024-11","営業データ集計件数":2847,"営業データ検証成功件数":2156,"営業データ検証失敗件数":691,"異常検出件数":145,"請求対象件数":1987,"請求集計金額":8540000,"顧客別請求件数":34,"サービス別請求件数":12,"データ品質スコア":62,"テンプレートステータス":"下書き","備考":"11月15日のシステムトラブルにより、東京営業所の営業データ約500件が未登録。検証失敗率が通常より高い。12月上旬の追加登録予定。","作成日時":"2024-12-02T09:30:00","更新日時":"2024-12-05T14:15:00","作成者":"鈴木花子","更新者":"佐藤次郎"},{"月次サマリーテンプレートID":"rec-001","対象年月":"2024-11","営業データ集計件数":15840,"営業データ検証成功件数":15623,"営業データ検証失敗件数":217,"異常検出件数":34,"請求対象件数":14892,"請求集計金額":8750000,"顧客別請求件数":287,"サービス別請求件数":12,"データ品質スコア":87,"テンプレートステータス":"確定","備考":"11月より新規サービス「クラウドバックアップ」の提供開始に伴い、請求対象件数が前月比+2,340件増加。顧客別請求件数も+89件増加し、請求集計金額は前月比+1,250,000円となった。データ品質スコアは安定的に推移。","作成日時":"2024-12-01T09:30:00","更新日時":"2024-12-05T14:15:00","作成者":"鈴木花子","更新者":"山田次郎"},{"月次サマリーテンプレートID":"rec-001","対象年月":"2024-11","営業データ集計件数":1250,"営業データ検証成功件数":1180,"営業データ検証失敗件数":70,"異常検出件数":45,"請求対象件数":1165,"請求集計金額":4820000,"顧客別請求件数":23,"サービス別請求件数":8,"データ品質スコア":82,"テンプレートステータス":"確定","備考":"顧客A社からのクレーム対応により請求額を85万円調整。11月15日の重複請求分を除外処理。検証失敗件数の増加は請求調整に伴う再検証による。","作成日時":"2024-12-01 09:30:00","更新日時":"2024-12-05 14:15:00","作成者":"鈴木花子","更新者":"佐藤次郎"},{"月次サマリーテンプレートID":"rec-20250201-0847","対象年月":"2025-01","営業データ集計件数":2847,"営業データ検証成功件数":2156,"営業データ検証失敗件数":691,"異常検出件数":124,"請求対象件数":2045,"請求集計金額":8756420,"顧客別請求件数":187,"サービス別請求件数":42,"データ品質スコア":58,"テンプレートステータス":"下書き","備考":"1月度のデータ品質スコアが前月比で22ポイント低下。検証失敗件数の増加が主因。請求前の再検証が必要。顧客マスタの更新漏れが複数件確認されたため、2月の入力ガイダンス強化を推奨。","作成日時":"2025-02-03 09:15:00","更新日時":"2025-02-05 14:42:00","作成者":"佐藤花子","更新者":"鈴木次郎"},{"月次サマリーテンプレートID":"rec-001","対象年月":"2025-01","営業データ集計件数":1247,"営業データ検証成功件数":1198,"営業データ検証失敗件数":49,"異常検出件数":12,"請求対象件数":1186,"請求集計金額":3847500,"顧客別請求件数":28,"サービス別請求件数":15,"データ品質スコア":92,"テンプレートステータス":"承認済み","備考":"前月12月分の下書きテンプレートが本月初に最終承認された。異常検出件数は前月比で減少傾向。データ品質スコアは目標値92を達成。","作成日時":"2024-12-15 09:30:00","更新日時":"2025-01-10 14:45:00","作成者":"佐藤花子","更新者":"山田太郎"},{"月次サマリーテンプレートID":"rec-001","対象年月":"2025-01","営業データ集計件数":1247,"営業データ検証成功件数":1198,"営業データ検証失敗件数":49,"異常検出件数":12,"請求対象件数":1186,"請求集計金額":8750000,"顧客別請求件数":34,"サービス別請求件数":18,"データ品質スコア":87,"テンプレートステータス":"確定","備考":"新入力ルール適用初月。検証成功率96.1%と良好。前月比で異常検出件数が減少し、ルール改善の効果を確認。","作成日時":"2025-02-03 09:15:30","更新日時":"2025-02-05 14:42:15","作成者":"佐藤花子","更新者":"鈴木一郎"}],"データ品質検証結果":[{"検証結果ID":"rec-001-20250115-0847","営業データID":"rec-sales-202501-1523","検証ルールID":"rec-rule-customer-name-01","検証実行日時":"2025-01-15T08:47:23+09:00","検証ステータス":"合格","エラー内容":"顧客名の表記ゆれが検出されました。登録済み顧客名「株式会社山田商事」に対して「山田商事株式会社」と記載されていました。","エラー重大度":"中","検証対象フィールド":"customer_name","検証対象値":"山田商事株式会社","是正状況":"完了","是正完了日時":"2025-01-18T14:32:15+09:00","請求対象フラグ":true,"作成日時":"2025-01-15T08:47:23+09:00","更新日時":"2025-01-18T14:32:15+09:00","作成者":"data_validation_system_v2.1"},{"検証結果ID":"rec-001-vr-20250115-0847","営業データID":"rec-002-sd-20250114-1523","検証ルールID":"rec-003-rule-billing-calc-001","検証実行日時":"2025-01-15T08:47:32+09:00","検証ステータス":"不合格","エラー内容":"請求金額の計算誤差を検出しました。請求金額は税込み金額（単価×数量×1.10）である必要がありますが、当該営業データでは税抜き金額（単価×数量）のみが記録されており、税金額が不足しています。正規の請求金額は1,650,000円ですが、記録値は1,500,000円です。差額150,000円。","エラー重大度":"高","検証対象フィールド":"請求金額","検証対象値":"1500000","是正状況":"対応中","是正完了日時":null,"請求対象フラグ":true,"作成日時":"2025-01-15T08:47:32+09:00","更新日時":"2025-01-15T14:22:18+09:00","作成者":"自動検証システム_V2.1"},{"検証結果ID":"rec-20250215-0847","営業データID":"rec-sales-2025-1523","検証ルールID":"rec-rule-delivery-format-001","検証実行日時":"2025-02-15T09:30:45Z","検証ステータス":"警告","エラー内容":"納期指定フィールドの日付形式が不正です。期待される形式: YYYY-MM-DD、実際の値: 2025/2/20","エラー重大度":"中","検証対象フィールド":"delivery_date","検証対象値":"2025/2/20","是正状況":"対応中","是正完了日時":null,"請求対象フラグ":true,"作成日時":"2025-02-15T09:30:45Z","更新日時":"2025-02-15T14:22:18Z","作成者":"山田花子"},{"検証結果ID":"rec-20250115-001","営業データID":"rec-sales-08742","検証ルールID":"rec-rule-duplicate-opp","検証実行日時":"2025-01-15T09:30:45Z","検証ステータス":"不合格","エラー内容":"営業機会ID「OPP-2024-0015847」が営業データテーブル内で3件重複して登録されています。同一顧客への重複提案となるため、営業プロセスの整合性が損なわれています。","エラー重大度":"致命的","検証対象フィールド":"営業機会ID","検証対象値":"OPP-2024-0015847","是正状況":"対応中","是正完了日時":null,"請求対象フラグ":true,"作成日時":"2025-01-15T09:30:45Z","更新日時":"2025-01-15T14:22:18Z","作成者":"自動検証システム_営業DB監視"},{"検証結果ID":"rec-20250115-0847","営業データID":"rec-cust-2024-5623","検証ルールID":"rec-rule-tax-id-001","検証実行日時":"2025-01-15T09:30:00+09:00","検証ステータス":"不合格","エラー内容":"顧客の税務ID（マイナンバー）が未入力です。請求処理に影響する可能性があります。","エラー重大度":"中","検証対象フィールド":"tax_id","検証対象値":"","是正状況":"対応不要","是正完了日時":null,"請求対象フラグ":false,"作成日時":"2025-01-15T09:30:15+09:00","更新日時":"2025-01-15T14:22:45+09:00","作成者":"自動検証システム_v2.1"},{"検証結果ID":"rec-20250115-0847","営業データID":"rec-sales-202501-5632","検証ルールID":"rec-rule-billing-flag-001","検証実行日時":"2025-01-15T09:30:45Z","検証ステータス":"警告","エラー内容":"請求対象外フラグが設定されている見積データが営業実績として登録されています。請求処理フローでの確認が必要です。","エラー重大度":"低","検証対象フィールド":"請求対象フラグ","検証対象値":"false","是正状況":"対応中","是正完了日時":null,"請求対象フラグ":false,"作成日時":"2025-01-15T09:30:45Z","更新日時":"2025-01-15T14:22:18Z","作成者":"自動検証システムv2.1"},{"検証結果ID":"rec-20250115-0847","営業データID":"rec-sales-2024-5632","検証ルールID":"rec-rule-email-format-001","検証実行日時":"2025-01-15T09:30:00+09:00","検証ステータス":"不合格","エラー内容":"メールアドレスの形式が不正です。@記号の位置が不正またはドメイン部分が欠落しています。","エラー重大度":"高","検証対象フィールド":"顧客_メールアドレス","検証対象値":"tanaka.taro@example","是正状況":"完了","是正完了日時":"2025-01-16T14:22:00+09:00","請求対象フラグ":true,"作成日時":"2025-01-15T09:30:00+09:00","更新日時":"2025-01-16T14:22:00+09:00","作成者":"automated_validation_system_v2.1"},{"検証結果ID":"rec-20250228-0847","営業データID":"rec-sales-202502-1523","検証ルールID":"rec-rule-amount-range-001","検証実行日時":"2025-02-28T16:45:30+09:00","検証ステータス":"不合格","エラー内容":"請求金額が前月比150%を超過しています。変更前：¥2,840,000、変更後：¥4,380,000。月次請求締切ルールによる異常値検出","エラー重大度":"高","検証対象フィールド":"請求金額","検証対象値":"4380000","是正状況":"完了","是正完了日時":"2025-02-28T17:22:15+09:00","請求対象フラグ":true,"作成日時":"2025-02-28T16:45:30+09:00","更新日時":"2025-02-28T17:22:15+09:00","作成者":"自動検証システム_営業データ監視"},{"検証結果ID":"rec-20250115-001","営業データID":"rec-sales-2024-08-156","検証ルールID":"rec-rule-multi-validation-042","検証実行日時":"2025-01-15T14:32:18+09:00","検証ステータス":"不合格","エラー内容":"複数の検証ルール違反を検出しました。(1)売上金額が負数です。(2)顧客コードが存在しません。(3)請求日が売上日より前の日付です。","エラー重大度":"致命的","検証対象フィールド":"売上金額,顧客コード,請求日","検証対象値":"-125000,CUST-99999,2024-12-01","是正状況":"対応中","是正完了日時":null,"請求対象フラグ":true,"作成日時":"2025-01-15T14:32:18+09:00","更新日時":"2025-01-15T16:45:22+09:00","作成者":"自動検証システムv2.1"},{"検証結果ID":"rec-20250215-001","営業データID":"rec-sales-20250210-042","検証ルールID":"rec-rule-customer-code-001","検証実行日時":"2025-02-15T09:30:00+09:00","検証ステータス":"不合格","エラー内容":"顧客マスタに登録されていない顧客コード「CUST-2024-88765」が検出されました。請求データとの照合に失敗しています。","エラー重大度":"致命的","検証対象フィールド":"顧客コード","検証対象値":"CUST-2024-88765","是正状況":"未対応","是正完了日時":null,"請求対象フラグ":true,"作成日時":"2025-02-15T09:30:15+09:00","更新日時":"2025-02-15T09:30:15+09:00","作成者":"自動検証システム_営業データ品質監視"}],"不足データ通知ログ":[{"不足データ通知ログID":"rec-20250115-001","営業データID":"rec-sales-20250110-045","不足項目名":"請求先住所","検証ルールID":"rec-rule-billing-address-001","通知ステータス":"対応中","通知対象者":"営業部_山田花子","通知日時":"2025-01-15 09:30:00","対応予定日":"2025-01-20 17:00:00","対応完了日時":null,"補正内容":null,"請求影響フラグ":true,"重要度レベル":"高","作成日時":"2025-01-15 09:30:00","更新日時":"2025-01-15 14:45:00","作成者":"system-validation"},{"不足データ通知ログID":"rec-20250115-001","営業データID":"rec-sales-20250110-042","不足項目名":"契約金額","検証ルールID":"rec-rule-20240601-015","通知ステータス":"対応中","通知対象者":"営業部_田中太郎","通知日時":"2025-01-15 09:30:00","対応予定日":"2025-01-17 17:00:00","対応完了日時":null,"補正内容":null,"請求影響フラグ":true,"重要度レベル":"高","作成日時":"2025-01-15 09:30:00","更新日時":"2025-01-15 14:22:00","作成者":"system"},{"不足データ通知ログID":"rec-20250115-001","営業データID":"rec-20250110-sales-0847","不足項目名":"請求対象部門コード","検証ルールID":"rec-validation-rule-0023","通知ステータス":"対応中","通知対象者":"営業部_請求管理チーム","通知日時":"2025-01-15 09:30:00","対応予定日":"2025-01-20 17:00:00","対応完了日時":null,"補正内容":null,"請求影響フラグ":true,"重要度レベル":"高","作成日時":"2025-01-15 09:30:00","更新日時":"2025-01-16 14:22:00","作成者":"system-validator"},{"不足データ通知ログID":"rec-001","営業データID":"rec-002","不足項目名":"対象期間開始日","検証ルールID":"rec-003","通知ステータス":"対応中","通知対象者":"営業部_請求管理チーム","通知日時":"2024-12-15 09:30:00","対応予定日":"2024-12-16 17:00:00","対応完了日時":null,"補正内容":null,"請求影響フラグ":true,"重要度レベル":"高","作成日時":"2024-12-15 09:30:00","更新日時":"2024-12-15 14:22:00","作成者":"system_batch"},{"不足データ通知ログID":"rec-001-20250115-001","営業データID":"rec-sales-20250110-042","不足項目名":"納入先住所（ビル名・階数）","検証ルールID":"rec-rule-delivery-address-001","通知ステータス":"対応中","通知対象者":"営業部_配送手配グループ","通知日時":"2025-01-15 09:30:00","対応予定日":"2025-01-17 17:00:00","対応完了日時":null,"補正内容":null,"請求影響フラグ":true,"重要度レベル":"高","作成日時":"2025-01-15 09:30:00","更新日時":"2025-01-15 14:22:00","作成者":"system_validator"},{"不足データ通知ログID":"rec-20250115-001","営業データID":"rec-sales-20250110-042","不足項目名":"営業担当者情報","検証ルールID":"rec-rule-20240601-015","通知ステータス":"対応中","通知対象者":"営業部長_鈴木健一","通知日時":"2025-01-15 09:30:00","対応予定日":"2025-01-17 17:00:00","対応完了日時":null,"補正内容":"営業担当者が2025年1月10日付で田中太郎から佐藤花子に変更されたが、売上帳票では旧担当者情報のまま。売上帰属の正確性確保のため営業データベースの担当者情報を佐藤花子に更新し、売上帰属先を修正予定。","請求影響フラグ":true,"重要度レベル":"高","作成日時":"2025-01-15 09:30:00","更新日時":"2025-01-15 14:45:00","作成者":"system_validator"},{"不足データ通知ログID":"rec-001-ndlog-20250115-001","営業データID":"rec-001-sales-20250110-045","不足項目名":"商品コード","検証ルールID":"rec-001-vrule-20240501-003","通知ステータス":"対応中","通知対象者":"営業部_鈴木花子","通知日時":"2025-01-15 09:30:00","対応予定日":"2025-01-17 17:00:00","対応完了日時":null,"補正内容":null,"請求影響フラグ":true,"重要度レベル":"高","作成日時":"2025-01-15 09:30:00","更新日時":"2025-01-15 14:45:00","作成者":"system_validator"},{"不足データ通知ログID":"rec-20250115-001","営業データID":"rec-sales-20250110-042","不足項目名":"税務登録番号","検証ルールID":"rec-rule-tax-001","通知ステータス":"対応中","通知対象者":"営業部_田中太郎","通知日時":"2025-01-15 09:30:00","対応予定日":"2025-01-20 17:00:00","対応完了日時":null,"補正内容":null,"請求影響フラグ":true,"重要度レベル":"高","作成日時":"2025-01-15 09:30:00","更新日時":"2025-01-15 14:25:00","作成者":"system"},{"不足データ通知ログID":"rec-20250115-0847","営業データID":"rec-20241220-5632","不足項目名":"期間限定割引終了日","検証ルールID":"rec-20240601-vrule-0312","通知ステータス":"対応中","通知対象者":"営業管理部_鈴木課長","通知日時":"2025-01-15 09:30:00","対応予定日":"2025-01-20 17:00:00","対応完了日時":null,"補正内容":null,"請求影響フラグ":true,"重要度レベル":"高","作成日時":"2025-01-15 09:30:00","更新日時":"2025-01-15 14:22:00","作成者":"システム管理者_佐藤花子"},{"不足データ通知ログID":"rec-00147","営業データID":"rec-00892","不足項目名":"請求書送付先メールアドレス","検証ルールID":"rec-00023","通知ステータス":"対応中","通知対象者":"営業部_田中太郎","通知日時":"2024-11-15T09:30:00+09:00","対応予定日":"2024-11-18T17:00:00+09:00","対応完了日時":null,"補正内容":null,"請求影響フラグ":true,"重要度レベル":"高","作成日時":"2024-11-15T09:30:00+09:00","更新日時":"2024-11-15T14:20:00+09:00","作成者":"system_admin"}],"操作履歴":[{"操作履歴ID":"rec-001","ユーザーID":"rec-002","操作種別":"CREATE","対象テーブル名":"営業データ","対象レコードID":"rec-003","操作内容":"新規顧客（株式会社テクノロジーソリューション）の売上データを作成。契約金額500万円、契約期間12ヶ月、納期2025年3月31日","変更前値":null,"変更後値":null,"操作ステータス":"SUCCESS","エラーメッセージ":null,"IPアドレス":"192.168.1.105","セッションID":"sess-20250115-8f7c9e2b","作成日時":"2025-01-15T10:32:45+09:00"},{"操作履歴ID":"rec-20250215-001","ユーザーID":"user-00847","操作種別":"UPDATE","対象テーブル名":"営業データ","対象レコードID":"rec-sales-20250214-5634","操作内容":"2025年2月営業データの請求金額を修正。顧客コード：C-00892（株式会社田中工業）の月次請求額が誤った単価で計算されていたため修正","変更前値":"1,250,000","変更後値":"980,000","操作ステータス":"SUCCESS","エラーメッセージ":null,"IPアドレス":"192.168.10.45","セッションID":"sess-7f4e2b9c-d1a3-4k8p-9q2r-5s6t7u8v9w0x","作成日時":"2025-02-15 09:47:23"},{"操作履歴ID":"rec-20250215-0847-a3f9","ユーザID":"rec-user-system-001","操作種別":"APPROVE","対象テーブル名":"請求対象項目定義","対象レコードID":"rec-billing-202502-001","操作内容":"2025年2月度の月次請求対象項目を自動抽出・検証後、システム承認を実行。対象件数：847件、請求対象金額合計：12,345,680円。営業データから契約ステータス「有効」かつ請求周期「月次」の項目を抽出し、重複排除・金額検証を完了。","変更前値":"ステータス: PENDING, 件数: 0, 金額: 0円","変更後値":"ステータス: APPROVED, 件数: 847, 金額: 12,345,680円","操作ステータス":"SUCCESS","エラーメッセージ":null,"IPアドレス":"192.168.100.50","セッションID":"sess-auto-batch-20250215-084712","作成日時":"2025-02-15T08:47:12+09:00"},{"操作履歴ID":"rec-20250215-0847","ユーザーID":"rec-user-admin-0034","操作種別":"DELETE","対象テーブル名":"請求データ","対象レコードID":"rec-invoice-202501-5847","操作内容":"2025年1月分の請求データ（顧客ID: rec-cust-0892、金額: 450,000円）を誤った二重計上のため削除。対象: 株式会社山田商事への請求書番号INV-2025-001234","変更前値":"{\"請求日\": \"2025-01-15\", \"顧客名\": \"株式会社山田商事\", \"請求金額\": 450000, \"請求状態\": \"確定\", \"支払期限\": \"2025-02-15\"}","変更後値":null,"操作ステータス":"SUCCESS","エラーメッセージ":null,"IPアドレス":"192.168.1.105","セッションID":"sess-20250215-admin-佐藤花子-08471629","作成日時":"2025-02-15 08:47:32"},{"操作履歴ID":"rec-20250115-00847","ユーザーID":"rec-user-00234","操作種別":"EXPORT","対象テーブル名":"営業データ","対象レコードID":"rec-sales-202501","操作内容":"2025年1月度の営業データを月次集計レポート形式でCSV出力。対象期間：2025年1月1日～1月31日。出力項目：営業担当者別売上、商品カテゴリ別売上、顧客別売上、地域別売上。","変更前値":null,"変更後値":null,"操作ステータス":"SUCCESS","エラーメッセージ":null,"IPアドレス":"192.168.1.105","セッションID":"sess-7a9f2c4e8b1d5","作成日時":"2025-02-01T09:15:32+09:00"},{"操作履歴ID":"rec-20250115-0847","ユーザーID":"rec-user-0324","操作種別":"UPDATE","対象テーブル名":"請求対象項目定義","対象レコードID":"rec-billing-rule-0156","操作内容":"請求対象項目定義ルールを更新し、新商品カテゴリ「スマートホームデバイス」を追加。既存の「生活家電」カテゴリとの区分を明確化し、新カテゴリの請求単価を設定。","変更前値":"商品カテゴリ一覧: [生活家電, オーディオ機器, 映像機器, コンピュータ周辺機器]","変更後値":"商品カテゴリ一覧: [生活家電, オーディオ機器, 映像機器, コンピュータ周辺機器, スマートホームデバイス]; スマートホームデバイス請求単価: 8,500円/ユニット","操作ステータス":"SUCCESS","エラーメッセージ":null,"IPアドレス":"192.168.1.105","セッションID":"sess-20250115-8f4c2e9d","作成日時":"2025-01-15T09:47:32+09:00"},{"操作履歴ID":"rec-20250215-0847","ユーザーID":"rec-user-0012","操作種別":"VALIDATE","対象テーブル名":"給与管理データ","対象レコードID":"rec-salary-2025-0156","操作内容":"2025年2月の給与計算データの検証を試みたが、アクセス権限が不足していため処理が中断された","変更前値":null,"変更後値":null,"操作ステータス":"FAILURE","エラーメッセージ":"アクセス権限エラー: ユーザー(山田健一)は給与管理データテーブルの参照権限を保有していません。必要な権限レベル: LEVEL_3以上","IPアドレス":"192.168.1.45","セッションID":"sess-20250215-8f3e2c1a9b7d","作成日時":"2025-02-15 08:47:32"},{"操作履歴ID":"rec-20250115-0847","ユーザーID":"rec-usr-sys-001","操作種別":"VALIDATE","対象テーブル名":"売上データ","対象レコードID":"rec-sales-202501-0156","操作内容":"2025年1月分売上データの自動検証。対象件数：1,247件、検証対象金額：¥45,680,000。請求書生成前の妥当性チェック実施。","変更前値":null,"変更後値":null,"操作ステータス":"SUCCESS","エラーメッセージ":null,"IPアドレス":"192.168.10.45","セッションID":"sess-auto-batch-20250115-084723","作成日時":"2025-01-15T08:47:23+09:00"},{"操作履歴ID":"rec-20250215-00847","ユーザーID":"usr-00234","操作種別":"APPROVE","対象テーブル名":"部門別売上レポート","対象レコードID":"rpt-202501-sales-div-03","操作内容":"2025年1月度の営業第3部門売上レポートを確認・承認。目標対比106%達成。前月比+12.3%。請求対象項目の妥当性を確認し、確定処理を実行。","変更前値":"{\"ステータス\": \"PENDING\", \"承認者\": null, \"確定日時\": null}","変更後値":"{\"ステータス\": \"APPROVED\", \"承認者\": \"usr-00234\", \"確定日時\": \"2025-02-15T14:32:18Z\"}","操作ステータス":"SUCCESS","エラーメッセージ":null,"IPアドレス":"192.168.1.105","セッションID":"sess-a7f2d9e4c1b6","作成日時":"2025-02-15T14:32:18"},{"操作履歴ID":"rec-20250115-0847","ユーザーID":"usr-20240501-1234","操作種別":"EXPORT","対象テーブル名":"操作履歴","対象レコードID":"rec-20241015-5678","操作内容":"監査ログを抽出し過去3ヶ月（2024年10月15日～2025年1月15日）の全操作履歴をCSV形式でダウンロード","変更前値":null,"変更後値":null,"操作ステータス":"SUCCESS","エラーメッセージ":null,"IPアドレス":"192.168.1.105","セッションID":"sess-20250115-a7f2c9e1","作成日時":"2025-01-15 08:47:23"}]};
+window.AIVIC_PAGE_SCREEN_ID = "scr-1782111291876";
+window.AIVIC_PAGE_INIT_JS = "function(container, apiUrl, tables) {}";
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<nav style="display:flex;align-items:center;overflow-x:auto;background:var(--top-bar-bg,var(--bg-sidebar,#0e1a31));border-bottom:1px solid var(--top-bar-border,var(--border,#2a3a5d));padding:0 12px;height:40px;flex-shrink:0;"><a href="./scr-1782111868648.html" data-aivic-nav-system="itg-2" style="padding:6px 14px;text-decoration:none;font-size:13px;white-space:nowrap;color:var(--text,#e8eefc);opacity:0.6;border-bottom:2px solid transparent;font-weight:400;">営業成果レポート自動生成・配信システム</a><a href="./scr-1782112376817.html" data-aivic-nav-system="itg-3" style="padding:6px 14px;text-decoration:none;font-size:13px;white-space:nowrap;color:var(--text,#e8eefc);opacity:0.6;border-bottom:2px solid transparent;font-weight:400;">契約・提案資料管理システム</a><a href="./scr-1782112883813-1f2f.html" data-aivic-nav-system="itg-4" style="padding:6px 14px;text-decoration:none;font-size:13px;white-space:nowrap;color:var(--text,#e8eefc);opacity:0.6;border-bottom:2px solid transparent;font-weight:400;">顧客企業向け契約・成果管理ポータル</a><a href="./scr-1782113354430.html" data-aivic-nav-system="itg-5" style="padding:6px 14px;text-decoration:none;font-size:13px;white-space:nowrap;color:var(--text,#e8eefc);opacity:0.6;border-bottom:2px solid transparent;font-weight:400;">契約変更・請求検証管理システム</a><a href="./scr-1782111017612.html" data-aivic-nav-system="itg-1" style="padding:6px 14px;text-decoration:none;font-size:13px;white-space:nowrap;color:var(--text,#e8eefc);opacity:1;border-bottom:2px solid var(--primary,#2b66ff);font-weight:600;">営業データ品質管理・請求自動化システム</a></nav>
+  <div class="shell-container">
+    <div class="top-bar">
+      <div class="brand">
+        <div class="brand-icon"></div>
+        <span>金と赤</span>
+      </div>
+      <div class="top-bar-center">
+        <span style="font-size: var(--font-size-sm); color: var(--text-muted);" id="system-name-display"></span>
+      </div>
+      <div class="top-bar-right">
+        <div class="user-menu">
+          <div class="user-avatar" id="user-initial">U</div>
+          <span style="font-size: var(--font-size-sm);">User</span>
+        </div>
+        <a href="./login.html" style="color: var(--text-muted); text-decoration: none; font-size: var(--font-size-sm); padding: 0.5rem 0.75rem; border-radius: 4px; transition: all 0.2s;" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='transparent'">ログアウト</a>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div class="sidebar">
+        <div class="sidebar-section">
+          <div class="sidebar-label">データ検証</div>
+          <div class="sidebar-item" data-aivic-nav="scr-1782111017612" onclick="showScreen('scr-1782111017612')">営業データ検証・異常検出</div>
+          <div class="sidebar-item" data-aivic-nav="scr-1782111099986" onclick="showScreen('scr-1782111099986')">検証結果確認</div>
+          <div class="sidebar-item" data-aivic-nav="scr-1782111120079" onclick="showScreen('scr-1782111120079')">不足・異常通知</div>
+          <div class="sidebar-item" data-aivic-nav="scr-1782111481431" onclick="showScreen('scr-1782111481431')">データ検索・照会</div>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-label">請求管理</div>
+          <div class="sidebar-item" data-aivic-nav="scr-1782111037156" onclick="showScreen('scr-1782111037156')">請求集計・確認</div>
+          <div class="sidebar-item" data-aivic-nav="scr-1782111439554" onclick="showScreen('scr-1782111439554')">請求書作成</div>
+          <div class="sidebar-item" data-aivic-nav="scr-1782111524134" onclick="showScreen('scr-1782111524134')">請求情報検証</div>
+          <div class="sidebar-item" data-aivic-nav="scr-1782111568050" onclick="showScreen('scr-1782111568050')">会計連携</div>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-label">設定・管理</div>
+          <div class="sidebar-item" data-aivic-nav="scr-1782111059376" onclick="showScreen('scr-1782111059376')">メタデータ管理</div>
+          <div class="sidebar-item" data-aivic-nav="scr-1782111080111" onclick="showScreen('scr-1782111080111')">月次サマリー定義</div>
+          <div class="sidebar-item" data-aivic-nav="scr-1782111418222" onclick="showScreen('scr-1782111418222')">請求ロジック定義</div>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-label">処理実行</div>
+          <div class="sidebar-item" data-aivic-nav="scr-1782111139444" onclick="showScreen('scr-1782111139444')">品質検証処理</div>
+          <div class="sidebar-item" data-aivic-nav="scr-1782111161150" onclick="showScreen('scr-1782111161150')">対象項目抽出</div>
+          <div class="sidebar-item" data-aivic-nav="scr-1782111181495" onclick="showScreen('scr-1782111181495')">請求額計算</div>
+          <div class="sidebar-item" data-aivic-nav="scr-1782111397103" onclick="showScreen('scr-1782111397103')">請求書生成・配信</div>
+        </div>
+      </div>
+
+      <div class="panel-area">
+        <div data-aivic-panel="scr-1782111017612" style="display:none"></p>
+          </div>
+          <div class="action-bar">
+            <button class="btn btn-primary">検証実行</button>
+            <button class="btn btn-secondary">フィルタリセット</button>
+            <button class="btn btn-ghost btn-sm">ヘルプ</button>
+          </div>
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-label">検証済みレコード</div>
+              <div class="kpi-value">12,450</div>
+              <div class="kpi-change">↑ 2.3% 前月比</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">異常検出件数</div>
+              <div class="kpi-value" style="color: var(--error);">287</div>
+              <div class="kpi-change" style="color: var(--error);">↑ 15 件 本日</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">データ品質スコア</div>
+              <div class="kpi-value" style="color: var(--success);">94.2%</div>
+              <div class="kpi-change">↑ 1.1% 前月比</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">未対応異常</div>
+              <div class="kpi-value" style="color: var(--warning);">42</div>
+              <div class="kpi-change">要対応</div>
+            </div>
+          </div>
+          <div class="filter-bar">
+            <input type="text" class="form-input filter-input" placeholder="検索キーワード">
+            <select class="form-select" style="flex: 0 0 150px;">
+              <option>全ステータス</option>
+              <option>異常検出</option>
+              <option>警告</option>
+              <option>正常</option>
+            </select>
+            <select class="form-select" style="flex: 0 0 150px;">
+              <option>全期間</option>
+              <option>本日</option>
+              <option>本週</option>
+              <option>本月</option>
+            </select>
+          </div>
+          <div class="scrollable-table">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>レコードID</th>
+                  <th>営業日</th>
+                  <th>顧客</th>
+                  <th>異常タイプ</th>
+                  <th>ステータス</th>
+                  <th>検出時刻</th>
+                  <th>アクション</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>#REC-001</td>
+                  <td>2025-01-15</td>
+                  <td>ABC Corp</td>
+                  <td>金額不正</td>
+                  <td><span class="status-badge status-error">異常</span></td>
+                  <td>14:32</td>
+                  <td><button class="btn btn-ghost btn-sm">詳細</button></td>
+                </tr>
+                <tr>
+                  <td>#REC-002</td>
+                  <td>2025-01-15</td>
+                  <td>XYZ Inc</td>
+                  <td>必須項目欠落</td>
+                  <td><span class="status-badge status-warning">警告</span></td>
+                  <td>14:28</td>
+                  <td><button class="btn btn-ghost btn-sm">詳細</button></td>
+                </tr>
+                <tr>
+                  <td>#REC-003</td>
+                  <td>2025-01-15</td>
+                  <td>DEF Ltd</td>
+                  <td>なし</td>
+                  <td><span class="status-badge status-success">正常</span></td>
+                  <td>14:15</td>
+                  <td><button class="btn btn-ghost btn-sm">詳細</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111037156" style="display:none"></p>
+          </div>
+          <div class="action-bar">
+            <button class="btn btn-primary">集計実行</button>
+            <button class="btn btn-secondary">CSVエクスポート</button>
+            <button class="btn btn-secondary">印刷</button>
+          </div>
+          <div class="split-layout">
+            <div class="split-panel">
+              <div class="split-panel-title">顧客別集計</div>
+              <div class="list-item selected">
+                <div class="list-item-title">ABC Corporation</div>
+                <div class="list-item-meta">請求額: ¥1,250,000 | 件数: 145</div>
+              </div>
+              <div class="list-item">
+                <div class="list-item-title">XYZ Industries</div>
+                <div class="list-item-meta">請求額: ¥890,500 | 件数: 98</div>
+              </div>
+              <div class="list-item">
+                <div class="list-item-title">DEF Solutions</div>
+                <div class="list-item-meta">請求額: ¥456,200 | 件数: 52</div>
+              </div>
+            </div>
+            <div class="split-panel">
+              <div class="split-panel-title">詳細情報</div>
+              <div class="stat-row">
+                <div class="stat-item">
+                  <div class="stat-label">請求額</div>
+                  <div class="stat-value">¥1,250,000</div>
+                </div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-item">
+                  <div class="stat-label">対象件数</div>
+                  <div class="stat-value">145</div>
+                </div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-item">
+                  <div class="stat-label">検証済み</div>
+                  <div class="stat-value" style="color: var(--success);">143 / 145</div>
+                </div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-item">
+                  <div class="stat-label">異常件数</div>
+                  <div class="stat-value" style="color: var(--error);">2</div>
+                </div>
+              </div>
+              <div class="divider"></div>
+              <button class="btn btn-primary" style="width: 100%;">確定・次へ</button>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111059376" style="display:none"></p>
+          </div>
+          <div class="action-bar">
+            <button class="btn btn-primary">新規追加</button>
+            <button class="btn btn-secondary">インポート</button>
+            <button class="btn btn-secondary">エクスポート</button>
+          </div>
+          <div class="tabs">
+            <button class="tab active">フィールド定義</button>
+            <button class="tab">検証ルール</button>
+            <button class="tab">請求対象項目</button>
+            <button class="tab">バージョン履歴</button>
+          </div>
+          <div class="tab-content active">
+            <div class="scrollable-table">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>フィールド名</th>
+                    <th>データ型</th>
+                    <th>必須</th>
+                    <th>説明</th>
+                    <th>最終更新</th>
+                    <th>アクション</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>transaction_id</td>
+                    <td>STRING</td>
+                    <td><span class="badge badge-primary">必須</span></td>
+                    <td>取引ID</td>
+                    <td>2025-01-10</td>
+                    <td><button class="btn btn-ghost btn-sm">編集</button></td>
+                  </tr>
+                  <tr>
+                    <td>amount</td>
+                    <td>DECIMAL</td>
+                    <td><span class="badge badge-primary">必須</span></td>
+                    <td>取引金額</td>
+                    <td>2025-01-10</td>
+                    <td><button class="btn btn-ghost btn-sm">編集</button></td>
+                  </tr>
+                  <tr>
+                    <td>customer_id</td>
+                    <td>STRING</td>
+                    <td><span class="badge badge-primary">必須</span></td>
+                    <td>顧客ID</td>
+                    <td>2025-01-10</td>
+                    <td><button class="btn btn-ghost btn-sm">編集</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111080111" style="display:none"></p>
+          </div>
+          <div class="action-bar">
+            <button class="btn btn-primary">新規テンプレート</button>
+            <button class="btn btn-secondary">複製</button>
+            <button class="btn btn-secondary">削除</button>
+          </div>
+          <div class="scrollable-table">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>テンプレート名</th>
+                  <th>対象期間</th>
+                  <th>集計項目数</th>
+                  <th>ステータス</th>
+                  <th>最終更新</th>
+                  <th>アクション</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>2025年1月度</td>
+                  <td>2025-01-01 ～ 2025-01-31</td>
+                  <td>12</td>
+                  <td><span class="status-badge status-success">有効</span></td>
+                  <td>2025-01-15 10:30</td>
+                  <td><button class="btn btn-ghost btn-sm">編集</button></td>
+                </tr>
+                <tr>
+                  <td>2024年12月度</td>
+                  <td>2024-12-01 ～ 2024-12-31</td>
+                  <td>12</td>
+                  <td><span class="status-badge status-success">有効</span></td>
+                  <td>2024-12-31 18:45</td>
+                  <td><button class="btn btn-ghost btn-sm">編集</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111099986" style="display:none"></p>
+          </div>
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-label">総検証件数</div>
+              <div class="kpi-value">15,320</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">成功率</div>
+              <div class="kpi-value" style="color: var(--success);">96.8%</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">エラー件数</div>
+              <div class="kpi-value" style="color: var(--error);">487</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">警告件数</div>
+              <div class="kpi-value" style="color: var(--warning);">123</div>
+            </div>
+          </div>
+          <div class="filter-bar">
+            <select class="form-select" style="flex: 0 0 150px;">
+              <option>全結果</option>
+              <option>エラー</option>
+              <option>警告</option>
+              <option>成功</option>
+            </select>
+            <select class="form-select" style="flex: 0 0 150px;">
+              <option>全期間</option>
+              <option>本日</option>
+              <option>本週</option>
+              <option>本月</option>
+            </select>
+          </div>
+          <div class="scrollable-table">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>検証ID</th>
+                  <th>レコード</th>
+                  <th>ルール</th>
+                  <th>結果</th>
+                  <th>詳細</th>
+                  <th>検証時刻</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>#VAL-5401</td>
+                  <td>#REC-001</td>
+                  <td>金額範囲チェック</td>
+                  <td><span class="status-badge status-error">エラー</span></td>
+                  <td>金額が範囲外</td>
+                  <td>2025-01-15 14:32</td>
+                </tr>
+                <tr>
+                  <td>#VAL-5402</td>
+                  <td>#REC-002</td>
+                  <td>必須項目チェック</td>
+                  <td><span class="status-badge status-warning">警告</span></td>
+                  <td>顧客名が未入力</td>
+                  <td>2025-01-15 14:28</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111120079" style="display:none"></p>
+          </div>
+          <div class="alert alert-warning">
+            <strong>⚠ 本日の未対応通知: 12件</strong> - 対応が必要な異常が検出されています
+          </div>
+          <div class="action-bar">
+            <button class="btn btn-primary">全て確認済みに</button>
+            <button class="btn btn-secondary">フィルタ</button>
+          </div>
+          <div class="scrollable-table">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>通知ID</th>
+                  <th>タイプ</th>
+                  <th>メッセージ</th>
+                  <th>対象レコード</th>
+                  <th>ステータス</th>
+                  <th>検出日時</th>
+                  <th>アクション</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>#NOT-001</td>
+                  <td><span class="badge badge-primary">異常</span></td>
+                  <td>金額が異常値です</td>
+                  <td>#REC-001</td>
+                  <td><span class="status-badge status-error">未対応</span></td>
+                  <td>2025-01-15 14:32</td>
+                  <td><button class="btn btn-ghost btn-sm">対応</button></td>
+                </tr>
+                <tr>
+                  <td>#NOT-002</td>
+                  <td><span class="badge badge-gold">不足</span></td>
+                  <td>必須項目が欠落しています</td>
+                  <td>#REC-002</td>
+                  <td><span class="status-badge status-warning">確認済み</span></td>
+                  <td>2025-01-15 14:28</td>
+                  <td><button class="btn btn-ghost btn-sm">詳細</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111139444" style="display:none"></p>
+          </div>
+          <div class="stepper">
+            <div class="step completed">
+              <div class="step-circle">✓</div>
+              <div class="step-label">データ読込</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step active">
+              <div class="step-circle">2</div>
+              <div class="step-label">検証実行</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step">
+              <div class="step-circle">3</div>
+              <div class="step-label">結果確認</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step">
+              <div class="step-circle">4</div>
+              <div class="step-label">完了</div>
+            </div>
+          </div>
+          <div class="split-layout">
+            <div class="split-panel">
+              <div class="split-panel-title">検証設定</div>
+              <div class="form-group">
+                <label class="form-label">対象期間</label>
+                <input type="date" class="form-input" value="2025-01-01">
+              </div>
+              <div class="form-group">
+                <label class="form-label">検証ルール</label>
+                <select class="form-select">
+                  <option>全ルール適用</option>
+                  <option>基本ルールのみ</option>
+                  <option>カスタムルール</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">並列処理数</label>
+                <input type="number" class="form-input" value="4" min="1" max="16">
+              </div>
+              <button class="btn btn-primary" style="width: 100%;">検証開始</button>
+            </div>
+            <div class="split-panel">
+              <div class="split-panel-title">進捗状況</div>
+              <div class="stat-row">
+                <div class="stat-item">
+                  <div class="stat-label">処理済み</div>
+                  <div class="stat-value">8,450 / 12,000</div>
+                </div>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 70%;"></div>
+              </div>
+              <div class="stat-row" style="margin-top: 1rem;">
+                <div class="stat-item">
+                  <div class="stat-label">検出異常</div>
+                  <div class="stat-value" style="color: var(--warning);">287</div>
+                </div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-item">
+                  <div class="stat-label">処理時間</div>
+                  <div class="stat-value">約 3分 45秒</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111161150" style="display:none"></p>
+          </div>
+          <div class="stepper">
+            <div class="step completed">
+              <div class="step-circle">✓</div>
+              <div class="step-label">品質検証</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step active">
+              <div class="step-circle">2</div>
+              <div class="step-label">項目抽出</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step">
+              <div class="step-circle">3</div>
+              <div class="step-label">集計</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step">
+              <div class="step-circle">4</div>
+              <div class="step-label">確定</div>
+            </div>
+          </div>
+          <div class="action-bar">
+            <button class="btn btn-primary">抽出実行</button>
+            <button class="btn btn-secondary">プレビュー</button>
+            <button class="btn btn-secondary">ログ確認</button>
+          </div>
+          <div class="alert alert-info">
+            ℹ 前回の検証で 12,450件が検証済みです。そのうち 12,163件が請求対象です。
+          </div>
+          <div class="scrollable-table">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>項目名</th>
+                  <th>データ型</th>
+                  <th>抽出条件</th>
+                  <th>対象件数</th>
+                  <th>ステータス</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>transaction_amount</td>
+                  <td>DECIMAL</td>
+                  <td>amount > 0</td>
+                  <td>12,163</td>
+                  <td><span class="status-badge status-success">抽出済み</span></td>
+                </tr>
+                <tr>
+                  <td>service_type</td>
+                  <td>STRING</td>
+                  <td>IN ('A', 'B', 'C')</td>
+                  <td>12,163</td>
+                  <td><span class="status-badge status-success">抽出済み</span></td>
+                </tr>
+                <tr>
+                  <td>customer_id</td>
+                  <td>STRING</td>
+                  <td>NOT NULL</td>
+                  <td>12,163</td>
+                  <td><span class="status-badge status-success">抽出済み</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111181495" style="display:none"></p>
+          </div>
+          <div class="stepper">
+            <div class="step completed">
+              <div class="step-circle">✓</div>
+              <div class="step-label">項目抽出</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step active">
+              <div class="step-circle">2</div>
+              <div class="step-label">計算実行</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step">
+              <div class="step-circle">3</div>
+              <div class="step-label">検証</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step">
+              <div class="step-circle">4</div>
+              <div class="step-label">確定</div>
+            </div>
+          </div>
+          <div class="action-bar">
+            <button class="btn btn-primary">計算開始</button>
+            <button class="btn btn-secondary">割引ルール確認</button>
+          </div>
+          <div class="split-layout">
+            <div class="split-panel">
+              <div class="split-panel-title">計算パラメータ</div>
+              <div class="form-group">
+                <label class="form-label">対象期間</label>
+                <input type="date" class="form-input" value="2025-01-01">
+              </div>
+              <div class="form-group">
+                <label class="form-label">割引ルール適用</label>
+                <select class="form-select">
+                  <option>標準ルール</option>
+                  <option>カスタムルール</option>
+                  <option>割引なし</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">税率</label>
+                <input type="number" class="form-input" value="10" min="0" max="100" step="0.1">
+              </div>
+            </div>
+            <div class="split-panel">
+              <div class="split-panel-title">計算結果サマリー</div>
+              <div class="stat-row">
+                <div class="stat-item">
+                  <div class="stat-label">対象顧客数</div>
+                  <div class="stat-value">28</div>
+                </div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-item">
+                  <div class="stat-label">対象サービス数</div>
+                  <div class="stat-value">5</div>
+                </div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-item">
+                  <div class="stat-label">総請求額</div>
+                  <div class="stat-value" style="color: var(--accent-gold);">¥3,596,700</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111203862" style="display:none"></p>
+          </div>
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-label">今月検証済み</div>
+              <div class="kpi-value">45,230</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">品質スコア</div>
+              <div class="kpi-value" style="color: var(--success);">95.6%</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">異常検出</div>
+              <div class="kpi-value" style="color: var(--error);">1,987</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">対応率</div>
+              <div class="kpi-value" style="color: var(--success);">92.3%</div>
+            </div>
+          </div>
+          <div class="tabs">
+            <button class="tab active">検証ルール</button>
+            <button class="tab">異常ログ</button>
+            <button class="tab">統計情報</button>
+          </div>
+          <div class="tab-content active">
+            <div class="scrollable-table">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ルール名</th>
+                    <th>説明</th>
+                    <th>適用対象</th>
+                    <th>検出件数</th>
+                    <th>有効</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>金額範囲チェック</td>
+                    <td>金額が定義範囲内か確認</td>
+                    <td>全レコード</td>
+                    <td>234</td>
+                    <td><span class="badge badge-primary">有効</span></td>
+                  </tr>
+                  <tr>
+                    <td>必須項目チェック</td>
+                    <td>必須項目が入力されているか確認</td>
+                    <td>全レコード</td>
+                    <td>567</td>
+                    <td><span class="badge badge-primary">有効</span></td>
+                  </tr>
+                  <tr>
+                    <td>日付妥当性チェック</td>
+                    <td>日付が妥当な範囲か確認</td>
+                    <td>全レコード</td>
+                    <td>89</td>
+                    <td><span class="badge badge-primary">有効</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111227940" style="display:none"></p>
+          </div>
+          <div class="action-bar">
+            <button class="btn btn-primary">スコア計算</button>
+            <button class="btn btn-secondary">レポート生成</button>
+          </div>
+          <div class="split-layout">
+            <div class="split-panel">
+              <div class="split-panel-title">計算設定</div>
+              <div class="form-group">
+                <label class="form-label">対象データセット</label>
+                <select class="form-select">
+                  <option>2025年1月度</option>
+                  <option>2024年12月度</option>
+                  <option>カスタム期間</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">スコア計算方式</label>
+                <select class="form-select">
+                  <option>標準方式</option>
+                  <option>加重方式</option>
+                  <option>カスタム方式</option>
+                </select>
+              </div>
+              <button class="btn btn-primary" style="width: 100%;">計算実行</button>
+            </div>
+            <div class="split-panel">
+              <div class="split-panel-title">スコア結果</div>
+              <div class="stat-row">
+                <div class="stat-item">
+                  <div class="stat-label">総合スコア</div>
+                  <div class="stat-value" style="color: var(--success);">94.2</div>
+                </div>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 94.2%;"></div>
+              </div>
+              <div class="stat-row" style="margin-top: 1rem;">
+                <div class="stat-item">
+                  <div class="stat-label">完全性</div>
+                  <div class="stat-value">96.5%</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-label">正確性</div>
+                  <div class="stat-value">92.1%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111248680" style="display:none"></p>
+          </div>
+          <div class="action-bar">
+            <button class="btn btn-primary">新規入力</button>
+            <button class="btn btn-secondary">テンプレート読込</button>
+            <button class="btn btn-secondary">キャンセル</button>
+          </div>
+          <div class="split-layout">
+            <div class="split-panel">
+              <div class="split-panel-title">入力フォーム</div>
+              <div class="form-group">
+                <label class="form-label">取引ID *</label>
+                <input type="text" class="form-input" placeholder="TXN-2025-001">
+              </div>
+              <div class="form-group">
+                <label class="form-label">顧客ID *</label>
+                <input type="text" class="form-input" placeholder="CUST-001">
+              </div>
+              <div class="form-group">
+                <label class="form-label">取引金額 *</label>
+                <input type="number" class="form-input" placeholder="0.00" step="0.01">
+              </div>
+              <div class="form-group">
+                <label class="form-label">サービス種別 *</label>
+                <select class="form-select">
+                  <option>選択してください</option>
+                  <option>サービスA</option>
+                  <option>サービスB</option>
+                  <option>サービスC</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">取引日 *</label>
+                <input type="date" class="form-input">
+              </div>
+              <div class="form-group">
+                <label class="form-label">備考</label>
+                <textarea class="form-textarea" placeholder="備考を入力してください"></textarea>
+              </div>
+              <button class="btn btn-primary" style="width: 100%;">検証・保存</button>
+            </div>
+            <div class="split-panel">
+              <div class="split-panel-title">検証結果</div>
+              <div class="alert alert-info">
+                ℹ 入力後に自動検証が実行されます
+              </div>
+              <div style="margin-top: 1rem;">
+                <div class="stat-row">
+                  <div class="stat-item">
+                    <div class="stat-label">検証ステータス</div>
+                    <div class="stat-value">-</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111272286" style="display:none"></p>
+          </div>
+          <div class="action-bar">
+            <button class="btn btn-primary">検証開始</button>
+            <button class="btn btn-secondary">エラーレポート</button>
+          </div>
+          <div class="scrollable-table">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>エラーID</th>
+                  <th>レコード</th>
+                  <th>エラータイプ</th>
+                  <th>メッセージ</th>
+                  <th>重大度</th>
+                  <th>検出時刻</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>#ERR-001</td>
+                  <td>#REC-001</td>
+                  <td>金額不正</td>
+                  <td>金額が負数です</td>
+                  <td><span class="status-badge status-error">致命的</span></td>
+                  <td>2025-01-15 14:32</td>
+                </tr>
+                <tr>
+                  <td>#ERR-002</td>
+                  <td>#REC-002</td>
+                  <td>必須項目欠落</td>
+                  <td>顧客IDが未入力です</td>
+                  <td><span class="status-badge status-error">致命的</span></td>
+                  <td>2025-01-15 14:28</td>
+                </tr>
+                <tr>
+                  <td>#ERR-003</td>
+                  <td>#REC-003</td>
+                  <td>日付不正</td>
+                  <td>日付が範囲外です</td>
+                  <td><span class="status-badge status-warning">警告</span></td>
+                  <td>2025-01-15 14:15</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111291876" style="display:block"><div style="display: flex; flex-direction: column; height: 100%; gap: 0;">
+  <!-- ヘッダー領域 -->
+  <div style="padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); background: var(--bg-card);">
+    <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">
+      金と赤 / 営業データ品質管理・請求自動化システム / 修正データ再検証処理
+    </div>
+    <div style="font-size: 18px; font-weight: 600; color: var(--text);">修正データ再検証処理</div>
+  </div>
+
+  <!-- ステッパー -->
+  <div style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; background: var(--bg-main); border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 12px;">
+    <div class="stepper-step" data-step="1" style="display: flex; align-items: center; gap: 4px; cursor: pointer;">
+      <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600;">1</div>
+      <span style="color: var(--text);">修正データ選択</span>
+    </div>
+    <div style="width: 20px; height: 1px; background: rgba(255,255,255,0.18);"></div>
+    <div class="stepper-step" data-step="2" style="display: flex; align-items: center; gap: 4px; cursor: pointer;">
+      <div style="width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.18); color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-weight: 600;">2</div>
+      <span style="color: var(--text-muted);">検証ルール設定</span>
+    </div>
+    <div style="width: 20px; height: 1px; background: rgba(255,255,255,0.18);"></div>
+    <div class="stepper-step" data-step="3" style="display: flex; align-items: center; gap: 4px; cursor: pointer;">
+      <div style="width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.18); color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-weight: 600;">3</div>
+      <span style="color: var(--text-muted);">再検証実行</span>
+    </div>
+    <div style="width: 20px; height: 1px; background: rgba(255,255,255,0.18);"></div>
+    <div class="stepper-step" data-step="4" style="display: flex; align-items: center; gap: 4px; cursor: pointer;">
+      <div style="width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.18); color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-weight: 600;">4</div>
+      <span style="color: var(--text-muted);">結果確認</span>
+    </div>
+  </div>
+
+  <!-- メインコンテンツ -->
+  <div style="flex: 1; overflow: auto; display: flex; flex-direction: column;">
+    
+    <!-- ステップ 1: 修正データ選択 -->
+    <div class="step-panel" data-step="1" style="padding: 16px; display: flex; gap: 16px; flex: 1;">
+      <!-- 左: フィルター + 修正データ一覧 -->
+      <div style="flex: 0 0 45%; display: flex; flex-direction: column; gap: 12px;">
+        <div style="font-size: 13px; font-weight: 600; color: var(--text);">修正対象営業データ</div>
+        
+        <!-- フィルターバー -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <div>
+            <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">顧客ID</label>
+            <input type="text" data-testid="filter-customer-id" placeholder="顧客IDで検索" style="width: 100%; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.18); border-radius: 4px; background: rgba(0,0,0,0.25); color: var(--text); font-size: 12px;" />
+          </div>
+          <div>
+            <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">品質ステータス</label>
+            <select data-testid="filter-quality-status" style="width: 100%; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.18); border-radius: 4px; background: rgba(0,0,0,0.25); color: var(--text); font-size: 12px;">
+              <option value="">すべて</option>
+              <option value="warning">警告</option>
+              <option value="error">エラー</option>
+              <option value="corrected">修正済み</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 修正データ一覧テーブル -->
+        <div style="flex: 1; overflow: auto; border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; background: var(--bg-main);">
+          <table data-testid="corrected-data-list" style="width: 100%; font-size: 12px; border-collapse: collapse;">
+            <thead style="position: sticky; top: 0; background: rgba(255,255,255,0.04);">
+              <tr>
+                <th style="padding: 8px; text-align: left; color: var(--text); font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.08); width: 30px;"><input type="checkbox" id="select-all-corrected" style="accent-color: var(--primary);" /></th>
+                <th style="padding: 8px; text-align: left; color: var(--text); font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.08);">営業データID</th>
+                <th style="padding: 8px; text-align: left; color: var(--text); font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.08);">顧客ID</th>
+                <th style="padding: 8px; text-align: right; color: var(--text); font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.08);">取引金額</th>
+                <th style="padding: 8px; text-align: left; color: var(--text); font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.08);">ステータス</th>
+              </tr>
+            </thead>
+            <tbody id="corrected-data-tbody">
+              <!-- 動的に生成 -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 選択件数表示 -->
+        <div style="font-size: 11px; color: var(--text-muted);">
+          選択件数: <span id="selected-count" style="color: var(--primary); font-weight: 600;">0</span> / <span id="total-count">0</span>件
+        </div>
+      </div>
+
+      <!-- 右: 修正内容確認 -->
+      <div style="flex: 0 0 55%; display: flex; flex-direction: column; gap: 12px;">
+        <div style="font-size: 13px; font-weight: 600; color: var(--text);">修正内容確認</div>
+        
+        <div id="correction-detail-panel" style="flex: 1; overflow: auto; border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; background: var(--bg-main); padding: 12px;">
+          <div style="color: var(--text-muted); font-size: 12px; text-align: center; padding: 20px;">
+            修正対象データを選択してください
+          </div>
+        </div>
+
+        <!-- 修正内容テーブル（選択時に表示） -->
+        <div id="correction-table-wrap" style="display: none; flex: 1; overflow: auto; border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; background: var(--bg-main);">
+          <table style="width: 100%; font-size: 11px; border-collapse: collapse;">
+            <thead style="position: sticky; top: 0; background: rgba(255,255,255,0.04);">
+              <tr>
+                <th style="padding: 6px 8px; text-align: left; color: var(--text); font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.08);">フィールド</th>
+                <th style="padding: 6px 8px; text-align: left; color: var(--text); font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.08);">修正前</th>
+                <th style="padding: 6px 8px; text-align: left; color: var(--text); font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.08);">修正後</th>
+              </tr>
+            </thead>
+            <tbody id="correction-tbody">
+              <!-- 動的に生成 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ステップ 2: 検証ルール設定 -->
+    <div class="step-panel" data-step="2" style="padding: 16px; display: none; flex-direction: column; gap: 12px;">
+      <div style="font-size: 13px; font-weight: 600; color: var(--text);">検証ルール適用設定</div>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div style="border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 12px; background: var(--bg-main);">
+          <div style="font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 8px;">有効なルール</div>
+          <div id="active-rules-list" style="font-size: 11px; color: var(--text-muted); max-height: 200px; overflow: auto;">
+            <!-- 動的に生成 -->
+          </div>
+        </div>
+        
+        <div style="border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 12px; background: var(--bg-main);">
+          <div style="font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 8px;">ルール選択</div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text); cursor: pointer;">
+              <input type="checkbox" class="rule-checkbox" value="required" checked style="accent-color: var(--primary);" />
+              <span>必須チェック</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text); cursor: pointer;">
+              <input type="checkbox" class="rule-checkbox" value="format" checked style="accent-color: var(--primary);" />
+              <span>形式チェック</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text); cursor: pointer;">
+              <input type="checkbox" class="rule-checkbox" value="range" checked style="accent-color: var(--primary);" />
+              <span>範囲チェック</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text); cursor: pointer;">
+              <input type="checkbox" class="rule-checkbox" value="duplicate" checked style="accent-color: var(--primary);" />
+              <span>重複チェック</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div style="border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 12px; background: var(--bg-main);">
+        <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 6px;">検証対象フィールド</label>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+          <label style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text); cursor: pointer;">
+            <input type="checkbox" class="field-checkbox" value="customer_id" checked style="accent-color: var(--primary);" />
+            <span>顧客ID</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text); cursor: pointer;">
+            <input type="checkbox" class="field-checkbox" value="transaction_amount" checked style="accent-color: var(--primary);" />
+            <span>取引金額</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text); cursor: pointer;">
+            <input type="checkbox" class="field-checkbox" value="product_id" checked style="accent-color: var(--primary);" />
+            <span>商品ID</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text); cursor: pointer;">
+            <input type="checkbox" class="field-checkbox" value="quantity" checked style="accent-color: var(--primary);" />
+            <span>数量</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text); cursor: pointer;">
+            <input type="checkbox" class="field-checkbox" value="unit_price" checked style="accent-color: var(--primary);" />
+            <span>単価</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text); cursor: pointer;">
+            <input type="checkbox" class="field-checkbox" value="billing_flag" checked style="accent-color: var(--primary);" />
+            <span>請求対象フラグ</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- ステップ 3: 再検証実行 -->
+    <div class="step-panel" data-step="3" style="padding: 16px; display: none; flex-direction: column; gap: 12px; align-items: center; justify-content: center;">
+      <div style="font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px;">再検証を実行中...</div>
+      
+      <!-- 検証進捗バー -->
+      <div style="width: 100%; max-width: 400px;">
+        <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 6px;">
+          <span>進捗</span>
+          <span id="progress-text">0 / 0</span>
+        </div>
+        <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
+          <div id="progress-bar" style="height: 100%; background: var(--primary); width: 0%; transition: width 0.3s ease;"></div>
+        </div>
+      </div>
+
+      <!-- 検証結果サマリー -->
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; width: 100%; max-width: 500px; margin-top: 20px;">
+        <div style="border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 12px; background: var(--bg-main); text-align: center;">
+          <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">検証済み</div>
+          <div id="summary-validated" style="font-size: 18px; font-weight: 600; color: var(--primary);">0</div>
+        </div>
+        <div style="border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 12px; background: var(--bg-main); text-align: center;">
+          <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">合格</div>
+          <div id="summary-passed" style="font-size: 18px; font-weight: 600; color: #4ade80;">0</div>
+        </div>
+        <div style="border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 12px; background: var(--bg-main); text-align: center;">
+          <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">警告</div>
+          <div id="summary-warning" style="font-size: 18px; font-weight: 600; color: #fbbf24;">0</div>
+        </div>
+        <div style="border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 12px; background: var(--bg-main); text-align: center;">
+          <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">エラー</div>
+          <div id="summary-error" style="font-size: 18px; font-weight: 600; color: #ef4444;">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ステップ 4: 結果確認 -->
+    <div class="step-panel" data-step="4" style="padding: 16px; display: none; flex-direction: column; gap: 12px; flex: 1; overflow: auto;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; flex: 1;">
+        
+        <!-- 左: 異常検出ログ -->
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="font-size: 13px; font-weight: 600; color: var(--text);">異常検出ログ</div>
+          
+          <div style="flex: 1; overflow: auto; border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; background: var(--bg-main);">
+            <table data-testid="anomaly-log-list" style="width: 100%; font-size: 11px; border-collapse: collapse;">
+              <thead style="position: sticky; top: 0; background: rgba(255,255,255,0.04);">
+                <tr>
+                  <th style="padding: 6px 8px; text-align: left; color: var(--text); font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.08);">異常タイプ</th>
+                  <th style="padding: 6px 8px; text-align: left; color: var(--text); font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.08);">フィールド</th>
+                  <th style="padding: 6px 8px; text-align: left; color: var(--text); font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.08);">重要度</th>
+                </tr>
+              </thead>
+              <tbody id="anomaly-tbody">
+                <!-- 動的に生成 -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 右: 品質スコア + 請求対象チェック -->
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <!-- 品質スコア -->
+          <div style="border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 12px; background: var(--bg-main);">
+            <div style="font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 8px;">データ品質スコア</div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(255,255,255,0.04); display: flex; align-items: center; justify-content: center;">
+                <div style="text-align: center;">
+                  <div id="quality-score" style="font-size: 24px; font-weight: 600; color: var(--primary);">0</div>
+                  <div style="font-size: 10px; color: var(--text-muted);">/ 100</div>
+                </div>
+              </div>
+              <div style="flex: 1;">
+                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">スコア評価</div>
+                <div id="quality-assessment" style="font-size: 12px; font-weight: 600; color: var(--text);">—</div>
+                <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">
+                  <div>合格率: <span id="pass-rate">0</span>%</div>
+                  <div>異常検出: <span id="anomaly-count">0</span>件</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 請求対象項目チェック -->
+          <div style="border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 12px; background: var(--bg-main); flex: 1; overflow: auto;">
+            <div style="font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 8px;">請求対象項目チェック</div>
+            <div id="billing-items-check" style="display: flex; flex-direction: column; gap: 6px; font-size: 11px;">
+              <!-- 動的に生成 -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 承認前確認チェックリスト -->
+      <div style="border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 12px; background: var(--bg-main);">
+        <div style="font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 8px;">承認前確認チェックリスト</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 11px;">
+          <label style="display: flex; align-items: center; gap: 6px; color: var(--text); cursor: pointer;">
+            <input type="checkbox" class="approval-checklist" value="data-quality" style="accent-color: var(--primary);" />
+            <span>データ品質スコア ≥ 80</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 6px; color: var(--text); cursor: pointer;">
+            <input type="checkbox" class="approval-checklist" value="no-critical-error" style="accent-color: var(--primary);" />
+            <span>致命的エラーなし</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 6px; color: var(--text); cursor: pointer;">
+            <input type="checkbox" class="approval-checklist" value="billing-items-complete" style="accent-color: var(--primary);" />
+            <span>請求対象項目完全</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 6px; color: var(--text); cursor: pointer;">
+            <input type="checkbox" class="approval-checklist" value="anomaly-resolved" style="accent-color: var(--primary);" />
+            <span>異常検出対応済み</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- フッター: ボタン群 -->
+  <div style="padding: 12px 16px; border-top: 1px solid rgba(255,255,255,0.08); background: var(--bg-card); display: flex; justify-content: space-between; gap: 8px;">
+    <button id="btn-prev" class="action-btn secondary" data-testid="prev-button" style="display: none; padding: 8px 16px; font-size: 12px;">戻る</button>
+    <div style="flex: 1;"></div>
+    <button id="btn-cancel" class="action-btn secondary" data-testid="cancel-button" style="padding: 8px 16px; font-size: 12px;">キャンセル</button>
+    <button id="btn-next" class="action-btn" data-testid="next-button" style="padding: 8px 16px; font-size: 12px;">次へ</button>
+    <button id="btn-validate" class="action-btn" data-testid="validate-button" style="display: none; padding: 8px 16px; font-size: 12px;">再検証実行</button>
+    <button id="btn-confirm-results" class="action-btn" data-testid="confirm-results-button" style="display: none; padding: 8px 16px; font-size: 12px;">検証結果確認</button>
+  </div>
+</div>
+
+<!-- エラーメッセージバナー -->
+<div id="error-banner" style="display: none; position: fixed; top: 60px; right: 16px; background: #ef4444; color: #fff; padding: 12px 16px; border-radius: 4px; font-size: 12px; z-index: 999; max-width: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+  <div id="error-message"></div>
+</div>
+
+<!-- 成功メッセージバナー -->
+<div id="success-banner" style="display: none; position: fixed; top: 60px; right: 16px; background: #4ade80; color: #fff; padding: 12px 16px; border-radius: 4px; font-size: 12px; z-index: 999; max-width: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+  <div id="success-message"></div>
+</div></p>
+          </div>
+          <div class="stepper">
+            <div class="step completed">
+              <div class="step-circle">✓</div>
+              <div class="step-label">修正入力</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step active">
+              <div class="step-circle">2</div>
+              <div class="step-label">再検証</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step">
+              <div class="step-circle">3</div>
+              <div class="step-label">確認</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step">
+              <div class="step-circle">4</div>
+              <div class="step-label">確定</div>
+            </div>
+          </div>
+          <div class="action-bar">
+            <button class="btn btn-primary">再検証実行</button>
+            <button class="btn btn-secondary">修正履歴確認</button>
+          </div>
+          <div class="scrollable-table">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>レコードID</th>
+                  <th>修正項目</th>
+                  <th>修正前</th>
+                  <th>修正後</th>
+                  <th>再検証結果</th>
+                  <th>修正者</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>#REC-001</td>
+                  <td>金額</td>
+                  <td>-1,000</td>
+                  <td>100,000</td>
+                  <td><span class="status-badge status-success">OK</span></td>
+                  <td>user@example.com</td>
+                </tr>
+                <tr>
+                  <td>#REC-002</td>
+                  <td>顧客ID</td>
+                  <td>-</td>
+                  <td>CUST-001</td>
+                  <td><span class="status-badge status-success">OK</span></td>
+                  <td>user@example.com</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111313329" style="display:none"></p>
+          </div>
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-label">完全性スコア</div>
+              <div class="kpi-value" style="color: var(--success);">98.5%</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">正確性スコア</div>
+              <div class="kpi-value" style="color: var(--success);">96.2%</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">検証対象</div>
+              <div class="kpi-value">12,450</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">検証済み</div>
+              <div class="kpi-value" style="color: var(--success);">12,163</div>
+            </div>
+          </div>
+          <div class="alert alert-success">
+            ✓ データ品質検証が完了しました。請求処理へ進めます。
+          </div>
+          <div class="action-bar">
+            <button class="btn btn-primary">請求処理へ進む</button>
+            <button class="btn btn-secondary">詳細レポート</button>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111335007" style="display:none"></p>
+          </div>
+          <div class="stepper">
+            <div class="step completed">
+              <div class="step-circle">✓</div>
+              <div class="step-label">品質検証</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step completed">
+              <div class="step-circle">✓</div>
+              <div class="step-label">項目抽出</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step active">
+              <div class="step-circle">3</div>
+              <div class="step-label">請求計算</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step">
+              <div class="step-circle">4</div>
+              <div class="step-label">完了</div>
+            </div>
+          </div>
+          <div class="action-bar">
+            <button class="btn btn-primary">請求処理実行</button>
+            <button class="btn btn-secondary">プレビュー</button>
+            <button class="btn btn-secondary">スケジュール設定</button>
+          </div>
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-label">対象顧客</div>
+              <div class="kpi-value">28</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">対象取引</div>
+              <div class="kpi-value">12,163</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">総請求額</div>
+              <div class="kpi-value" style="color: var(--accent-gold);">¥3,596,700</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">予定実行</div>
+              <div class="kpi-value">2025-01-20</div>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111356693" style="display:none"></p>
+          </div>
+          <div class="action-bar">
+            <button class="btn btn-primary">新規ロジック</button>
+            <button class="btn btn-secondary">テスト実行</button>
+            <button class="btn btn-secondary">検証</button>
+          </div>
+          <div class="tabs">
+            <button class="tab active">ロジック定義</button>
+            <button class="tab">テスト結果</button>
+            <button class="tab">バージョン管理</button>
+          </div>
+          <div class="tab-content active">
+            <div class="scrollable-table">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ロジック名</th>
+                    <th>説明</th>
+                    <th>優先度</th>
+                    <th>ステータス</th>
+                    <th>最終更新</th>
+                    <th>アクション</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>標準請求ロジック</td>
+                    <td>基本的な請求額計算</td>
+                    <td><span class="badge">高</span></td>
+                    <td><span class="status-badge status-success">有効</span></td>
+                    <td>2025-01-10</td>
+                    <td><button class="btn btn-ghost btn-sm">編集</button></td>
+                  </tr>
+                  <tr>
+                    <td>割引適用ロジック</td>
+                    <td>顧客別割引の適用</td>
+                    <td><span class="badge">中</span></td>
+                    <td><span class="status-badge status-success">有効</span></td>
+                    <td>2025-01-08</td>
+                    <td><button class="btn btn-ghost btn-sm">編集</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111377110" style="display:none"></p>
+          </div>
+          <div class="action-bar">
+            <button class="btn btn-primary">計算実行</button>
+            <button class="btn btn-secondary">計算ログ</button>
+            <button class="btn btn-secondary">結果確認</button>
+          </div>
+          <div class="split-layout">
+            <div class="split-panel">
+              <div class="split-panel-title">計算設定</div>
+              <div class="form-group">
+                <label class="form-label">対象期間</label>
+                <input type="date" class="form-input" value="2025-01-01">
+                <span style="font-size: var(--font-size-xs); color: var(--text-muted);">～</span>
+                <input type="date" class="form-input" value="2025-01-31" style="margin-top: 0.25rem;">
+              </div>
+              <div class="form-group">
+                <label class="form-label">計算方式</label>
+                <select class="form-select">
+                  <option>標準方式</option>
+                  <option>カスタム方式</option>
+                </select>
+              </div>
+              <button class="btn btn-primary" style="width: 100%;">計算開始</button>
+            </div>
+            <div class="split-panel">
+              <div class="split-panel-title">計算結果</div>
+              <div class="stat-row">
+                <div class="stat-item">
+                  <div class="stat-label">小計</div>
+                  <div class="stat-value">¥3,269,727</div>
+                </div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-item">
+                  <div class="stat-label">割引額</div>
+                  <div class="stat-value" style="color: var(--success);">-¥326,973</div>
+                </div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-item">
+                  <div class="stat-label">税金</div>
+                  <div class="stat-value">¥293,700</div>
+                </div>
+              </div>
+              <div class="divider"></div>
+              <div class="stat-row">
+                <div class="stat-item">
+                  <div class="stat-label">合計</div>
+                  <div class="stat-value" style="color: var(--accent-gold); font-size: var(--font-size-xl);">¥3,236,454</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111397103" style="display:none"></p>
+          </div>
+          <div class="stepper">
+            <div class="step completed">
+              <div class="step-circle">✓</div>
+              <div class="step-label">検証</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step completed">
+              <div class="step-circle">✓</div>
+              <div class="step-label">計算</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step active">
+              <div class="step-circle">3</div>
+              <div class="step-label">生成・配信</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step">
+              <div class="step-circle">4</div>
+              <div class="step-label">完了</div>
+            </div>
+          </div>
+          <div class="action-bar">
+            <button class="btn btn-primary">請求書生成</button>
+            <button class="btn btn-secondary">プレビュー</button>
+            <button class="btn btn-secondary">配信設定</button>
+          </div>
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-label">生成対象</div>
+              <div class="kpi-value">28</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">総金額</div>
+              <div class="kpi-value" style="color: var(--accent-gold);">¥3,596,700</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">配信予定</div>
+              <div class="kpi-value">2025-01-20</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">配信方法</div>
+              <div class="kpi-value">メール</div>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111418222" style="display:none"></p>
+          </div>
+          <div class="action-bar">
+            <button class="btn btn-primary">新規定義</button>
+            <button class="btn btn-secondary">複製</button>
+            <button class="btn btn-secondary">削除</button>
+          </div>
+          <div class="tabs">
+            <button class="tab active">請求ロジック</button>
+            <button class="tab">割引基準</button>
+            <button class="tab">税率設定</button>
+          </div>
+          <div class="tab-content active">
+            <div class="scrollable-table">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ロジック名</th>
+                    <th>計算式</th>
+                    <th>適用対象</th>
+                    <th>有効期間</th>
+                    <th>ステータス</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>基本請求</td>
+                    <td>SUM(amount)</td>
+                    <td>全サービス</td>
+                    <td>2025-01-01 ～</td>
+                    <td><span class="status-badge status-success">有効</span></td>
+                  </tr>
+                  <tr>
+                    <td>ボリューム割引</td>
+                    <td>SUM(amount) * (1 - discount_rate)</td>
+                    <td>サービスA, B</td>
+                    <td>2025-01-01 ～</td>
+                    <td><span class="status-badge status-success">有効</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111439554" style="display:none"></p>
+          </div>
+          <div class="action-bar">
+            <button class="btn btn-primary">請求書生成</button>
+            <button class="btn btn-secondary">プレビュー</button>
+            <button class="btn btn-secondary">PDF出力</button>
+            <button class="btn btn-secondary">メール送信</button>
+          </div>
+          <div class="split-layout">
+            <div class="split-panel">
+              <div class="split-panel-title">請求書情報</div>
+              <div class="form-group">
+                <label class="form-label">請求先顧客</label>
+                <select class="form-select">
+                  <option>ABC Corporation</option>
+                  <option>XYZ Industries</option>
+                  <option>DEF Solutions</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">請求期間</label>
+                <input type="date" class="form-input" value="2025-01-01">
+              </div>
+              <div class="form-group">
+                <label class="form-label">請求日</label>
+                <input type="date" class="form-input" value="2025-01-20">
+              </div>
+              <div class="form-group">
+                <label class="form-label">支払期限</label>
+                <input type="date" class="form-input" value="2025-02-20">
+              </div>
+            </div>
+            <div class="split-panel">
+              <div class="split-panel-title">請求額サマリー</div>
+              <div class="stat-row">
+                <div class="stat-item">
+                  <div class="stat-label">小計</div>
+                  <div class="stat-value">¥1,136,364</div>
+                </div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-item">
+                  <div class="stat-label">割引</div>
+                  <div class="stat-value" style="color: var(--success);">-¥113,636</div>
+                </div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-item">
+                  <div class="stat-label">税金</div>
+                  <div class="stat-value">¥102,273</div>
+                </div>
+              </div>
+              <div class="divider"></div>
+              <div class="stat-row">
+                <div class="stat-item">
+                  <div class="stat-label">合計</div>
+                  <div class="stat-value" style="color: var(--accent-gold); font-size: var(--font-size-xl);">¥1,125,001</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111459183" style="display:none"></p>
+          </div>
+          <div class="action-bar">
+            <button class="btn btn-primary">チェック実行</button>
+            <button class="btn btn-secondary">修正履歴</button>
+            <button class="btn btn-secondary">レポート</button>
+          </div>
+          <div class="filter-bar">
+            <input type="text" class="form-input filter-input" placeholder="検索">
+            <select class="form-select" style="flex: 0 0 150px;">
+              <option>全ステータス</option>
+              <option>OK</option>
+              <option>警告</option>
+              <option>エラー</option>
+            </select>
+          </div>
+          <div class="scrollable-table">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>レコード</th>
+                  <th>チェック項目</th>
+                  <th>結果</th>
+                  <th>詳細</th>
+                  <th>修正</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>#REC-001</td>
+                  <td>金額妥当性</td>
+                  <td><span class="status-badge status-error">NG</span></td>
+                  <td>金額が範囲外</td>
+                  <td><button class="btn btn-ghost btn-sm">修正</button></td>
+                </tr>
+                <tr>
+                  <td>#REC-002</td>
+                  <td>必須項目</td>
+                  <td><span class="status-badge status-warning">警告</span></td>
+                  <td>備考が未入力</td>
+                  <td><button class="btn btn-ghost btn-sm">修正</button></td>
+                </tr>
+                <tr>
+                  <td>#REC-003</td>
+                  <td>全項目</td>
+                  <td><span class="status-badge status-success">OK</span></td>
+                  <td>問題なし</td>
+                  <td>-</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111481431" style="display:none"></p>
+          </div>
+          <div class="filter-bar">
+            <input type="text" class="form-input filter-input" placeholder="キーワード検索">
+            <select class="form-select" style="flex: 0 0 150px;">
+              <option>全期間</option>
+              <option>本日</option>
+              <option>本週</option>
+              <option>本月</option>
+            </select>
+            <select class="form-select" style="flex: 0 0 150px;">
+              <option>全顧客</option>
+              <option>ABC Corp</option>
+              <option>XYZ Inc</option>
+              <option>DEF Ltd</option>
+            </select>
+            <button class="btn btn-secondary">検索</button>
+          </div>
+          <div class="scrollable-table">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>レコードID</th>
+                  <th>顧客</th>
+                  <th>金額</th>
+                  <th>サービス</th>
+                  <th>日付</th>
+                  <th>ステータス</th>
+                  <th>詳細</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>#REC-001</td>
+                  <td>ABC Corp</td>
+                  <td>¥100,000</td>
+                  <td>サービスA</td>
+                  <td>2025-01-15</td>
+                  <td><span class="status-badge status-success">正常</span></td>
+                  <td><button class="btn btn-ghost btn-sm">表示</button></td>
+                </tr>
+                <tr>
+                  <td>#REC-002</td>
+                  <td>XYZ Inc</td>
+                  <td>¥250,000</td>
+                  <td>サービスB</td>
+                  <td>2025-01-14</td>
+                  <td><span class="status-badge status-success">正常</span></td>
+                  <td><button class="btn btn-ghost btn-sm">表示</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111504454" style="display:none"></p>
+          </div>
+          <div class="action-bar">
+            <button class="btn btn-primary">抽出開始</button>
+            <button class="btn btn-secondary">抽出ルール確認</button>
+            <button class="btn btn-secondary">ログ確認</button>
+          </div>
+          <div class="split-layout">
+            <div class="split-panel">
+              <div class="split-panel-title">抽出設定</div>
+              <div class="form-group">
+                <label class="form-label">対象期間</label>
+                <input type="date" class="form-input" value="2025-01-01">
+              </div>
+              <div class="form-group">
+                <label class="form-label">抽出ルール</label>
+                <select class="form-select">
+                  <option>標準ルール</option>
+                  <option>カスタムルール</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">品質基準</label>
+                <select class="form-select">
+                  <option>厳格</option>
+                  <option>標準</option>
+                  <option>緩和</option>
+                </select>
+              </div>
+              <button class="btn btn-primary" style="width: 100%;">抽出実行</button>
+            </div>
+            <div class="split-panel">
+              <div class="split-panel-title">抽出結果</div>
+              <div class="stat-row">
+                <div class="stat-item">
+                  <div class="stat-label">対象レコード</div>
+                  <div class="stat-value">12,450</div>
+                </div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-item">
+                  <div class="stat-label">抽出済み</div>
+                  <div class="stat-value" style="color: var(--success);">12,163</div>
+                </div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-item">
+                  <div class="stat-label">除外</div>
+                  <div class="stat-value" style="color: var(--warning);">287</div>
+                </div>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 97.7%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111524134" style="display:none"></p>
+          </div>
+          <div class="action-bar">
+            <button class="btn btn-primary">検証実行</button>
+            <button class="btn btn-secondary">詳細確認</button>
+            <button class="btn btn-secondary">修正</button>
+          </div>
+          <div class="alert alert-info">
+            ℹ 請求情報の検証を実施してください。問題がなければ確定できます。
+          </div>
+          <div class="scrollable-table">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>顧客</th>
+                  <th>請求額</th>
+                  <th>対象件数</th>
+                  <th>検証結果</th>
+                  <th>ステータス</th>
+                  <th>アクション</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>ABC Corporation</td>
+                  <td>¥1,250,000</td>
+                  <td>145</td>
+                  <td><span class="status-badge status-success">OK</span></td>
+                  <td><span class="status-badge status-success">確認済み</span></td>
+                  <td><button class="btn btn-ghost btn-sm">確定</button></td>
+                </tr>
+                <tr>
+                  <td>XYZ Industries</td>
+                  <td>¥890,500</td>
+                  <td>98</td>
+                  <td><span class="status-badge status-warning">警告</span></td>
+                  <td><span class="status-badge status-warning">要確認</span></td>
+                  <td><button class="btn btn-ghost btn-sm">確認</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111546360" style="display:none"></p>
+          </div>
+          <div class="action-bar">
+            <button class="btn btn-primary">計算・割引適用</button>
+            <button class="btn btn-secondary">割引ルール確認</button>
+            <button class="btn btn-secondary">結果確認</button>
+          </div>
+          <div class="split-layout">
+            <div class="split-panel">
+              <div class="split-panel-title">計算パラメータ</div>
+              <div class="form-group">
+                <label class="form-label">対象期間</label>
+                <input type="date" class="form-input" value="2025-01-01">
+              </div>
+              <div class="form-group">
+                <label class="form-label">割引ルール</label>
+                <select class="form-select">
+                  <option>標準ルール</option>
+                  <option>カスタムルール</option>
+                  <option>割引なし</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">税率 (%)</label>
+                <input type="number" class="form-input" value="10" step="0.1">
+              </div>
+              <button class="btn btn-primary" style="width: 100%;">計算実行</button>
+            </div>
+            <div class="split-panel">
+              <div class="split-panel-title">計算結果</div>
+              <div class="stat-row">
+                <div class="stat-item">
+                  <div class="stat-label">小計</div>
+                  <div class="stat-value">¥3,269,727</div>
+                </div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-item">
+                  <div class="stat-label">割引率</div>
+                  <div class="stat-value">10.0%</div>
+                </div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-item">
+                  <div class="stat-label">割引額</div>
+                  <div class="stat-value" style="color: var(--success);">-¥326,973</div>
+                </div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-item">
+                  <div class="stat-label">税金</div>
+                  <div class="stat-value">¥293,700</div>
+                </div>
+              </div>
+              <div class="divider"></div>
+              <div class="stat-row">
+                <div class="stat-item">
+                  <div class="stat-label">最終請求額</div>
+                  <div class="stat-value" style="color: var(--accent-gold); font-size: var(--font-size-xl);">¥3,236,454</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111568050" style="display:none"></p>
+          </div>
+          <div class="action-bar">
+            <button class="btn btn-primary">連携実行</button>
+            <button class="btn btn-secondary">連携ログ</button>
+            <button class="btn btn-secondary">エラー確認</button>
+          </div>
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-label">連携対象</div>
+              <div class="kpi-value">28</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">成功件数</div>
+              <div class="kpi-value" style="color: var(--success);">27</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">エラー件数</div>
+              <div class="kpi-value" style="color: var(--error);">1</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">最終連携</div>
+              <div class="kpi-value">2025-01-15</div>
+            </div>
+          </div>
+          <div class="scrollable-table">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>連携ID</th>
+                  <th>顧客</th>
+                  <th>金額</th>
+                  <th>ステータス</th>
+                  <th>連携時刻</th>
+                  <th>詳細</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>#LINK-001</td>
+                  <td>ABC Corporation</td>
+                  <td>¥1,250,000</td>
+                  <td><span class="status-badge status-success">成功</span></td>
+                  <td>2025-01-15 15:30</td>
+                  <td><button class="btn btn-ghost btn-sm">確認</button></td>
+                </tr>
+                <tr>
+                  <td>#LINK-002</td>
+                  <td>XYZ Industries</td>
+                  <td>¥890,500</td>
+                  <td><span class="status-badge status-error">エラー</span></td>
+                  <td>2025-01-15 15:28</td>
+                  <td><button class="btn btn-ghost btn-sm">詳細</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div data-aivic-panel="scr-1782111586868" style="display:none"></p>
+          </div>
+          <div class="action-bar">
+            <button class="btn btn-primary">スコア計算</button>
+            <button class="btn btn-secondary">詳細レポート</button>
+            <button class="btn btn-secondary">トレンド分析</button>
+          </div>
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-label">総合スコア</div>
+              <div class="kpi-value" style="color: var(--success);">94.2</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">完全性</div>
+              <div class="kpi-value" style="color: var(--success);">96.5%</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">正確性</div>
+              <div class="kpi-value" style="color: var(--success);">92.1%</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">一貫性</div>
+              <div class="kpi-value" style="color: var(--success);">93.8%</div>
+            </div>
+          </div>
+          <div class="split-layout">
+            <div class="split-panel">
+              <div class="split-panel-title">スコア計算設定</div>
+              <div class="form-group">
+                <label class="form-label">対象期間</label>
+                <input type="date" class="form-input" value="2025-01-01">
+              </div>
+              <div class="form-group">
+                <label class="form-label">計算方式</label>
+                <select class="form-select">
+                  <option>標準方式</option>
+                  <option>加重方式</option>
+                </select>
+              </div>
+              <button class="btn btn-primary" style="width: 100%;">計算実行</button>
+            </div>
+            <div class="split-panel">
+              <div class="split-panel-title">スコア詳細</div>
+              <div class="stat-row">
+                <div class="stat-item">
+                  <div class="stat-label">検証対象</div>
+                  <div class="stat-value">12,450</div>
+                </div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-item">
+                  <div class="stat-label">合格</div>
+                  <div class="stat-value" style="color: var(--success);">11,732</div>
+                </div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-item">
+                  <div class="stat-label">不合格</div>
+                  <div class="stat-value" style="color: var(--error);">718</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const systemNameEl = document.getElementById('system-name-display');
+      if (systemNameEl && window.AIVIC_SYSTEM_NAME) {
+        systemNameEl.textContent = window.AIVIC_SYSTEM_NAME;
+      }
+      const firstNav = document.querySelector('[data-aivic-nav]');
+      if (firstNav) {
+        firstNav.classList.add('aivic-active');
+      }
+    });
+
+    window.showScreen = function(screenId) {
+      document.querySelectorAll('[data-aivic-nav]').forEach(el => {
+        el.classList.remove('aivic-active');
+      });
+      const activeNav = document.querySelector(`[data-aivic-nav="${screenId}"]`);
+      if (activeNav) {
+        activeNav.classList.add('aivic-active');
+      }
+    };
+  </script>
+
+  <script>
+(function() {
+  var TABLE_DEFS = window.AIVIC_TABLES || [];
+  var PRESET_SEED = window.AIVIC_PRESET_SEED || {};
+  var SYSTEM_NAME = window.AIVIC_SYSTEM_NAME || "";
+  var APP_ID = window.AIVIC_APP_ID || "";
+  var API_URL = (window.AIVIC_API_URL && window.AIVIC_API_URL !== "REPLACE_WITH_API_URL")
+    ? window.AIVIC_API_URL : window.location.origin;
+
+  // 通知 helper ( SPA 版と同じ )
+  window.aivicNotify = (function() {
+    function ensureContainer() {
+      var c = document.getElementById("aivic-toast-container");
+      if (c) return c;
+      c = document.createElement("div");
+      c.id = "aivic-toast-container";
+      c.style.cssText = "position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;max-width:360px;";
+      document.body.appendChild(c);
+      return c;
+    }
+    function show(msg, type) {
+      var c = ensureContainer();
+      var el = document.createElement("div");
+      el.textContent = msg;
+      el.style.cssText = "padding:10px 16px;border-radius:8px;font-size:13px;line-height:1.4;pointer-events:auto;color:#fff;background:" + (type === "error" ? "#dc2626" : "#d97706");
+      c.appendChild(el);
+      setTimeout(function() {
+        el.style.transition = "opacity .3s";
+        el.style.opacity = "0";
+        setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 320);
+      }, type === "error" ? 6000 : 4500);
+    }
+    return {
+      error: function(msg) { show("❌ " + msg, "error"); },
+      warn:  function(msg) { show("⚠️ " + msg, "warn"); },
+    };
+  })();
+
+  // CRUD API ( SPA 版と同じ )
+  window.aivicApi = (function() {
+    function dbErr(op) { window.aivicNotify.error("データベースエラー ( " + op + " ): APIサーバーに接続できません。"); }
+    function newId() { return typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : "id-" + Date.now() + "-" + Math.random().toString(36).slice(2); }
+    function q(i) {
+      var t = TABLE_DEFS[i];
+      var dbP = (window.AIVIC_DB_TYPE && window.AIVIC_DB_TYPE !== "dynamodb") ? "&db=" + encodeURIComponent(window.AIVIC_DB_TYPE) : "";
+      return "?app=" + encodeURIComponent(APP_ID) + "&system=" + encodeURIComponent(SYSTEM_NAME) + "&table=" + encodeURIComponent(t ? t.tableName : "table" + i) + dbP;
+    }
+    return {
+      list: async function(tableIndex) {
+        if (!API_URL) return [];
+        try { var r = await fetch(API_URL + "/api/" + tableIndex + q(tableIndex)); var d = await r.json(); return Array.isArray(d) ? d : (d.items || []); }
+        catch(e) { dbErr("データ取得"); return []; }
+      },
+      save: async function(tableIndex, item) {
+        if (!API_URL) { dbErr("保存"); return null; }
+        var now = new Date().toISOString();
+        var rec = Object.assign({}, item, { id: item.id || newId(), createdAt: item.createdAt || now, updatedAt: now });
+        try { var r = await fetch(API_URL + "/api/" + tableIndex + q(tableIndex), { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(rec) }); return await r.json(); }
+        catch(e) { dbErr("保存"); return null; }
+      },
+      update: async function(tableIndex, id, changes) {
+        if (!API_URL) { dbErr("更新"); return null; }
+        try { var r = await fetch(API_URL + "/api/" + tableIndex + "/" + id + q(tableIndex), { method:"PUT", headers:{"Content-Type":"application/json"}, body:JSON.stringify(Object.assign({}, changes, {updatedAt: new Date().toISOString()})) }); return await r.json(); }
+        catch(e) { dbErr("更新"); return null; }
+      },
+      delete: async function(tableIndex, id) {
+        if (!API_URL) { dbErr("削除"); return {deleted:false}; }
+        try { await fetch(API_URL + "/api/" + tableIndex + "/" + id + q(tableIndex), {method:"DELETE"}); return {deleted:true}; }
+        catch(e) { dbErr("削除"); return {deleted:false}; }
+      },
+    };
+  })();
+
+  // showScreen はマルチページ構成ではページ遷移として動く。
+  var _aivicNavLastTime = 0;
+  var _aivicNavLastTarget = "";
+  var _aivicReady = false;
+  window.showScreen = function(screenId) {
+    if (!screenId) return;
+    if (screenId === window.AIVIC_PAGE_SCREEN_ID) return;
+    var targetPath = './' + encodeURIComponent(screenId) + '.html';
+    var currentName = (window.location.pathname.split('/').pop() || '');
+    if (currentName === (encodeURIComponent(screenId) + '.html') ||
+        currentName === (screenId + '.html')) {
+      return;
+    }
+    var now = Date.now();
+    if (_aivicNavLastTarget === targetPath && (now - _aivicNavLastTime) < 100) {
+      console.warn('[aivic] showScreen 連続呼び出し検知。 無限ループ防止のため抑制:', screenId);
+      return;
+    }
+    if (!_aivicReady) {
+      console.warn('[aivic] DOMContentLoaded 前の showScreen 呼び出し。 抑制:', screenId);
+      return;
+    }
+    _aivicNavLastTime = now;
+    _aivicNavLastTarget = targetPath;
+    window.location.href = targetPath;
+  };
+
+  function seedAllIfEmpty() {
+    if (!API_URL) return Promise.resolve();
+    return Promise.all(TABLE_DEFS.map(function(t, i) {
+      var preset = PRESET_SEED[t.tableName];
+      if (!Array.isArray(preset) || preset.length === 0) return Promise.resolve();
+      return window.aivicApi.list(i).then(function(existing) {
+        if (existing && existing.length > 0) return;
+        return Promise.all(preset.map(function(row) { return window.aivicApi.save(i, row); }));
+      }).catch(function() {});
+    }));
+  }
+
+  // ── 初期表示: このページ専用の panel に initFn を実行 ──
+  document.addEventListener("DOMContentLoaded", function() {
+    setTimeout(function() { _aivicReady = true; }, 1500);
+    var pageScreenId = window.AIVIC_PAGE_SCREEN_ID;
+    if (!pageScreenId) return;
+
+    document.querySelectorAll('[data-aivic-nav]').forEach(function(btn) {
+      var isActive = btn.getAttribute("data-aivic-nav") === pageScreenId;
+      btn.classList.toggle("aivic-active", isActive);
+      btn.setAttribute("aria-current", isActive ? "page" : "false");
+    });
+
+    var container = document.querySelector('[data-aivic-panel="' + pageScreenId + '"]');
+    if (!container) return;
+
+    // content 要素の hidden 強制除去 ( 2026-05-24 Playwright 大量 fail 対応 )
+    var isModalLike = function(el) {
+      if (!el || !el.classList) return false;
+      var cn = String(el.className || "");
+      if (/\bmodal\b|\bdialog\b|\boverlay\b|\bpopup\b|\bdropdown\b|\btooltip\b/i.test(cn)) return true;
+      var role = el.getAttribute && el.getAttribute("role");
+      if (role === "dialog" || role === "alertdialog" || role === "tooltip" || role === "menu") return true;
+      if (el.hasAttribute && (el.hasAttribute("data-modal") || el.hasAttribute("data-dropdown") || el.hasAttribute("data-popup"))) return true;
+      return false;
+    };
+    var unhideContentElements = function(root) {
+      var all = root.querySelectorAll('.hidden, [hidden], [style*="display:none"], [style*="display: none"]');
+      for (var k = 0; k < all.length; k++) {
+        var el = all[k];
+        if (isModalLike(el)) continue;
+        var p = el.parentElement;
+        var insideModal = false;
+        while (p && p !== root) {
+          if (isModalLike(p)) { insideModal = true; break; }
+          p = p.parentElement;
+        }
+        if (insideModal) continue;
+        el.classList.remove('hidden');
+        el.removeAttribute('hidden');
+        if (el.style && el.style.display === 'none') el.style.display = '';
+      }
+    };
+    try { unhideContentElements(container); } catch (e) { console.warn('[aivic] unhideContent failed:', e); }
+
+    var initJsSource = window.AIVIC_PAGE_INIT_JS;
+    if (!initJsSource) {
+      seedAllIfEmpty();
+      return;
+    }
+    var initFn = null;
+    try {
+      initFn = (new Function("return (" + initJsSource + ")"))();
+    } catch (e) {
+      console.error("[aivic] initJs compile error:", pageScreenId, e);
+      return;
+    }
+    if (typeof initFn !== "function") return;
+
+    seedAllIfEmpty().then(function() {
+      return Promise.all(TABLE_DEFS.map(function(t, i) {
+        return window.aivicApi.list(i)
+          .then(function(records) { return Object.assign({}, t, { records: records }); })
+          .catch(function() { return Object.assign({}, t, { records: [] }); });
+      }));
+    }).then(function(tables) {
+      try { initFn(container, API_URL, tables); } catch (e) { console.error("[aivic] initFn error:", pageScreenId, e); }
+      _aivicReady = true;
+    });
+  });
+})();
+
+</script>
+</body>
+</html>
